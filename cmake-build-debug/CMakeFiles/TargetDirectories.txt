@@ -1,0 +1,3 @@
+C:/Users/davi2/Desktop/trabalho de grafos/Clion github/Grafos-Grupo14/cmake-build-debug/CMakeFiles/Grafos_Grupo14.dir
+C:/Users/davi2/Desktop/trabalho de grafos/Clion github/Grafos-Grupo14/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/davi2/Desktop/trabalho de grafos/Clion github/Grafos-Grupo14/cmake-build-debug/CMakeFiles/rebuild_cache.dir

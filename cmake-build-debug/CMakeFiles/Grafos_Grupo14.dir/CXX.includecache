@@ -1,0 +1,48 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/Users/davi2/Desktop/trabalho de grafos/Clion github/Grafos-Grupo14/Edge.h
+
+C:/Users/davi2/Desktop/trabalho de grafos/Clion github/Grafos-Grupo14/Graph.h
+Node.h
+C:/Users/davi2/Desktop/trabalho de grafos/Clion github/Grafos-Grupo14/Node.h
+fstream
+-
+stack
+-
+list
+-
+
+C:/Users/davi2/Desktop/trabalho de grafos/Clion github/Grafos-Grupo14/Node.h
+Edge.h
+C:/Users/davi2/Desktop/trabalho de grafos/Clion github/Grafos-Grupo14/Edge.h
+
+C:/Users/davi2/Desktop/trabalho de grafos/Clion github/Grafos-Grupo14/main.cpp
+iostream
+-
+fstream
+-
+string
+-
+math.h
+-
+utility
+-
+tuple
+-
+iomanip
+-
+stdlib.h
+-
+chrono
+-
+Graph.h
+C:/Users/davi2/Desktop/trabalho de grafos/Clion github/Grafos-Grupo14/Graph.h
+Node.h
+C:/Users/davi2/Desktop/trabalho de grafos/Clion github/Grafos-Grupo14/Node.h
+

@@ -97,57 +97,75 @@ Node *Graph::getLastNode()
 */
 void Graph::insertNode(int id)
 {
-    
+
 }
 
 void Graph::insertEdge(int id, int target_id, float weight)
 {
 
-    
+
 }
 
-void Graph::removeNode(int id){ 
-    Node* node = this->getFirstNode();
-    Node* temp;
-    while(node != this->getLastNode()) {
+void Graph::removeNode(int id){
+    /*if(searchNode(id)) {
+        Node* node = this->getFirstNode();
+        Node* temp;
         if(node->getId() == id) {
-            temp->removeEdge(id, this->directed, node);
-            temp->insertEdge(node->getNextNode()->getId(), 0); //peso 0 por enquanto pq n sei como setar isso
-            break;
+            delete node;
         }
-        temp = node;
-        node = node->getNextNode();
+        else {
+            while(node != nullptr) {
+                if(node->getId() == id) {
+                    temp->setNextNode(node->getNextNode());
+                    break;
+                }
+                temp = node;
+                node = node->getNextNode();
+            }
+            if(node == this->getLastNode()) {
+                this->last_node = temp;
+            }
+            Node* aux = this->getFirstNode();
+            while(aux != nullptr) {
+                aux->removeEdge(id, this->directed, node);
+                aux = aux->getNextNode();
+            }
+        }
+        delete node;
     }
+    else {
+        cout << "Nó não encontrado!";
+    }*/
 }
 
 bool Graph::searchNode(int id)
 {
-    
+
 }
 
 Node *Graph::getNode(int id)
 {
 
-    
+
 }
 
 
 //Function that prints a set of edges belongs breadth tree
 
 void Graph::breadthFirstSearch(ofstream &output_file){
-    
+
 }
 
 
 
 float Graph::floydMarshall(int idSource, int idTarget){
-    
+
 }
 
-   
+
 
 float Graph::dijkstra(int idSource, int idTarget){
-    
+
 }
 
 //function that prints a topological sorting
@@ -170,7 +188,8 @@ Graph* agmPrim(){
 
 }
 
-void directedTransitiveClosure(int id) {
+void Graph::directedTransitiveClosure(int id) {
+    /*
     int foo[10000];
     Node* node = this->getNode(id);
     foo[0] = id;
@@ -182,8 +201,8 @@ void directedTransitiveClosure(int id) {
         node->removeEdge(id, 0, targetNode);
         i++;
         foo[i] = id;
-    }    
+    }
     for(int j = 0; j < sizeof(foo); j++) {
         cout << foo[j];
-    }
+    } */
 }

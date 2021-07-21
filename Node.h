@@ -12,42 +12,42 @@ using namespace std;
 class Node{
 
     // Attributes
-    private:
-        Edge* first_edge;
-        Edge* last_edge;
-        int id;
-        unsigned int in_degree;
-        unsigned int out_degree;
-        float weight;
-        Node* next_node;
+private:
+    Edge* first_edge;
+    Edge* last_edge;
+    int id;
+    unsigned int in_degree;
+    unsigned int out_degree;
+    float weight;
+    Node* next_node;
 
-    public:
-        // Constructor
-        Node(int id);
-        // Destructor
-        ~Node();
-        // Getters
-        Edge* getFirstEdge();
-        Edge* getLastEdge();
-        int getId();
-        int getInDegree();
-        int getOutDegree();
-        float getWeight();
-        Node* getNextNode();
-        // Setters
-        void setNextNode(Node* node);
-        void setWeight(float weight);
-        // Other methods
-        bool searchEdge(int target_id);
-        void insertEdge(int target_id, float weight);
-        void removeAllEdges();
-        int removeEdge(int id, bool directed, Node* target_node);
-        void incrementOutDegree();
-        void decrementOutDegree();
-        void incrementInDegree();
-        void decrementInDegree();
-        Edge* hasEdgeBetween(int target_id);
-        // Auxiliar methods
+public:
+    // Constructor
+    Node(int id);
+    // Destructor
+    ~Node();
+    // Getters
+    Edge* getFirstEdge();
+    Edge* getLastEdge();
+    int getId();
+    int getInDegree();
+    int getOutDegree();
+    float getWeight();
+    Node* getNextNode();
+    // Setters
+    void setNextNode(Node* node);
+    void setWeight(float weight);
+    // Other methods
+    bool searchEdge(int target_id);
+    void insertEdge(Node* target_node, bool directed,  float weight);
+    void removeAllEdges();
+    int removeEdge(Node* target_node, bool directed);
+    void incrementOutDegree();
+    void decrementOutDegree();
+    void incrementInDegree();
+    void decrementInDegree();
+    Edge* hasEdgeBetween(int target_id);
+    // Auxiliar methods
 
 };
 

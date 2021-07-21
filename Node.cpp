@@ -94,21 +94,36 @@ void Node::setWeight(float weight){
 }
 
 // Other methods
-void Node::insertEdge(int target_id, float weight){
+void Node::insertEdge(Node* target_node, bool directed,  float weight){
     // Verifies whether there are at least one edge in the node
+
     if(this->first_edge != nullptr){
         // Allocating the new edge and keeping the integrity of the edge list
-        Edge* edge = new Edge(target_id);
+        Edge* edge = new Edge(target_node->getId());
         edge->setWeight(weight);
         this->last_edge->setNextEdge(edge);
         this->last_edge = edge;
 
     }
     else{
-         // Allocating the new edge and keeping the integrity of the edge list
-        this->first_edge = new Edge(target_id);
+        // Allocating the new edge and keeping the integrity of the edge list
+        this->first_edge = new Edge(target_node->getId());
         this->first_edge->setWeight(weight);
         this->last_edge = this->first_edge;
+
+    }
+
+    if(directed){
+        this->incrementOutDegree();
+        target_node->incrementInDegree();
+    } else{
+        this->incrementOutDegree();
+        this->decrementInDegree(); //correction in degree
+
+        //to not generate an infite loop, the directed funcion is called but only
+        //the outDegree increment is used
+
+        target_node->insertEdge(this, 1, weight);
 
     }
 
@@ -118,24 +133,30 @@ void Node::removeAllEdges(){
     // Verifies whether there are at least one edge in the node
     if(this->first_edge != nullptr){
 
-        Edge* next = nullptr;
-        Edge* aux = this->first_edge;
         // Removing all edges of the node
-        while(aux != nullptr){
+        Edge* next_edge = this->first_edge;
 
-            next = aux->getNextEdge();
-            delete aux;
+        while(next_edge != nullptr){
+
+            Edge* aux_edge = next_edge->getNextEdge();
+            delete next_edge;
+            next_edge = aux_edge;
 
         }
 
+
     }
 
+    //setting values for the attributes after deletion
+    this->in_degree = 0;
+    this->out_degree = 0;
     this->first_edge = this->last_edge = nullptr;
 
 }
 
-int Node::removeEdge(int id, bool directed, Node* target_node){
+int Node::removeEdge(Node* target_node, bool directed){
     // Verifies whether the edge to remove is in the node
+    int id = target_node->getId();
     if(this->searchEdge(id)){
 
         Edge* aux = this->first_edge;
@@ -162,13 +183,18 @@ int Node::removeEdge(int id, bool directed, Node* target_node){
 
         delete aux;
         // Verifies whether the graph is directed
-        if(directed)
+
+        if(directed){
             this->decrementOutDegree();
-
-        else{
-
-            this->decrementInDegree();
             target_node->decrementInDegree();
+        } else{
+            this->decrementOutDegree();
+            this->incrementInDegree();
+
+            //to not generate an infite loop, the directed funcion is called but only
+            //the outDegree increment is used
+
+            target_node->removeEdge(this, 1);
 
         }
 
@@ -181,7 +207,7 @@ int Node::removeEdge(int id, bool directed, Node* target_node){
 }
 
 bool Node::searchEdge(int target_id){
-     // Verifies whether there are at least one edge in the node
+    // Verifies whether there are at least one edge in the node
     if(this->first_edge != nullptr){
         // Searching for a specific edge of target id equal to target id
         for(Edge* aux = this->first_edge; aux != nullptr; aux = aux->getNextEdge())

@@ -19,14 +19,20 @@ Edge::Edge(int target_id){
 // Destructor
 Edge::~Edge(){
 
-    if (this->next_edge != nullptr){
+
+    //deleta todas as arestas??
+
+    /*if (this->next_edge != nullptr){
         delete this->next_edge;
         this->next_edge = nullptr;
-    }
+    }*/
+
+    this->next_edge = nullptr;
 
 }
 
 // Getters
+
 int Edge::getTargetId(){
 
     return this->target_id;
