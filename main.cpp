@@ -266,13 +266,14 @@ int main(int argc, char const *argv[]) {
     // cout << node1->getOutDegree() << " " << node2->getOutDegree() << " " << node3->getOutDegree() << "\n";
     // cout << node1->getInDegree() << " " << node2->getInDegree() << " " << node3->getInDegree();
     
-    Graph* graph = new Graph( 0, 0, 0, 0);
+    Graph* graph = new Graph( 0, 1, 0, 0);
     graph->insertNode( 0);
     graph->insertNode( 1);
     graph->insertNode( 2);
-    graph->insertNode( 2);
-    graph->removeNode(1);
 
+    graph->insertEdge(1,0,0);
+
+    cout << graph->getNode(0)->searchEdge(1) << endl << "Grau: " << graph->getNode(1)->getOutDegree() << endl;
     graph->print();
 
     return 0;

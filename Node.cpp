@@ -118,13 +118,16 @@ void Node::insertEdge(Node* target_node, bool directed,  float weight){
         target_node->incrementInDegree();
     } else{
         this->incrementOutDegree();
-        this->decrementInDegree(); //correction in degree
 
         //to not generate an infite loop, the directed funcion is called but only
         //the outDegree increment is used
-
-        target_node->insertEdge(this, 1, weight);
-
+        if(this->id != target_node->getId())
+        {
+            target_node->insertEdge(this, 1, weight);
+            this->decrementInDegree(); //correction in degree
+        }
+        else
+            this->incrementOutDegree();
     }
 
 }

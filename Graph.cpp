@@ -120,7 +120,25 @@ void Graph::insertNode(int id)
 
 void Graph::insertEdge(int id, int target_id, float weight)
 {
-
+    bool origin_node_check = this->searchNode(id);
+    bool target_node_check = this->searchNode(target_id);
+    if(origin_node_check && target_node_check)
+    {
+        Node* origin_node = this->getNode(id);
+        if(!origin_node->searchEdge(target_id))
+            origin_node->insertEdge(this->getNode(target_id), this->directed, weight);
+        else
+            cout << "ERROR: A aresta ja existe!" << endl;
+    }
+    else
+    {
+        if(!origin_node_check && !target_node_check)
+            cout << "ERROR: nenhum dos nos existe!" << endl;
+        else if(!origin_node_check)
+            cout << "ERROR: o no origem nao existe!" << endl;
+        else
+            cout << "ERROR: o no alvo nao existe!" << endl;
+    }
 }
 
 void Graph::removeNode(int id){
@@ -151,7 +169,7 @@ void Graph::removeNode(int id){
         delete node;
     }
     else {
-        cout << "Nó não encontrado!";
+        cout << "No nao encontrado!";
     }
 }
 
