@@ -270,7 +270,10 @@ int main(int argc, char const *argv[]) {
     graph->insertNode( 0);
     graph->insertNode( 1);
     graph->insertNode( 2);
-    
+    graph->insertNode( 2);
+    graph->removeNode(1);
+
+    graph->print();
 
     return 0;
 }

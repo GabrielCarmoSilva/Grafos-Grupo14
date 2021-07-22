@@ -57,6 +57,9 @@ public:
     float greed();
     float greedRandom();
     float greedRactiveRandom();
+
+    //imprimir
+    void print();
 private:
     //Auxiliar methods
 

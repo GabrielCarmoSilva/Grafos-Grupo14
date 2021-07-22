@@ -124,7 +124,7 @@ void Graph::insertEdge(int id, int target_id, float weight)
 }
 
 void Graph::removeNode(int id){
-    /*if(searchNode(id)) {
+    if(searchNode(id)) {
         Node* node = this->getFirstNode();
         Node* temp;
         if(node->getId() == id) {
@@ -144,7 +144,7 @@ void Graph::removeNode(int id){
             }
             Node* aux = this->getFirstNode();
             while(aux != nullptr) {
-                aux->removeEdge(id, this->directed, node);
+                aux->removeEdge(node, this->directed);
                 aux = aux->getNextNode();
             }
         }
@@ -152,7 +152,7 @@ void Graph::removeNode(int id){
     }
     else {
         cout << "Nó não encontrado!";
-    }*/
+    }
 }
 
 bool Graph::searchNode(int id)
@@ -186,6 +186,17 @@ Node *Graph::getNode(int id)
     }
     cout << "ERROR: O grafo esta vazio!" << endl;
     return NULL;
+}
+
+void Graph::print()
+{
+    if(this->first_node != nullptr)
+    {
+        for(Node* aux = this->first_node; aux != nullptr; aux = aux->getNextNode())
+        {
+            cout << "No: "  << aux->getId() << endl;
+        }
+    }
 }
 
 
