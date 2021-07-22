@@ -97,23 +97,29 @@ Node *Graph::getLastNode()
 */
 void Graph::insertNode(int id)
 {
-    Node* new_node = new Node(id);
-
-    if(this->first_node != nullptr)
+    if (!this->searchNode(id))
     {
-        this->last_node->setNextNode(new_node);
-        this->last_node = new_node;
+        Node* new_node = new Node(id);
+
+        if(this->first_node != nullptr)
+        {
+            this->last_node->setNextNode(new_node);
+            this->last_node = new_node;
+        }
+        else
+        {
+            this->first_node = new_node;
+            this->last_node = this->first_node;
+        }
     }
     else
     {
-        this->first_node = new_node;
-        this->last_node = this->first_node;
+        cout << "ERROR: O no ja existe" << endl;
     }
 }
 
 void Graph::insertEdge(int id, int target_id, float weight)
 {
-
 
 }
 
@@ -151,13 +157,35 @@ void Graph::removeNode(int id){
 
 bool Graph::searchNode(int id)
 {
-
+    if(this->first_node != nullptr)
+    {
+        for(Node* aux = this->first_node; aux != nullptr; aux = aux->getNextNode())
+        {
+            if(aux->getId() == id)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 Node *Graph::getNode(int id)
 {
-
- //anna
+    if(this->first_node != nullptr)
+    {
+        for(Node* aux = this->first_node; aux != nullptr; aux = aux->getNextNode())
+        {
+            if(aux->getId() == id)
+            {
+                return aux;
+            }
+        }
+        cout << "ERROR: No nao encontrado no grafo!" << endl;
+        return NULL;
+    }
+    cout << "ERROR: O grafo esta vazio!" << endl;
+    return NULL;
 }
 
 

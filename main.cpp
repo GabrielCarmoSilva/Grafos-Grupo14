@@ -14,7 +14,7 @@ using namespace std;
 
 Graph* leitura(ifstream& input_file, int directed, int weightedEdge, int weightedNode){
 
-    //VariÃ¡veis para auxiliar na criaÃ§Ã£o dos nÃ³s no Grafo
+    //Variaveis para auxiliar na criacao dos nao no Grafo
     int idNodeSource;
     int idNodeTarget;
     int order;
@@ -253,18 +253,24 @@ int main(int argc, char const *argv[]) {
     output_file.close();
     */
 
-    Node *node1 = new Node(0);
-    Node *node2 = new Node(1);
-    Node *node3 = new Node(2);
+    // Node *node1 = new Node(0);
+    // Node *node2 = new Node(1);
+    // Node *node3 = new Node(2);
 
-    node1->insertEdge(node2, 0, 0);
-    node1->insertEdge(node3, 0, 0);
-    node2->insertEdge(node3, 0, 0);
+    // node1->insertEdge(node2, 0, 0);
+    // node1->insertEdge(node3, 0, 0);
+    // node2->insertEdge(node3, 0, 0);
 
-    node2->removeAllEdges();
+    // node2->removeAllEdges();
 
-    cout << node1->getOutDegree() << " " << node2->getOutDegree() << " " << node3->getOutDegree() << "\n";
-    cout << node1->getInDegree() << " " << node2->getInDegree() << " " << node3->getInDegree();
+    // cout << node1->getOutDegree() << " " << node2->getOutDegree() << " " << node3->getOutDegree() << "\n";
+    // cout << node1->getInDegree() << " " << node2->getInDegree() << " " << node3->getInDegree();
+    
+    Graph* graph = new Graph( 0, 0, 0, 0);
+    graph->insertNode( 0);
+    graph->insertNode( 1);
+    graph->insertNode( 2);
+    
 
     return 0;
 }
