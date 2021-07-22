@@ -28,6 +28,12 @@ Graph::Graph(int order, bool directed, bool weighted_edge, bool weighted_node)
     this->weighted_node = weighted_node;
     this->first_node = this->last_node = nullptr;
     this->number_edges = 0;
+
+    //o readme disse para padronuizar em 0 a n-1
+    //entretanto os arquivos nao estão nesse padrão e sim de 1 a n
+    for(int i = 1; i <= order; i++)
+        this->insertNode(i);
+
 }
 
 // Destructor
@@ -111,6 +117,8 @@ void Graph::insertNode(int id)
             this->first_node = new_node;
             this->last_node = this->first_node;
         }
+
+        this->order++;
     }
     else
     {
@@ -125,19 +133,22 @@ void Graph::insertEdge(int id, int target_id, float weight)
     if(origin_node_check && target_node_check)
     {
         Node* origin_node = this->getNode(id);
-        if(!origin_node->searchEdge(target_id))
+        if(!origin_node->searchEdge(target_id)){
             origin_node->insertEdge(this->getNode(target_id), this->directed, weight);
-        else
-            cout << "ERROR: A aresta ja existe!" << endl;
+            //cout <<"aresta criada com no de origem " << id << " e no alvo " << target_id << endl;
+        }
+        else{
+            cout << "ERROR: A aresta com no de origem" << id << " e no alvo " << target_id << " ja existe!" << endl;
+        }
     }
     else
     {
         if(!origin_node_check && !target_node_check)
             cout << "ERROR: nenhum dos nos existe!" << endl;
         else if(!origin_node_check)
-            cout << "ERROR: o no origem nao existe!" << endl;
+            cout << "ERROR: o no origem com id: <<" << id << " nao existe!" << endl;
         else
-            cout << "ERROR: o no alvo nao existe!" << endl;
+            cout << "ERROR: o no alvo com id: " << target_id << " nao existe!" << endl;
     }
 }
 
@@ -167,6 +178,7 @@ void Graph::removeNode(int id){
             }
         }
         delete node;
+        this->order--;
     }
     else {
         cout << "No nao encontrado!";

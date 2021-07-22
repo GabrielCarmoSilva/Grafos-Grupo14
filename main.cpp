@@ -83,7 +83,8 @@ Graph* leituraInstancia(ifstream& input_file, int directed, int weightedEdge, in
     int numEdges;
 
     //Pegando a ordem do grafo
-    input_file >> order >> numEdges;
+    //input_file >> order >> numEdges;
+    input_file >> order;
 
     //Criando objeto grafo
     Graph* graph = new Graph(order, directed, weightedEdge, weightedNode);
@@ -92,7 +93,6 @@ Graph* leituraInstancia(ifstream& input_file, int directed, int weightedEdge, in
     while(input_file >> idNodeSource >> idNodeTarget) {
 
         graph->insertEdge(idNodeSource, idNodeTarget, 0);
-
     }
 
     return graph;
@@ -126,6 +126,7 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
 
     switch (selecao) {
         case 0: {
+            cout << "tem aresta? " << graph->getNode(722)->searchEdge(760) << " ida e volta? " << graph->getNode(760)->searchEdge(722);
             exit(1);
             break;
         }
@@ -186,7 +187,7 @@ int mainMenu(ofstream& output_file, Graph* graph){
     int selecao = 1;
 
     while(selecao != 0){
-        system("clear");
+        system("cls");
         selecao = menu();
 
         if(output_file.is_open())
@@ -207,7 +208,6 @@ int mainMenu(ofstream& output_file, Graph* graph){
 int main(int argc, char const *argv[]) {
 
     //VerificaÃ§Ã£o se todos os parÃ¢metros do programa foram entrados
-    /*
     if (argc != 6) {
 
         cout << "ERROR: Expecting: ./<program_name> <input_file> <output_file> <directed> <weighted_edge> <weighted_node> " << endl;
@@ -233,13 +233,14 @@ int main(int argc, char const *argv[]) {
 
 
     Graph* graph;
-
     if(input_file.is_open()){
 
         graph = leituraInstancia(input_file, atoi(argv[3]), atoi(argv[4]), atoi(argv[5]));
 
     }else
         cout << "Unable to open " << argv[1];
+
+
 
 
     mainMenu(output_file, graph);
@@ -251,7 +252,7 @@ int main(int argc, char const *argv[]) {
 
     //Fechando arquivo de saÃ­da
     output_file.close();
-    */
+
 
     // Node *node1 = new Node(0);
     // Node *node2 = new Node(1);
@@ -265,7 +266,8 @@ int main(int argc, char const *argv[]) {
 
     // cout << node1->getOutDegree() << " " << node2->getOutDegree() << " " << node3->getOutDegree() << "\n";
     // cout << node1->getInDegree() << " " << node2->getInDegree() << " " << node3->getInDegree();
-    
+
+    /*
     Graph* graph = new Graph( 0, 1, 0, 0);
     graph->insertNode( 0);
     graph->insertNode( 1);
@@ -274,7 +276,7 @@ int main(int argc, char const *argv[]) {
     graph->insertEdge(1,0,0);
 
     cout << graph->getNode(0)->searchEdge(1) << endl << "Grau: " << graph->getNode(1)->getOutDegree() << endl;
-    graph->print();
+    graph->print();*/
 
     return 0;
 }
