@@ -23,6 +23,9 @@ private:
     Node* first_node;
     Node* last_node;
 
+    //private aux methods
+    void auxSave(Node* node, ofstream& output_file);
+
 public:
     //Constructor
     Graph(int order, bool directed, bool weighted_edge, bool weighted_node);
@@ -61,6 +64,7 @@ public:
     //imprimir e salvar
     void print();
     void save(ofstream& output_file);
+
 private:
     //Auxiliar methods
 

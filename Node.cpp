@@ -225,21 +225,7 @@ bool Node::searchEdge(int target_id){
 
 }
 
-void Node::saveEdges(ofstream& output_file, bool weighted_edge, bool directed){
-    if(weighted_edge){
-        for(Edge* aux = this->getFirstEdge(); aux != nullptr; aux = aux->getNextEdge()){
-            if(!aux->isDirected() || directed){
-                output_file << this->getId()  << " " << aux->getTargetId() << " " << aux->getWeight() << endl;
-            }
-        }
-    } else{
-        for(Edge* aux = this->getFirstEdge(); aux != nullptr; aux = aux->getNextEdge()){
-            if(!aux->isDirected() || directed){
-                output_file << this->getId()  << " " << aux->getTargetId() << endl;
-            }
-        }
-    }
-}
+
 
 void Node::incrementInDegree(){
 

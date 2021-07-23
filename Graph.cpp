@@ -234,11 +234,49 @@ void Graph::save(ofstream& output_file){
     output_file << this->order << endl;
     for(Node* aux = this->first_node; aux != nullptr; aux = aux->getNextNode())
     {
-        aux->saveEdges(output_file, this->weighted_edge, this->directed);
+        this->auxSave(aux, output_file);
     }
 
 }
 
+
+void Graph::auxSave(Node *node, ofstream& output_file){
+
+    if(this->weighted_edge && !this->weighted_node){
+        for(Edge* aux = node->getFirstEdge(); aux != nullptr; aux = aux->getNextEdge()){
+            if(!aux->isDirected() || this->directed){
+                output_file << node->getId()  << " " << aux->getTargetId() << " " << aux->getWeight() << endl;
+            }
+        }
+    }
+
+    if(!this->weighted_edge && !this->weighted_node){
+        for(Edge* aux = node->getFirstEdge(); aux != nullptr; aux = aux->getNextEdge()){
+            if(!aux->isDirected() || this->directed){
+                output_file << node->getId()  << " " << aux->getTargetId() << endl;
+            }
+        }
+    }
+
+    if(this->weighted_edge && this->weighted_node){
+        for(Edge* aux = node->getFirstEdge(); aux != nullptr; aux = aux->getNextEdge()){
+            if(!aux->isDirected() || this->directed){
+                output_file << node->getId() << " " << node->getWeight() << " " << aux->getTargetId() << " " ;
+                output_file << this->getNode(aux->getTargetId())->getWeight() << " " << aux->getWeight() << endl;
+            }
+        }
+    }
+
+    if(!this->weighted_edge && this->weighted_node){
+        for(Edge* aux = node->getFirstEdge(); aux != nullptr; aux = aux->getNextEdge()){
+            if(!aux->isDirected() || this->directed){
+                output_file << node->getId() << " " << node->getWeight() << " " << aux->getTargetId() << " " ;
+                output_file << this->getNode(aux->getTargetId())->getWeight() <<  endl;
+            }
+        }
+    }
+
+}
 
 //Function that prints a set of edges belongs breadth tree
 

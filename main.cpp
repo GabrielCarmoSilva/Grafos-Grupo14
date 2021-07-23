@@ -61,7 +61,7 @@ Graph* leitura(ifstream& input_file, int directed, int weightedEdge, int weighte
 
         float nodeSourceWeight, nodeTargetWeight, edgeWeight;
 
-        while(input_file >> idNodeSource >> nodeSourceWeight >> idNodeTarget >> nodeTargetWeight) {
+        while(input_file >> idNodeSource >> nodeSourceWeight >> idNodeTarget >> nodeTargetWeight >> edgeWeight) {
 
             graph->insertEdge(idNodeSource, idNodeTarget, edgeWeight);
             graph->getNode(idNodeSource)->setWeight(nodeSourceWeight);
@@ -74,7 +74,7 @@ Graph* leitura(ifstream& input_file, int directed, int weightedEdge, int weighte
     return graph;
 }
 
-Graph* leituraInstancia(ifstream& input_file, int directed, int weightedEdge, int weightedNode){
+/*Graph* leituraInstancia(ifstream& input_file, int directed, int weightedEdge, int weightedNode){
 
     //VariÃ¡veis para auxiliar na criaÃ§Ã£o dos nÃ³s no Grafo
     int idNodeSource;
@@ -96,7 +96,7 @@ Graph* leituraInstancia(ifstream& input_file, int directed, int weightedEdge, in
     }
 
     return graph;
-}
+}*/
 
 int menu(){
 
@@ -236,7 +236,7 @@ int main(int argc, char const *argv[]) {
     Graph* graph;
     if(input_file.is_open()){
 
-        graph = leituraInstancia(input_file, atoi(argv[3]), atoi(argv[4]), atoi(argv[5]));
+        graph = leitura(input_file, atoi(argv[3]), atoi(argv[4]), atoi(argv[5]));
 
     }else
         cout << "Unable to open " << argv[1];

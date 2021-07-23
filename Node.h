@@ -51,7 +51,6 @@ public:
     Edge* hasEdgeBetween(int target_id);
 
     // Auxiliar methods
-    void saveEdges(ofstream& output_file, bool weighted_edge, bool directed);
 
 };
 
