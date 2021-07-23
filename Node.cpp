@@ -96,10 +96,11 @@ void Node::setWeight(float weight){
 // Other methods
 void Node::insertEdge(Node* target_node, bool directed,  float weight){
     // Verifies whether there are at least one edge in the node
+    Edge* edge = new Edge(target_node->getId());
 
     if(this->first_edge != nullptr){
         // Allocating the new edge and keeping the integrity of the edge list
-        Edge* edge = new Edge(target_node->getId());
+
         edge->setWeight(weight);
         this->last_edge->setNextEdge(edge);
         this->last_edge = edge;
@@ -107,7 +108,7 @@ void Node::insertEdge(Node* target_node, bool directed,  float weight){
     }
     else{
         // Allocating the new edge and keeping the integrity of the edge list
-        this->first_edge = new Edge(target_node->getId());
+        this->first_edge = edge;
         this->first_edge->setWeight(weight);
         this->last_edge = this->first_edge;
 
@@ -116,6 +117,7 @@ void Node::insertEdge(Node* target_node, bool directed,  float weight){
     if(directed){
         this->incrementOutDegree();
         target_node->incrementInDegree();
+        edge->setDirected(true);
     } else{
         this->incrementOutDegree();
 
@@ -221,6 +223,22 @@ bool Node::searchEdge(int target_id){
 
     return false;
 
+}
+
+void Node::saveEdges(ofstream& output_file, bool weighted_edge, bool directed){
+    if(weighted_edge){
+        for(Edge* aux = this->getFirstEdge(); aux != nullptr; aux = aux->getNextEdge()){
+            if(!aux->isDirected() || directed){
+                output_file << this->getId()  << " " << aux->getTargetId() << " " << aux->getWeight() << endl;
+            }
+        }
+    } else{
+        for(Edge* aux = this->getFirstEdge(); aux != nullptr; aux = aux->getNextEdge()){
+            if(!aux->isDirected() || directed){
+                output_file << this->getId()  << " " << aux->getTargetId() << endl;
+            }
+        }
+    }
 }
 
 void Node::incrementInDegree(){

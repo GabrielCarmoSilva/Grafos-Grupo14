@@ -4,6 +4,8 @@
 
 #ifndef NODE_H_INCLUDED
 #define NODE_H_INCLUDED
+
+#include <fstream>
 #include "Edge.h" // Include of the Edge class
 
 using namespace std;
@@ -47,7 +49,9 @@ public:
     void incrementInDegree();
     void decrementInDegree();
     Edge* hasEdgeBetween(int target_id);
+
     // Auxiliar methods
+    void saveEdges(ofstream& output_file, bool weighted_edge, bool directed);
 
 };
 

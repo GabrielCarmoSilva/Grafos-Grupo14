@@ -13,6 +13,7 @@ Edge::Edge(int target_id){
     this->target_id = target_id;
     this->next_edge = nullptr;
     this->weight = 0;
+    this->directed = false;
 
 }
 
@@ -33,6 +34,10 @@ Edge::~Edge(){
 
 // Getters
 
+bool Edge::isDirected() const {
+    return directed;
+}
+
 int Edge::getTargetId(){
 
     return this->target_id;
@@ -52,6 +57,11 @@ float Edge::getWeight(){
 }
 
 // Setters
+
+void Edge::setDirected(bool directed) {
+    Edge::directed = directed;
+}
+
 void Edge::setNextEdge(Edge* edge){
 
     this->next_edge = edge;

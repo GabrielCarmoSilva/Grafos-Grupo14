@@ -15,6 +15,7 @@ private:
     int target_id;
     Edge* next_edge;
     float weight;
+    bool directed;
 
 public:
     // Constructor
@@ -28,6 +29,10 @@ public:
     // Setters
     void setNextEdge(Edge* edge);
     void setWeight(float weight);
+
+    bool isDirected() const;
+
+    void setDirected(bool directed);
 
 };
 

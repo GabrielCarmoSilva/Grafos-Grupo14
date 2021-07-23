@@ -22,7 +22,7 @@ using namespace std;
 Graph::Graph(int order, bool directed, bool weighted_edge, bool weighted_node)
 {
 
-    this->order = order;
+    this->order = 0;
     this->directed = directed;
     this->weighted_edge = weighted_edge;
     this->weighted_node = weighted_node;
@@ -227,6 +227,16 @@ void Graph::print()
             cout << "No: "  << aux->getId() << endl;
         }
     }
+}
+
+void Graph::save(ofstream& output_file){
+
+    output_file << this->order << endl;
+    for(Node* aux = this->first_node; aux != nullptr; aux = aux->getNextNode())
+    {
+        aux->saveEdges(output_file, this->weighted_edge, this->directed);
+    }
+
 }
 
 

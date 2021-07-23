@@ -126,8 +126,9 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
 
     switch (selecao) {
         case 0: {
-            cout << "tem aresta? " << graph->getNode(722)->searchEdge(760) << " ida e volta? " << graph->getNode(760)->searchEdge(722);
-            exit(1);
+            bool edges[graph->getOrder()][graph->getOrder()];
+            graph->save(output_file);
+            //exit(1);
             break;
         }
         //Subgrafo induzido por um conjunto de vÃ©rtices X;

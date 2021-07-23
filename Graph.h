@@ -58,8 +58,9 @@ public:
     float greedRandom();
     float greedRactiveRandom();
 
-    //imprimir
+    //imprimir e salvar
     void print();
+    void save(ofstream& output_file);
 private:
     //Auxiliar methods
 
