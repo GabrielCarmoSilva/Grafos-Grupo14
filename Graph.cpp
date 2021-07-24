@@ -293,7 +293,60 @@ float Graph::floydMarshall(int idSource, int idTarget){
 
 
 float Graph::dijkstra(int idSource, int idTarget){
+    Node* q[order];
+    int dist[order];
+    int prev[order];
+    int u = 0;
+    int alt = 0;
+    Node* node = first_node;
 
+    int i = 0;
+    while(node != nullptr) {
+        dist[node->getId()] = MAX_INT;
+        prev[node->getId()] = -1;
+        q[node->getId()] = node;
+        node = node->getNextNode()
+    }
+    dist[idSource] = 0;
+
+    int smaller = dist[0];
+    while(q != NULL) {
+        for(int i = 0; i < sizeof(dist); i++) {
+            if(dist[i] < smaller) {
+                smaller = dist[i];
+                u = i;
+            }
+        }
+        delete q[getNode(u)];
+        if(u == idTarget) {
+            break;
+        }
+
+        Node *current_node = getNode(u);
+        Node *aux = current_node;
+        while(aux != nullptr) {
+            if(searchEdge(aux)) {
+                alt = dist[u] + current_node->hasEdgeBetween(aux->getId())->getWeight();
+                if(alt < dist[aux->getId()]) {
+                    dist[aux->getId()] = alt;
+                    prev[aux->getId()] = u->getId();
+                }
+            }
+        }
+    }
+    int S[order];
+    u = target_id;
+    int i = 0;
+    if(prev[u] != -1 || u = source_id) {
+        while(u != -1) {
+            S[i] = u;
+            u = prev[u];
+            i++;
+        }
+    }
+    for(int i = 0; i < sizeof(S); i++) {
+        cout << S[i] << endl;
+    }
 }
 
 //function that prints a topological sorting
@@ -308,8 +361,7 @@ Graph* getVertexInduced(int* listIdNodes){
 
 }
 
-Graph* agmKuskal(){
-
+Graph* agmKuskal() {
 }
 
 Graph* agmPrim(){
