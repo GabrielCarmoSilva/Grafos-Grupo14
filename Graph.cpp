@@ -309,24 +309,24 @@ Graph* getVertexInduced(int* listIdNodes){
 
 }
 
-Graph* agmKruskal(){
+Graph* Graph::agmKruskal(){
     Graph* graph;
-    Edge* S[getNumberEdges()];
-    Node* node = first_node;
+    Edge* S[this->getNumberEdges()] = {};
+    Node* node = this->getFirstNode();
     Node* aux = node;
     int i = 0;
     int index = 0;
     bool flag_insert = false;
     while(node != nullptr) {
         while(aux != nullptr) {
-            if(node->searchEdge(aux)) {
+            if(node->searchEdge(aux->getId())) {
                 for(int i = 0; i < sizeof(S); i++) {
-                    if(S[i] == node->hasEdgeBetween(aux)) {
+                    if(S[i] == node->hasEdgeBetween(aux->getId())) {
                         flag_insert = true;
                     }
                 }
                 if(!flag_insert) {
-                    S[i] = node->hasEdgeBetween(aux);
+                    S[i] = node->hasEdgeBetween(aux->getId());
                 }    
             }
             aux = aux->getNextNode();
@@ -343,11 +343,11 @@ Graph* agmKruskal(){
             }
         }
         delete S[index];
-        Node *node1 = graph->first_node;
+        Node *node1 = graph->getFirstNode();
         while(node1 != nullptr) {
             if(!node1->searchEdge(minWeightEdge->getTargetId())) {
-                graph->insertNode(node1);
-                graph->insertNode(searchNode(minWeightEdge->getTargetId()));
+                graph->insertNode(node1->getId());
+                graph->insertNode(this->searchNode(minWeightEdge->getTargetId()));
                 graph->insertEdge(node1->getId(), minWeightEdge->getTargetId(), minWeightEdge->isDirected());
             }
             node1 = node1->getNextNode();
