@@ -135,6 +135,7 @@ void Graph::insertEdge(int id, int target_id, float weight)
         Node* origin_node = this->getNode(id);
         if(!origin_node->searchEdge(target_id)){
             origin_node->insertEdge(this->getNode(target_id), this->directed, weight);
+            this->number_edges++;
             //cout <<"aresta criada com no de origem " << id << " e no alvo " << target_id << endl;
         }
         else{
@@ -308,8 +309,51 @@ Graph* getVertexInduced(int* listIdNodes){
 
 }
 
-Graph* agmKuskal(){
-
+Graph* agmKruskal(){
+    Graph* graph;
+    Edge* S[getNumberEdges()];
+    Node* node = first_node;
+    Node* aux = node;
+    int i = 0;
+    int index = 0;
+    bool flag_insert = false;
+    while(node != nullptr) {
+        while(aux != nullptr) {
+            if(node->searchEdge(aux)) {
+                for(int i = 0; i < sizeof(S); i++) {
+                    if(S[i] == node->hasEdgeBetween(aux)) {
+                        flag_insert = true;
+                    }
+                }
+                if(!flag_insert) {
+                    S[i] = node->hasEdgeBetween(aux);
+                }    
+            }
+            aux = aux->getNextNode();
+        }
+        node = node->getNextNode();
+    }
+    //aresta nao pode ter inicio e fim em elementos que ja estao no grafo
+    while(S != NULL) {
+        Edge* minWeightEdge = S[0];
+        for(int i = 0; i < sizeof(S); i++) {
+            if(S[i]->getWeight() < minWeightEdge->getWeight()) {
+                minWeightEdge = S[i];
+                index = i;
+            }
+        }
+        delete S[index];
+        Node *node1 = graph->first_node;
+        while(node1 != nullptr) {
+            if(!node1->searchEdge(minWeightEdge->getTargetId())) {
+                graph->insertNode(node1);
+                graph->insertNode(searchNode(minWeightEdge->getTargetId()));
+                graph->insertEdge(node1->getId(), minWeightEdge->getTargetId(), minWeightEdge->isDirected());
+            }
+            node1 = node1->getNextNode();
+        }
+    }
+    return graph;    
 }
 
 Graph* agmPrim(){
