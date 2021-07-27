@@ -212,10 +212,10 @@ Node *Graph::getNode(int id)
             }
         }
         cout << "ERROR: No nao encontrado no grafo!" << endl;
-        return NULL;
+        return nullptr;
     }
     cout << "ERROR: O grafo esta vazio!" << endl;
-    return NULL;
+    return nullptr;
 }
 
 void Graph::print()
@@ -316,23 +316,37 @@ Graph* agmPrim(){
 
 }
 
-void Graph::directedTransitiveClosure(int id) {
-    /*
-    int foo[10000];
-    Node* node = this->getNode(id);
-    foo[0] = id;
-    int i = 1;
-    while(node->getFirstEdge() != nullptr) {
-        Edge* edge = node->getFirstEdge();
-        int id = edge->getTargetId();
-        Node* targetNode = this->getNode(id);
-        node->removeEdge(id, 0, targetNode);
-        i++;
-        foo[i] = id;
+Graph* Graph::FTD(int id) {
+    if(this->directed){
+        int visited[this->order+1];
+        for(int i = 1; i <= this->order; i++)
+            visited[i] = -1;
+        auxFTD(id, visited);
+
+        cout << "imprimindo vértices do fecho transitivo indireto!" << endl;
+        for(int k = 1; k <= this->order; k++){
+            if(visited[k] != -1)
+                cout << visited[k] << endl;
+        }
+        return nullptr;
+
+    } else{
+        cout << "ERROR: O Grafo deve ser direcionado!" << endl;
     }
-    for(int j = 0; j < sizeof(foo); j++) {
-        cout << foo[j];
-    } */
+
+}
+
+void Graph::auxFTD(int id, int visited[]) {
+    Node* node = this->getNode(id);
+    if(node != nullptr){
+        for(Edge* aux = node->getFirstEdge(); aux != nullptr; aux = aux->getNextEdge()){
+            if(visited[aux->getTargetId()] == -1){
+                visited[aux->getTargetId()] = aux->getTargetId();
+                auxFTD(aux->getTargetId(), visited);
+
+            }
+        }
+    }
 }
 
 //FECHO TRANSITIVO INDIRETO
@@ -348,6 +362,7 @@ Graph* Graph::FTI(int id) {
             if(visited[k] != -1)
                 cout << visited[k] << endl;
         }
+        return nullptr;
 
     } else{
         cout << "ERROR: O Grafo deve ser direcionado!" << endl;

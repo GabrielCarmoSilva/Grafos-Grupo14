@@ -126,7 +126,7 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
 
     switch (selecao) {
         case 0: {
-            graph->FTI(1);
+            graph->FTD(1);
             exit(1);
             break;
         }
