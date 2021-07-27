@@ -126,13 +126,13 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
 
     switch (selecao) {
         case 0: {
-            bool edges[graph->getOrder()][graph->getOrder()];
-            graph->save(output_file);
-            //exit(1);
+            graph->FTI(1);
+            exit(1);
             break;
         }
         //Subgrafo induzido por um conjunto de vÃ©rtices X;
         case 1:{
+
             break;
         }
             //Caminho mÃ­nimo entre dois vÃ©rtices usando Dijkstra;
@@ -174,6 +174,7 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
         }
         case 8: {
 
+            break;
         }
         default:
         {

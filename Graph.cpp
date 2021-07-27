@@ -334,3 +334,31 @@ void Graph::directedTransitiveClosure(int id) {
         cout << foo[j];
     } */
 }
+
+//FECHO TRANSITIVO INDIRETO
+Graph* Graph::FTI(int id) {
+    if(this->directed){
+        int visited[this->order+1];
+        for(int i = 1; i <= this->order; i++)
+            visited[i] = -1;
+        auxFTI(id, visited);
+
+        cout << "imprimindo vértices do fecho transitivo indireto!" << endl;
+        for(int k = 1; k <= this->order; k++){
+            if(visited[k] != -1)
+                cout << visited[k] << endl;
+        }
+
+    } else{
+        cout << "ERROR: O Grafo deve ser direcionado!" << endl;
+    }
+}
+
+void Graph::auxFTI(int id, int visited[]) {
+    for(Node* aux = this->first_node; aux != nullptr; aux = aux->getNextNode()){
+        if(visited[aux->getId()] == -1 && aux->searchEdge(id)){
+            visited[aux->getId()] = aux->getId();
+            auxFTI(aux->getId(), visited);
+        }
+    }
+}

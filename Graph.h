@@ -25,6 +25,7 @@ private:
 
     //private aux methods
     void auxSave(Node* node, ofstream& output_file);
+    void auxFTI(int id, int visited[]);
 
 public:
     //Constructor
@@ -55,6 +56,7 @@ public:
     float floydMarshall(int idSource, int idTarget);
     float dijkstra(int idSource, int idTarget);
     void directedTransitiveClosure(int id);
+    Graph* FTI(int id);
 
     //methods phase1
     float greed();
