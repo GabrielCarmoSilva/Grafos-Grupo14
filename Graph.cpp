@@ -293,60 +293,79 @@ float Graph::floydMarshall(int idSource, int idTarget){
 
 
 float Graph::dijkstra(int idSource, int idTarget){
-    Node* q[order];
-    int dist[order];
-    int prev[order];
-    int u = 0;
+    int max = order+1;
+    Node* q[max];
+    int dist[max];
+    int prev[max];
+    int u = 1;
     int alt = 0;
     Node* node = first_node;
+    Node *source_node = this->getNode(idSource);
 
     int i = 0;
     while(node != nullptr) {
-        dist[node->getId()] = MAX_INT;
+
+        dist[node->getId()] = source_node->searchEdge(node->getId()) ? source_node->hasEdgeBetween(node->getId())->getWeight() : -1;
         prev[node->getId()] = -1;
         q[node->getId()] = node;
-        node = node->getNextNode()
+        node = node->getNextNode();
     }
-    dist[idSource] = 0;
 
-    int smaller = dist[0];
-    while(q != NULL) {
-        for(int i = 0; i < sizeof(dist); i++) {
-            if(dist[i] < smaller) {
+    dist[idSource] = 0;
+    prev[idSource] = idSource;
+
+
+    while(u != idTarget) {
+        int smaller = dist[u];
+        for(int i = 1; i < order+1; i++) {
+            if( ( (dist[i] < smaller || ( dist[i] <= smaller && i == idTarget ) ) && dist[i] != -1 || smaller == -1 ) && prev[i] == -1 ) {
                 smaller = dist[i];
                 u = i;
             }
         }
-        delete q[getNode(u)];
-        if(u == idTarget) {
-            break;
-        }
+        prev[u] = u;
 
         Node *current_node = getNode(u);
         Node *aux = current_node;
+
         while(aux != nullptr) {
-            if(searchEdge(aux)) {
-                alt = dist[u] + current_node->hasEdgeBetween(aux->getId())->getWeight();
-                if(alt < dist[aux->getId()]) {
-                    dist[aux->getId()] = alt;
-                    prev[aux->getId()] = u->getId();
-                }
-            }
+            dist[aux->getId()] = current_node->searchEdge(aux->getId()) ? current_node->hasEdgeBetween(aux->getId())->getWeight() : -1;
+            aux = aux->getNextNode();
+        }
+
+    }
+
+    for(int k = 1; k < max; k++){
+        if(prev[k] != -1){
+            cout << prev[k] << endl;
         }
     }
-    int S[order];
-    u = target_id;
-    int i = 0;
-    if(prev[u] != -1 || u = source_id) {
+
+    /*int S[order];
+
+    for(int k = 0; k < order; k++){
+        S[k] = -1;
+    }
+
+    u = idTarget;
+    int j = 0;
+    if(prev[u] != -1 || u == idSource) {
         while(u != -1) {
-            S[i] = u;
+            S[j] = u;
             u = prev[u];
-            i++;
+            j++;
         }
     }
-    for(int i = 0; i < sizeof(S); i++) {
-        cout << S[i] << endl;
-    }
+
+    for(int i = 0; i < order; i++) {
+        if(S[i] != -1){
+            cout << "imprimi: " << endl;
+            cout << S[i] << endl;
+
+        } else{
+            cout << "não consegui imprimir!" << endl;
+        }
+    }*/
 }
 
 //function that prints a topological sorting
