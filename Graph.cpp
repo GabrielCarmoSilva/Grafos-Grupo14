@@ -366,51 +366,86 @@ Graph* getVertexInduced(int* listIdNodes){
 
 }
 
-Graph* Graph::agmKruskal(){
-    Graph* graph;
+void Graph::agmKruskal(ofstream& output_file){
     Edge* S[this->getNumberEdges()] = {};
     Node* node = this->getFirstNode();
     Node* aux = node;
+    Node* aux2 = nullptr;
     int i = 0;
     int index = 0;
-    bool flag_insert = false;
+    int flag_insert = 0;
     while(node != nullptr) {
         while(aux != nullptr) {
             if(node->searchEdge(aux->getId())) {
-                for(int i = 0; i < sizeof(S); i++) {
-                    if(S[i] == node->hasEdgeBetween(aux->getId())) {
-                        flag_insert = true;
-                    }
-                }
-                if(!flag_insert) {
-                    S[i] = node->hasEdgeBetween(aux->getId());
-                }    
+                S[i] = node->hasEdgeBetween(aux->getId());
+                i++;
+            }
+            if(aux == this->last_node) {
+                break;
             }
             aux = aux->getNextNode();
         }
+        if(node == this->last_node) {
+            break;
+        }
         node = node->getNextNode();
+        aux = node;
     }
+    Node *node1 = this->getFirstNode();
     //aresta nao pode ter inicio e fim em elementos que ja estao no grafo
-    while(S != NULL) {
-        Edge* minWeightEdge = S[0];
-        for(int i = 0; i < sizeof(S); i++) {
-            if(S[i]->getWeight() < minWeightEdge->getWeight()) {
+    Graph* graph = new Graph(0, 0, 1, 0);
+    Edge* minWeightEdge = S[0];
+    for(int k = 0; k < this->getNumberEdges(); k++) {
+        for(int i = 0; i < this->getNumberEdges(); i++) {
+            if(S[i] != nullptr && S[i]->getWeight() <= minWeightEdge->getWeight()) {
                 minWeightEdge = S[i];
                 index = i;
             }
         }
-        delete S[index];
-        Node *node1 = graph->getFirstNode();
+        S[index] = nullptr;
+        if(graph->getFirstNode() != nullptr) {
+            Node* aux2 = graph->getFirstNode();
+        }
+        flag_insert = false;
         while(node1 != nullptr) {
-            if(!node1->searchEdge(minWeightEdge->getTargetId())) {
-                graph->insertNode(node1->getId());
-                graph->insertNode(this->searchNode(minWeightEdge->getTargetId()));
-                graph->insertEdge(node1->getId(), minWeightEdge->getTargetId(), minWeightEdge->isDirected());
+            cout << "Node 1: " << node1->getId() << endl;
+            if(node1->searchEdge(minWeightEdge->getTargetId())) {
+                if(aux2 == nullptr) {
+                    cout << "Entrou nesse if" << endl;
+                    flag_insert = 0;
+                }
+                else {
+                    while(aux2 != nullptr) {
+                        cout << "Aux2: " << aux2->getId() << endl;
+                        cout << "Target Id: " << minWeightEdge->getTargetId() << endl;
+                        if(aux2->getId() == minWeightEdge->getTargetId() || aux2->getId() == node1->getId()) {
+                            flag_insert++;
+                        }
+                        aux2 = aux2->getNextNode();
+                    }
+                }
+                if(flag_insert < 2) {
+                    cout << "Entrou aqui para inserir os nós" << endl;
+                    graph->insertNode(node1->getId());
+                    graph->insertNode(minWeightEdge->getTargetId());
+                    graph->insertEdge(node1->getId(), minWeightEdge->getTargetId(), this->directed);
+                    cout << "Inseriu aresta do " << node1->getId() << " pro " << minWeightEdge->getTargetId() << endl;
+                }
             }
             node1 = node1->getNextNode();
+            if(graph->getFirstNode() != nullptr) {
+                aux2 = graph->getFirstNode();
+            }
+            flag_insert = 0;
         }
+        node1 = this->first_node;
+        if(graph->getFirstNode() != nullptr) {
+            aux2 = graph->getFirstNode();
+        }
+        flag_insert = 0;
     }
-    return graph;    
+    graph->print();   
+    graph->save(output_file);
 }
 
 Graph* agmPrim(){

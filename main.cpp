@@ -126,7 +126,7 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
 
     switch (selecao) {
         case 0: {
-            graph->dijkstra(1, 10, output_file);
+            graph->agmKruskal(output_file);
             exit(1);
             break;
         }
