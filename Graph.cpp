@@ -293,8 +293,65 @@ float Graph::floydMarshall(int idSource, int idTarget){
 
 
 
-float Graph::dijkstra(int idSource, int idTarget){
+void Graph::dijkstra(int idSource, int idTarget, ofstream& output_file){
+    int max = order+1;
+    Node* q[max];
+    int dist[max];
+    int prev[max];
+    int u = 1;
+    int alt = 0;
+    Node* node = first_node;
+    Node *source_node = this->getNode(idSource);
 
+    int i = 0;
+    while(node != nullptr) {
+
+        dist[node->getId()] = source_node->searchEdge(node->getId()) ? source_node->hasEdgeBetween(node->getId())->getWeight() : -1;
+        prev[node->getId()] = -1;
+        q[node->getId()] = node;
+        node = node->getNextNode();
+    }
+
+    dist[idSource] = 0;
+    prev[idSource] = idSource;
+
+
+    while(u != idTarget) {
+        int smaller = dist[u];
+        for(int i = 1; i < order+1; i++) {
+            if( ( (dist[i] < smaller || ( dist[i] <= smaller && i == idTarget ) ) && dist[i] != -1 || smaller == -1 ) && prev[i] == -1 ) {
+                smaller = dist[i];
+                u = i;
+            }
+        }
+        prev[u] = u;
+
+        Node *current_node = getNode(u);
+        Node *aux = current_node;
+
+        while(aux != nullptr) {
+            dist[aux->getId()] = current_node->searchEdge(aux->getId()) ? current_node->hasEdgeBetween(aux->getId())->getWeight() : -1;
+            aux = aux->getNextNode();
+        }
+
+    }
+
+    Graph* graph = new Graph(0, 1, 0, 0);
+    for(int k = 1; k < max; k++){
+        if(prev[k] != -1){
+            graph->insertNode(prev[k]);
+        }
+    }
+    Node *n = graph->first_node;
+    while (n != nullptr) {
+        if(n == graph->last_node) {
+            break;
+        }
+        graph->insertEdge(n->getId(), n->getNextNode()->getId(), 0);
+        n = n->getNextNode();
+    }
+    graph->print();
+    graph->save(output_file);
 }
 
 //function that prints a topological sorting

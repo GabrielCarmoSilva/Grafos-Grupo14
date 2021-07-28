@@ -126,9 +126,8 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
 
     switch (selecao) {
         case 0: {
-            bool edges[graph->getOrder()][graph->getOrder()];
-            graph->save(output_file);
-            //exit(1);
+            graph->dijkstra(1, 10, output_file);
+            exit(1);
             break;
         }
         //Subgrafo induzido por um conjunto de vÃ©rtices X;
@@ -137,7 +136,7 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
         }
             //Caminho mÃ­nimo entre dois vÃ©rtices usando Dijkstra;
         case 2:{
-
+            //float aux = graph->dijkstra(1, 4);
             break;
         }
 
@@ -177,6 +176,7 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
         }
         default:
         {
+
             cout << " Error!!! invalid option!!" << endl;
         }
 
@@ -278,6 +278,7 @@ int main(int argc, char const *argv[]) {
 
     cout << graph->getNode(0)->searchEdge(1) << endl << "Grau: " << graph->getNode(1)->getOutDegree() << endl;
     graph->print();*/
+
 
     return 0;
 }
