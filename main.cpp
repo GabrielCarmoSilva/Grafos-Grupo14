@@ -126,7 +126,6 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
 
     switch (selecao) {
         case 0: {
-            graph->BuscaEmProfundidade(194);
             exit(1);
             break;
         }
@@ -242,12 +241,7 @@ int main(int argc, char const *argv[]) {
     }else
         cout << "Unable to open " << argv[1];
 
-
-
-
     mainMenu(output_file, graph);
-
-
 
     //Fechando arquivo de entrada
     input_file.close();
@@ -255,30 +249,6 @@ int main(int argc, char const *argv[]) {
     //Fechando arquivo de saÃ­da
     output_file.close();
 
-
-    // Node *node1 = new Node(0);
-    // Node *node2 = new Node(1);
-    // Node *node3 = new Node(2);
-
-    // node1->insertEdge(node2, 0, 0);
-    // node1->insertEdge(node3, 0, 0);
-    // node2->insertEdge(node3, 0, 0);
-
-    // node2->removeAllEdges();
-
-    // cout << node1->getOutDegree() << " " << node2->getOutDegree() << " " << node3->getOutDegree() << "\n";
-    // cout << node1->getInDegree() << " " << node2->getInDegree() << " " << node3->getInDegree();
-
-    /*
-    Graph* graph = new Graph( 0, 1, 0, 0);
-    graph->insertNode( 0);
-    graph->insertNode( 1);
-    graph->insertNode( 2);
-
-    graph->insertEdge(1,0,0);
-
-    cout << graph->getNode(0)->searchEdge(1) << endl << "Grau: " << graph->getNode(1)->getOutDegree() << endl;
-    graph->print();*/
 
     return 0;
 }

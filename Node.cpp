@@ -26,6 +26,7 @@ Node::~Node(){
 
     Edge* next_edge = this->first_edge;
 
+    //destruindo todas as suas arestas
     while(next_edge != nullptr){
 
         Edge* aux_edge = next_edge->getNextEdge();
@@ -99,7 +100,7 @@ void Node::insertEdge(Node* target_node, bool directed,  float weight){
     Edge* edge = new Edge(target_node->getId());
 
     if(this->first_edge != nullptr){
-        // Allocating the new edge and keeping the integrity of the edge list
+        // caso não seja a primeira
 
         edge->setWeight(weight);
         this->last_edge->setNextEdge(edge);
@@ -107,7 +108,7 @@ void Node::insertEdge(Node* target_node, bool directed,  float weight){
 
     }
     else{
-        // Allocating the new edge and keeping the integrity of the edge list
+        // caso seja a primeira aresta
         this->first_edge = edge;
         this->first_edge->setWeight(weight);
         this->last_edge = this->first_edge;
@@ -115,68 +116,69 @@ void Node::insertEdge(Node* target_node, bool directed,  float weight){
     }
 
     if(directed){
+
+        //atualizando valores de entrada e saida e setando a aresta como direcionada
         this->incrementOutDegree();
         target_node->incrementInDegree();
         edge->setDirected(true);
-    } else{
-        this->incrementOutDegree();
 
-        //to not generate an infite loop, the directed funcion is called but only
-        //the outDegree increment is used
+    } else{
+
+        //utilizando uma aresta direcionada como aresta de volta
+        //para o grafo nao direcionado
+        //assim evita-se um loop infinito e tem-se uma diferenciação para essas arestas auxiliares
+
+        this->incrementOutDegree();
         if(this->id != target_node->getId())
         {
             target_node->insertEdge(this, 1, weight);
-            this->decrementInDegree(); //correction in degree
+
+            //como é utilizado o modo de aresta direcionada é preciso atualizar novamento os valores
+            this->decrementInDegree();
         }
-        else
+        else{
+            //caso seja self loop
             this->incrementOutDegree();
+        }
     }
 
 }
 
 void Node::removeAllEdges(){
-    // Verifies whether there are at least one edge in the node
     if(this->first_edge != nullptr){
 
-        // Removing all edges of the node
+        // removendo todas as arestas que partem do nó
         Edge* next_edge = this->first_edge;
-
         while(next_edge != nullptr){
-
             Edge* aux_edge = next_edge->getNextEdge();
             delete next_edge;
             next_edge = aux_edge;
-
         }
 
 
     }
 
-    //setting values for the attributes after deletion
-    this->in_degree = 0;
+    //setando atributos apos deletar as arestas
     this->out_degree = 0;
     this->first_edge = this->last_edge = nullptr;
 
 }
 
 int Node::removeEdge(Node* target_node, bool directed){
-    // Verifies whether the edge to remove is in the node
+    // busca e verifica se a aresta de fato existe
     int id = target_node->getId();
     if(this->searchEdge(id)){
 
         Edge* aux = this->first_edge;
         Edge* previous = nullptr;
-        // Searching for the edge to be removed
+        // procurando pela aresta a ser removida
+        //a variável previous é necessária para manter a integridade da lista
         while(aux->getTargetId() != id){
-
             previous = aux;
             aux = aux->getNextEdge();
-
         }
-        // Keeping the integrity of the edge list
         if(previous != nullptr)
             previous->setNextEdge(aux->getNextEdge());
-
         else
             this->first_edge = aux->getNextEdge();
 
@@ -187,20 +189,25 @@ int Node::removeEdge(Node* target_node, bool directed){
             this->last_edge = aux->getNextEdge();
 
         delete aux;
-        // Verifies whether the graph is directed
 
+        //fazendo as devidas mudanças de valor para caso seja direcionado ou não
         if(directed){
             this->decrementOutDegree();
             target_node->decrementInDegree();
-        } else{
+        } else if(id != this->getId()){
             this->decrementOutDegree();
             this->incrementInDegree();
 
-            //to not generate an infite loop, the directed funcion is called but only
-            //the outDegree increment is used
+            //como existem arestas auxiliares que foram setadas como direcionadas
+            //para os grafos nao direciondas
+            // ao remover uma aresta desses grafos eh preciso também remover sua auxiliar
 
             target_node->removeEdge(this, 1);
 
+        } else{
+            //caso seja self loop
+            this->decrementOutDegree();
+            this->decrementOutDegree();
         }
 
         return 1;
