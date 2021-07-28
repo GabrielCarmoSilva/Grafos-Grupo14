@@ -292,7 +292,7 @@ float Graph::floydMarshall(int idSource, int idTarget){
 
 
 
-float Graph::dijkstra(int idSource, int idTarget){
+void Graph::dijkstra(int idSource, int idTarget, ofstream& output_file){
     int max = order+1;
     Node* q[max];
     int dist[max];
@@ -335,37 +335,22 @@ float Graph::dijkstra(int idSource, int idTarget){
 
     }
 
+    Graph* graph = new Graph(0, 1, 0, 0);
     for(int k = 1; k < max; k++){
         if(prev[k] != -1){
-            cout << prev[k] << endl;
+            graph->insertNode(prev[k]);
         }
     }
-
-    /*int S[order];
-
-    for(int k = 0; k < order; k++){
-        S[k] = -1;
-    }
-
-    u = idTarget;
-    int j = 0;
-    if(prev[u] != -1 || u == idSource) {
-        while(u != -1) {
-            S[j] = u;
-            u = prev[u];
-            j++;
+    Node *n = graph->first_node;
+    while (n != nullptr) {
+        if(n == graph->last_node) {
+            break;
         }
+        graph->insertEdge(n->getId(), n->getNextNode()->getId(), 0);
+        n = n->getNextNode();
     }
-
-    for(int i = 0; i < order; i++) {
-        if(S[i] != -1){
-            cout << "imprimi: " << endl;
-            cout << S[i] << endl;
-
-        } else{
-            cout << "não consegui imprimir!" << endl;
-        }
-    }*/
+    graph->print();
+    graph->save(output_file);
 }
 
 //function that prints a topological sorting

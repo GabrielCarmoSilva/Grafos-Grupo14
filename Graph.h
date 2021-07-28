@@ -53,7 +53,7 @@ public:
     Graph* agmKuskal();
     Graph* agmPrim();
     float floydMarshall(int idSource, int idTarget);
-    float dijkstra(int idSource, int idTarget);
+    void dijkstra(int idSource, int idTarget, ofstream& output_file);
     void directedTransitiveClosure(int id);
 
     //methods phase1

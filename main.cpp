@@ -126,7 +126,7 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
 
     switch (selecao) {
         case 0: {
-            float aux = graph->dijkstra(1, 4);
+            graph->dijkstra(1, 10, output_file);
             exit(1);
             break;
         }
