@@ -222,9 +222,12 @@ void Graph::print()
 {
     if(this->first_node != nullptr)
     {
-        for(Node* aux = this->first_node; aux != nullptr; aux = aux->getNextNode())
-        {
-            cout << "No: "  << aux->getId() << endl;
+        for(Node* node = this->first_node; node != nullptr; node = node->getNextNode()){
+            for(Edge* aux = node->getFirstEdge(); aux != nullptr; aux = aux->getNextEdge()){
+                if(!aux->isDirected() || this->directed){
+                    cout << node->getId()  << " " << aux->getTargetId() << endl;
+                }
+            }
         }
     }
 }
@@ -316,6 +319,7 @@ Graph* agmPrim(){
 
 }
 
+//FECHO TRANSITIVO DIRETO
 Graph* Graph::FTD(int id) {
     if(this->directed){
         int visited[this->order+1];
@@ -323,7 +327,7 @@ Graph* Graph::FTD(int id) {
             visited[i] = -1;
         auxFTD(id, visited);
 
-        cout << "imprimindo vértices do fecho transitivo indireto!" << endl;
+        cout << "imprimindo vértices do fecho transitivo direto!" << endl;
         for(int k = 1; k <= this->order; k++){
             if(visited[k] != -1)
                 cout << visited[k] << endl;
@@ -336,6 +340,7 @@ Graph* Graph::FTD(int id) {
 
 }
 
+//FECHO TRANSITIVO DIRETO AUXILIAR
 void Graph::auxFTD(int id, int visited[]) {
     Node* node = this->getNode(id);
     if(node != nullptr){
@@ -355,11 +360,14 @@ Graph* Graph::FTI(int id) {
         int visited[this->order+1];
         for(int i = 1; i <= this->order; i++)
             visited[i] = -1;
+
+        visited[id] = id;
+
         auxFTI(id, visited);
 
         cout << "imprimindo vértices do fecho transitivo indireto!" << endl;
         for(int k = 1; k <= this->order; k++){
-            if(visited[k] != -1)
+            if(visited[k] != -1 && k != id)
                 cout << visited[k] << endl;
         }
         return nullptr;
@@ -369,11 +377,76 @@ Graph* Graph::FTI(int id) {
     }
 }
 
+//FECHO TRANSITIVO INDIRETO AUXILIAR
 void Graph::auxFTI(int id, int visited[]) {
     for(Node* aux = this->first_node; aux != nullptr; aux = aux->getNextNode()){
         if(visited[aux->getId()] == -1 && aux->searchEdge(id)){
             visited[aux->getId()] = aux->getId();
             auxFTI(aux->getId(), visited);
         }
+    }
+}
+
+//BUSCA EM PROFUNDIADE DESTACANDO ARESTAS DE RETORNO
+Graph* Graph::BuscaEmProfundidade(int id){
+
+    int visited[this->order+1];
+
+    for(int i = 1; i <= this->order; i++){
+        visited[i] = -1;
+    }
+
+    visited[id] = 0;
+
+    Graph *retorno = new Graph(0, this->directed, this->weighted_edge, this->weighted_node);
+
+
+
+    //no vetor visited
+    // -1 = não visitado
+    //  id do vertice anterior = visitado 1 vez
+    //  -2 = vertice que todas as arestas já foram visitadas
+    auxBuscaEmProfundidade(id, visited, retorno);
+    cout << "Árvore gerada pela busca em profundidade" << endl;
+    for(int k = 1; k <= this->order; k++){
+        if(visited[k] != -1){
+            cout << "No: " << k << endl;
+        }
+    }
+
+    cout << "Arestas de retorno: " << endl;
+    retorno->print();
+    return retorno;
+}
+
+//BUSCA EM PROFUNDIADE DESTACANDO ARESTAS DE RETORNO AUXILIAR
+void Graph::auxBuscaEmProfundidade(int id, int visited[], Graph* retorno){
+    Node* node = this->getNode(id);
+    if(node != nullptr){
+        for(Edge* aux = node->getFirstEdge(); aux != nullptr; aux = aux->getNextEdge()){
+
+            if(visited[aux->getTargetId()] == -1){
+
+                if(!this->directed){
+                    visited[node->getId()] = aux->getTargetId();
+                }
+
+                visited[aux->getTargetId()] = node->getId();
+
+                this->auxBuscaEmProfundidade(aux->getTargetId(), visited, retorno);
+
+            } else if(visited[aux->getTargetId()] >= 0 && visited[aux->getTargetId()] != node->getId() ){
+                if(!retorno->searchNode(node->getId())){
+                    retorno->insertNode(node->getId());
+                }
+
+                if(!retorno->searchNode(aux->getTargetId())){
+                    retorno->insertNode(aux->getTargetId());
+                }
+
+                retorno->insertEdge(node->getId(), aux->getTargetId(), 0);
+            }
+        }
+        visited[node->getId()] = -2;
     }
 }

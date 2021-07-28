@@ -23,10 +23,11 @@ private:
     Node* first_node;
     Node* last_node;
 
-    //private aux methods
+    //métodos auxiliares
     void auxSave(Node* node, ofstream& output_file);
     void auxFTI(int id, int visited[]);
     void auxFTD(int id, int visited[]);
+    void auxBuscaEmProfundidade(int id, int visited[], Graph* retorno);
 
 public:
     //Constructor
@@ -59,6 +60,7 @@ public:
     void directedTransitiveClosure(int id);
     Graph* FTI(int id);
     Graph* FTD(int id);
+    Graph* BuscaEmProfundidade(int id);
 
     //methods phase1
     float greed();
