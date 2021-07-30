@@ -24,7 +24,6 @@ private:
     Node* last_node;
 
     //métodos auxiliares
-    void auxSave(Node* node, ofstream& output_file);
     void auxFTI(int id, int visited[]);
     void auxFTD(int id, int visited[]);
     void auxBuscaEmProfundidade(int id, int visited[], Graph* retorno);
@@ -70,6 +69,10 @@ public:
     //imprimir e salvar
     void print();
     void save(ofstream& output_file);
+
+    //static e helpers
+    bool isInList(int* list, int id);
+    Graph* listToGraph(int nodeList[]);
 
 private:
     //Auxiliar methods

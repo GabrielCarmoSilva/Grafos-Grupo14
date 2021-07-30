@@ -126,20 +126,18 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
 
     switch (selecao) {
         case 0: {
-            exit(1);
             break;
         }
-        //Subgrafo induzido por um conjunto de vÃ©rtices X;
         case 1:{
 
+            Graph* aux = graph->FTD(1);
+            aux->save(output_file);
             break;
         }
             //Caminho mÃ­nimo entre dois vÃ©rtices usando Dijkstra;
         case 2:{
-
             break;
         }
-
             //Caminho mÃ­nimo entre dois vÃ©rtices usando Floyd;
         case 3:{
 
