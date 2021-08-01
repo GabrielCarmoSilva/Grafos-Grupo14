@@ -291,67 +291,154 @@ float Graph::floydMarshall(int idSource, int idTarget){
 }
 
 
-
-void Graph::dijkstra(int idSource, int idTarget, ofstream& output_file){
-    int max = order+1;
-    Node* q[max];
-    int dist[max];
-    int prev[max];
-    int u = 1;
-    int alt = 0;
-    Node* node = first_node;
-    Node *source_node = this->getNode(idSource);
-
-    int i = 0;
-    while(node != nullptr) {
-
-        dist[node->getId()] = source_node->searchEdge(node->getId()) ? source_node->hasEdgeBetween(node->getId())->getWeight() : -1;
-        prev[node->getId()] = -1;
-        q[node->getId()] = node;
-        node = node->getNextNode();
-    }
-
-    dist[idSource] = 0;
-    prev[idSource] = idSource;
-
-
-    while(u != idTarget) {
-        int smaller = dist[u];
-        for(int i = 1; i < order+1; i++) {
-            if( ( (dist[i] < smaller || ( dist[i] <= smaller && i == idTarget ) ) && dist[i] != -1 || smaller == -1 ) && prev[i] == -1 ) {
-                smaller = dist[i];
-                u = i;
+int Graph::procuraMenorDistancia(float *dist, int *visitado, int NV) {
+    int i, menor = -1, primeiro = 1;
+    for(i = 0; i < NV; i++) {
+        if(dist[i] >= 0 && visitado[i] == 0) {
+            if(primeiro) {
+                menor = i;
+                primeiro = 0;
+            } else {
+                if(dist[menor] > dist[i])
+                    menor = i;
             }
         }
-        prev[u] = u;
-
-        Node *current_node = getNode(u);
-        Node *aux = current_node;
-
-        while(aux != nullptr) {
-            dist[aux->getId()] = current_node->searchEdge(aux->getId()) ? current_node->hasEdgeBetween(aux->getId())->getWeight() : -1;
-            aux = aux->getNextNode();
-        }
-
     }
+    return menor;
+}
 
-    Graph* graph = new Graph(0, 1, 0, 0);
-    for(int k = 1; k < max; k++){
-        if(prev[k] != -1){
-            graph->insertNode(prev[k]);
-        }
+void Graph::dijkstra(int idSource, int idTarget, ofstream& output_file) {
+    int ant[this->order+1];
+    float dist[this->order+1];
+    int vizinhos[this->order+1];
+    int i, cont, NV, ind, *visitado, u;
+    cont = NV = this->order+1;
+    visitado = (int*) malloc(NV * sizeof(int));
+    for(i = 0; i < NV; i++) {
+        ant[i] = -1;
+        dist[i] = -1;
+        visitado[i] = 0;
     }
-    Node *n = graph->first_node;
-    while (n != nullptr) {
-        if(n == graph->last_node) {
+    dist[idSource] = 0;
+    while(cont > 0) {
+        u = procuraMenorDistancia(dist, visitado, NV);
+        if(u == -1)
             break;
+        visitado[u] = 1;
+        cont--;
+        int j = 0;
+        for(int k = 0; k < this->order+1; k++) {
+            if(this->getNode(u)->searchEdge(k)) {
+                vizinhos[j] = k;
+                j++; 
+            }
         }
-        graph->insertEdge(n->getId(), n->getNextNode()->getId(), 0);
-        n = n->getNextNode();
+        for(i = 0; i < this->getNode(u)->getOutDegree(); i++) {
+            ind = vizinhos[i];
+            if(dist[ind] < 0) {
+                if(!this->weighted_edge) {
+                    dist[ind] = dist[u] + 1;
+                    ant[ind] = u;
+                }
+                else {
+                    if(this->getNode(u)->searchEdge(ind)) {
+                        dist[ind] = dist[u] + this->getNode(u)->hasEdgeBetween(ind)->getWeight();
+                        ant[ind] = u;
+                    }
+                }    
+            }
+            else {
+                if(!this->weighted_edge) {
+                    if(dist[ind] > dist[u] + 1) {
+                        dist[ind] = dist[u] + 1;
+                        ant[ind] = u;
+                    }
+                }
+                else {
+                    if(this->getNode(u)->searchEdge(ind)) {
+                        if(dist[ind] > dist[u] + this->getNode(u)->hasEdgeBetween(ind)->getWeight()) {
+                            dist[ind] = dist[u] + this->getNode(u)->hasEdgeBetween(ind)->getWeight();
+                            ant[ind] = u;
+                        }
+                    }
+                }    
+            }
+        }
     }
-    graph->print();
+    Graph* graph = new Graph(0, this->directed, this->weighted_edge, this->weighted_node);
+    while(idTarget != idSource) {
+        if(!graph->searchNode(idTarget)) {
+            graph->insertNode(idTarget);
+        }
+        if(!graph->searchNode(ant[idTarget])) {    
+            graph->insertNode(ant[idTarget]);
+        }
+        graph->insertEdge(ant[idTarget], idTarget, this->getNode(ant[idTarget])->hasEdgeBetween(idTarget)->getWeight());
+        idTarget = ant[idTarget];
+    }
     graph->save(output_file);
 }
+
+// void Graph::dijkstra(int idSource, int idTarget, ofstream& output_file){
+//     int max = order+1;
+//     Node* q[max];
+//     int dist[max];
+//     int prev[max];
+//     int u = 1;
+//     int alt = 0;
+//     Node* node = first_node;
+//     Node *source_node = this->getNode(idSource);
+
+//     int i = 0;
+//     while(node != nullptr) {
+
+//         dist[node->getId()] = source_node->searchEdge(node->getId()) ? source_node->hasEdgeBetween(node->getId())->getWeight() : -1;
+//         prev[node->getId()] = -1;
+//         q[node->getId()] = node;
+//         node = node->getNextNode();
+//     }
+
+//     dist[idSource] = 0;
+//     prev[idSource] = idSource;
+
+
+//     while(u != idTarget) {
+//         int smaller = dist[u];
+//         for(int i = 1; i < order+1; i++) {
+//             if( ( (dist[i] < smaller || ( dist[i] <= smaller && i == idTarget ) ) && dist[i] != -1 || smaller == -1 ) && prev[i] == -1 ) {
+//                 smaller = dist[i];
+//                 u = i;
+//             }
+//         }
+//         prev[u] = u;
+
+//         Node *current_node = getNode(u);
+//         Node *aux = current_node;
+
+//         while(aux != nullptr) {
+//             dist[aux->getId()] = current_node->searchEdge(aux->getId()) ? current_node->hasEdgeBetween(aux->getId())->getWeight() : -1;
+//             aux = aux->getNextNode();
+//         }
+
+//     }
+
+//     Graph* graph = new Graph(0, 1, 0, 0);
+//     for(int k = 1; k < max; k++){
+//         if(prev[k] != -1){
+//             graph->insertNode(prev[k]);
+//         }
+//     }
+//     Node *n = graph->first_node;
+//     while (n != nullptr) {
+//         if(n == graph->last_node) {
+//             break;
+//         }
+//         graph->insertEdge(n->getId(), n->getNextNode()->getId(), 0);
+//         n = n->getNextNode();
+//     }
+//     graph->print();
+//     graph->save(output_file);
+// }
 
 //function that prints a topological sorting
 void topologicalSorting(){

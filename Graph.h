@@ -55,6 +55,7 @@ public:
     float floydMarshall(int idSource, int idTarget);
     void dijkstra(int idSource, int idTarget, ofstream& output_file);
     void directedTransitiveClosure(int id);
+    int procuraMenorDistancia(float *dist, int *visitado, int NV);//
 
     //methods phase1
     float greed();

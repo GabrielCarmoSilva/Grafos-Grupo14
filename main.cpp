@@ -126,7 +126,13 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
 
     switch (selecao) {
         case 0: {
-            graph->dijkstra(1, 10, output_file);
+            int idSource;
+            int idTarget;
+            cout << "Digite o id de origem: " << endl;
+            cin >> idSource;
+            cout << "Digite o id de destino: " << endl;
+            cin >> idTarget;
+            graph->dijkstra(idSource, idTarget, output_file);
             exit(1);
             break;
         }
