@@ -29,8 +29,7 @@ Graph::Graph(int order, bool directed, bool weighted_edge, bool weighted_node)
     this->first_node = this->last_node = nullptr;
     this->number_edges = 0;
 
-    //o readme disse para padronuizar em 0 a n-1
-    //entretanto os arquivos nao estão nesse padrão e sim de 1 a n
+    //preenchendo grafo com os nos
     for(int i = 1; i <= order; i++)
         this->insertNode(i);
 
@@ -42,10 +41,9 @@ Graph::~Graph()
 
     Node *next_node = this->first_node;
 
+    //destruindo a lista de nós e suas arestas
     while (next_node != nullptr)
     {
-
-        next_node->removeAllEdges();
         Node *aux_node = next_node->getNextNode();
         delete next_node;
         next_node = aux_node;
@@ -130,12 +128,12 @@ void Graph::insertEdge(int id, int target_id, float weight)
 {
     bool origin_node_check = this->searchNode(id);
     bool target_node_check = this->searchNode(target_id);
+    //checagem para ver se ambos os nos existem e a aresta pode ser criada
     if(origin_node_check && target_node_check)
     {
         Node* origin_node = this->getNode(id);
         if(!origin_node->searchEdge(target_id)){
             origin_node->insertEdge(this->getNode(target_id), this->directed, weight);
-            //cout <<"aresta criada com no de origem " << id << " e no alvo " << target_id << endl;
         }
         else{
             cout << "ERROR: A aresta com no de origem" << id << " e no alvo " << target_id << " ja existe!" << endl;
@@ -143,6 +141,7 @@ void Graph::insertEdge(int id, int target_id, float weight)
     }
     else
     {
+        //tratamento do erro, caso nao existe um dos nos
         if(!origin_node_check && !target_node_check)
             cout << "ERROR: nenhum dos nos existe!" << endl;
         else if(!origin_node_check)
@@ -153,30 +152,39 @@ void Graph::insertEdge(int id, int target_id, float weight)
 }
 
 void Graph::removeNode(int id){
+
     if(searchNode(id)) {
+
         Node* node = this->getFirstNode();
-        Node* temp;
-        if(node->getId() == id) {
-            delete node;
+        Node* temp = nullptr;
+
+
+        // busca pelo no desejado e do temp
+        // para manter a integridade da lista
+        while(node->getId() != id) {
+            temp = node;
+            node = node->getNextNode();
         }
-        else {
-            while(node != nullptr) {
-                if(node->getId() == id) {
-                    temp->setNextNode(node->getNextNode());
-                    break;
-                }
-                temp = node;
-                node = node->getNextNode();
-            }
-            if(node == this->getLastNode()) {
-                this->last_node = temp;
-            }
-            Node* aux = this->getFirstNode();
-            while(aux != nullptr) {
-                aux->removeEdge(node, this->directed);
-                aux = aux->getNextNode();
-            }
+
+        if(temp != nullptr)
+            temp->setNextNode(node->getNextNode());
+        else
+            this->first_node = node->getNextNode();
+
+        if(node == this->last_node)
+            this->last_node = temp;
+
+        if(node->getNextNode() == this->last_node)
+            this->last_node = node->getNextNode();
+
+        Node* aux = this->getFirstNode();
+
+        // removendo arestas ligadas a ele mas que não partem desse nó
+        while(aux != nullptr) {
+            aux->removeEdge(node, this->directed);
+            aux = aux->getNextNode();
         }
+
         delete node;
         this->order--;
     }
@@ -212,73 +220,114 @@ Node *Graph::getNode(int id)
             }
         }
         cout << "ERROR: No nao encontrado no grafo!" << endl;
-        return NULL;
+        return nullptr;
     }
     cout << "ERROR: O grafo esta vazio!" << endl;
-    return NULL;
+    return nullptr;
 }
 
+//printar todos os nós com suas respectivas arestas no console
 void Graph::print()
 {
+    // impressão de todas as arestas do grafo
     if(this->first_node != nullptr)
     {
-        for(Node* aux = this->first_node; aux != nullptr; aux = aux->getNextNode())
-        {
-            cout << "No: "  << aux->getId() << endl;
+        for(Node* node = this->first_node; node != nullptr; node = node->getNextNode()){
+            cout << "No: " << node->getId() << endl;
+            for(Edge* aux = node->getFirstEdge(); aux != nullptr; aux = aux->getNextEdge()){
+                if(!aux->isDirected() || this->directed){
+                    cout << node->getId()  << " " << aux->getTargetId() << endl;
+                }
+            }
         }
     }
 }
 
+//função para salvar um grafo no arquivo de output na linguagem dot
 void Graph::save(ofstream& output_file){
 
-    output_file << this->order << endl;
-    for(Node* aux = this->first_node; aux != nullptr; aux = aux->getNextNode())
-    {
-        this->auxSave(aux, output_file);
+    //definindo tipo de grafo para o dot
+    string graphType = this->directed ? "strict digraph {" : "strict graph {";
+    output_file << graphType << endl;
+    for(Node* aux = this->first_node; aux != nullptr; aux = aux->getNextNode()){
+        output_file << aux->getId();
+        if(this->weighted_node){
+            output_file << " [weight=\"" << aux->getWeight() << "\"]";
+        }
+        output_file << ";" << endl;
     }
 
+    if(this->directed){
+        for(Node* node = this->first_node; node != nullptr; node = node->getNextNode()){
+            for(Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()){
+                output_file << node->getId() << " -> " << edge->getTargetId();
+                if(this->weighted_edge) {
+                    output_file << " " << "[label=\"" << edge->getWeight() << "\",weight=\"" << edge->getWeight() << "\"]";
+                }
+                output_file << ";" << endl;
+            }
+        }
+    } else{
+        for(Node* node = this->first_node; node != nullptr; node = node->getNextNode()){
+            for(Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()){
+                if(!edge->isDirected()){
+                    output_file << node->getId() << " -- " << edge->getTargetId();
+                    if(this->weighted_edge){
+                        output_file << " " << "[label=\"" << edge->getWeight() << "\",weight=\"" << edge->getWeight() << "\"]";
+                    }
+                    output_file << ";" << endl;
+                }
+            }
+        }
+    }
+    output_file << "}" << endl;
 }
 
 
-void Graph::auxSave(Node *node, ofstream& output_file){
+//função que transormará uma lista de nos visitados no grafo resultante baseado no grafo existente
+Graph* Graph::listToGraph(int nodeList[]){
+    //grafo que será gerado
+    Graph* result = new Graph(0, this->directed, this->weighted_edge, this->weighted_node);
 
-    if(this->weighted_edge && !this->weighted_node){
-        for(Edge* aux = node->getFirstEdge(); aux != nullptr; aux = aux->getNextEdge()){
-            if(!aux->isDirected() || this->directed){
-                output_file << node->getId()  << " " << aux->getTargetId() << " " << aux->getWeight() << endl;
+    for(Node *node = this->first_node; node != nullptr; node = node->getNextNode()){
+
+        //verificando se o nó está na lista
+        if(this->isInList(nodeList, node->getId())){
+
+            //verificando se o nó existe no grafo resultante
+            if(!result->searchNode(node->getId())){
+                result->insertNode(node->getId());
+            }
+
+            for(Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()){
+
+                //verificando se o nó alvo existe na lista
+                if(this->isInList(nodeList,  edge->getTargetId())){
+
+                    //verificando se o nó alvo existe no grafo resultante
+                    if(!result->searchNode(edge->getTargetId())){
+                        result->insertNode(edge->getTargetId());
+                    }
+
+                    //inserindo aresta ao grafo resultante
+                    result->insertEdge(node->getId(), edge->getTargetId(), edge->getWeight());
+                }
             }
         }
     }
-
-    if(!this->weighted_edge && !this->weighted_node){
-        for(Edge* aux = node->getFirstEdge(); aux != nullptr; aux = aux->getNextEdge()){
-            if(!aux->isDirected() || this->directed){
-                output_file << node->getId()  << " " << aux->getTargetId() << endl;
-            }
-        }
-    }
-
-    if(this->weighted_edge && this->weighted_node){
-        for(Edge* aux = node->getFirstEdge(); aux != nullptr; aux = aux->getNextEdge()){
-            if(!aux->isDirected() || this->directed){
-                output_file << node->getId() << " " << node->getWeight() << " " << aux->getTargetId() << " " ;
-                output_file << this->getNode(aux->getTargetId())->getWeight() << " " << aux->getWeight() << endl;
-            }
-        }
-    }
-
-    if(!this->weighted_edge && this->weighted_node){
-        for(Edge* aux = node->getFirstEdge(); aux != nullptr; aux = aux->getNextEdge()){
-            if(!aux->isDirected() || this->directed){
-                output_file << node->getId() << " " << node->getWeight() << " " << aux->getTargetId() << " " ;
-                output_file << this->getNode(aux->getTargetId())->getWeight() <<  endl;
-            }
-        }
-    }
-
+    return result;
 }
 
-//Function that prints a set of edges belongs breadth tree
+
+//função para verificar a existencia de um nó em uma lista de nos visitados
+bool Graph::isInList(int* list, int id){
+    for(int i = 1; i <= this->order; i++){
+        if(i == id && list[i] != -1){
+            return true;
+        }
+    }
+    return false;
+}
 
 void Graph::breadthFirstSearch(ofstream &output_file){
 
@@ -366,7 +415,7 @@ void Graph::dijkstra(int idSource, int idTarget, ofstream& output_file) {
         }
     }
     Graph* graph = new Graph(0, this->directed, this->weighted_edge, this->weighted_node);
-    while(idTarget != idSource) {
+    while(idTarget != idSource && idTarget != -1 && ant[idTarget] != -1) {
         if(!graph->searchNode(idTarget)) {
             graph->insertNode(idTarget);
         }
@@ -377,6 +426,9 @@ void Graph::dijkstra(int idSource, int idTarget, ofstream& output_file) {
         idTarget = ant[idTarget];
     }
     graph->save(output_file);
+    if(idTarget == -1 || ant[idTarget] == -1) {
+        cout << "Caminho não encontrado!" << endl;
+    }
 }
 
 //function that prints a topological sorting
@@ -398,21 +450,148 @@ Graph* agmPrim(){
 
 }
 
-void Graph::directedTransitiveClosure(int id) {
-    /*
-    int foo[10000];
-    Node* node = this->getNode(id);
-    foo[0] = id;
-    int i = 1;
-    while(node->getFirstEdge() != nullptr) {
-        Edge* edge = node->getFirstEdge();
-        int id = edge->getTargetId();
-        Node* targetNode = this->getNode(id);
-        node->removeEdge(id, 0, targetNode);
-        i++;
-        foo[i] = id;
+//FECHO TRANSITIVO DIRETO
+Graph* Graph::FTD(int id) {
+    if(this->directed){
+
+        //preenchimento da lista de nos visitados
+        int visited[this->order+1];
+        for(int i = 1; i <= this->order; i++)
+            visited[i] = -1;
+
+        auxFTD(id, visited);
+
+        cout << "imprimindo nos do fecho transitivo direto!" << endl;
+        for(int k = 1; k <= this->order; k++){
+            if(visited[k] != -1)
+                cout << visited[k] << endl;
+        }
+
+
+        return this->listToGraph(visited);
+
+    } else{
+        cout << "ERROR: O Grafo deve ser direcionado!" << endl;
+        return nullptr;
     }
-    for(int j = 0; j < sizeof(foo); j++) {
-        cout << foo[j];
-    } */
+
+}
+
+//FECHO TRANSITIVO DIRETO AUXILIAR
+void Graph::auxFTD(int id, int visited[]) {
+    Node* node = this->getNode(id);
+    if(node != nullptr){
+        //busca em profundiade para encontrar todos os caminhos possíveis pelo nó
+        for(Edge* aux = node->getFirstEdge(); aux != nullptr; aux = aux->getNextEdge()){
+            if(visited[aux->getTargetId()] == -1){
+                visited[aux->getTargetId()] = aux->getTargetId();
+                auxFTD(aux->getTargetId(), visited);
+
+            }
+        }
+    }
+}
+
+//FECHO TRANSITIVO INDIRETO
+Graph* Graph::FTI(int id) {
+    if(this->directed){
+
+        //preenchimento da lista de nos visitados
+        int visited[this->order+1];
+        for(int i = 1; i <= this->order; i++)
+            visited[i] = -1;
+
+        auxFTI(id, visited);
+
+        cout << "imprimindo nos do fecho transitivo indireto!" << endl;
+        for(int k = 1; k <= this->order; k++){
+            if(visited[k] != -1)
+                cout << visited[k] << endl;
+        }
+        return this->listToGraph(visited);;
+
+    } else{
+        cout << "ERROR: O Grafo deve ser direcionado!" << endl;
+    }
+}
+
+//FECHO TRANSITIVO INDIRETO AUXILIAR
+void Graph::auxFTI(int id, int visited[]) {
+    //busca por qualquer no que possua aresta apontada para o id atual
+    for(Node* aux = this->first_node; aux != nullptr; aux = aux->getNextNode()){
+        if(visited[aux->getId()] == -1 && aux->searchEdge(id)){
+            visited[aux->getId()] = aux->getId();
+            auxFTI(aux->getId(), visited);
+        }
+    }
+}
+
+//BUSCA EM PROFUNDIADE DESTACANDO ARESTAS DE RETORNO
+Graph* Graph::BuscaEmProfundidade(int id){
+
+    //criação e preenchimento das lista de nos visitados e o grafo
+    //para armazenar as arestas de retorno
+    int visited[this->order+1];
+    Graph *retorno = new Graph(0, this->directed, this->weighted_edge, this->weighted_node);
+
+    for(int i = 1; i <= this->order; i++){
+        visited[i] = -1;
+    }
+
+    visited[id] = 0;
+
+    //Possíveis valores no vetor visited, que representa os nos do grafo
+    // -1 = no não visitado
+    //  numero > 0 (id do no anterior) = visitado 1 vez
+    //  -2 = no que todas as arestas já foram visitadas
+    auxBuscaEmProfundidade(id, visited, retorno);
+
+    //imprimindo no console caminho realizado
+    cout << "Arvore gerada pela busca em profundidade" << endl;
+    for(int k = 1; k <= this->order; k++){
+        if(visited[k] != -1){
+            cout << "No: " << k << endl;
+        }
+    }
+
+    //imprimindo as areas de retorno no padrão "Nó origem Nó alvo"
+    cout << "Arestas de retorno: " << endl;
+    retorno->print();
+    return retorno;
+}
+
+//BUSCA EM PROFUNDIADE DESTACANDO ARESTAS DE RETORNO AUXILIAR
+void Graph::auxBuscaEmProfundidade(int id, int visited[], Graph* retorno){
+    Node* node = this->getNode(id);
+    if(node != nullptr){
+        for(Edge* aux = node->getFirstEdge(); aux != nullptr; aux = aux->getNextEdge()){
+
+            if(visited[aux->getTargetId()] == -1){
+
+                //caso seja um grafo nao direcionado
+                //desconsiderar aresta de volta
+                if(!this->directed){
+                    visited[node->getId()] = aux->getTargetId();
+                }
+
+                visited[aux->getTargetId()] = node->getId();
+
+                this->auxBuscaEmProfundidade(aux->getTargetId(), visited, retorno);
+
+            } else if(visited[aux->getTargetId()] >= 0 && visited[aux->getTargetId()] != node->getId() ){
+
+                //preenchendo grafo com arestas de retorno
+                if(!retorno->searchNode(node->getId())){
+                    retorno->insertNode(node->getId());
+                }
+
+                if(!retorno->searchNode(aux->getTargetId())){
+                    retorno->insertNode(aux->getTargetId());
+                }
+
+                retorno->insertEdge(node->getId(), aux->getTargetId(), 0);
+            }
+        }
+        visited[node->getId()] = -2;
+    }
 }

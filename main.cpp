@@ -136,16 +136,16 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
             exit(1);
             break;
         }
-        //Subgrafo induzido por um conjunto de vÃ©rtices X;
         case 1:{
+
+            Graph* aux = graph->FTD(1);
+            aux->save(output_file);
             break;
         }
             //Caminho mÃ­nimo entre dois vÃ©rtices usando Dijkstra;
         case 2:{
-            //float aux = graph->dijkstra(1, 4);
             break;
         }
-
             //Caminho mÃ­nimo entre dois vÃ©rtices usando Floyd;
         case 3:{
 
@@ -179,6 +179,7 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
         }
         case 8: {
 
+            break;
         }
         default:
         {
@@ -247,43 +248,13 @@ int main(int argc, char const *argv[]) {
     }else
         cout << "Unable to open " << argv[1];
 
-
-
-
     mainMenu(output_file, graph);
-
-
 
     //Fechando arquivo de entrada
     input_file.close();
 
     //Fechando arquivo de saÃ­da
     output_file.close();
-
-
-    // Node *node1 = new Node(0);
-    // Node *node2 = new Node(1);
-    // Node *node3 = new Node(2);
-
-    // node1->insertEdge(node2, 0, 0);
-    // node1->insertEdge(node3, 0, 0);
-    // node2->insertEdge(node3, 0, 0);
-
-    // node2->removeAllEdges();
-
-    // cout << node1->getOutDegree() << " " << node2->getOutDegree() << " " << node3->getOutDegree() << "\n";
-    // cout << node1->getInDegree() << " " << node2->getInDegree() << " " << node3->getInDegree();
-
-    /*
-    Graph* graph = new Graph( 0, 1, 0, 0);
-    graph->insertNode( 0);
-    graph->insertNode( 1);
-    graph->insertNode( 2);
-
-    graph->insertEdge(1,0,0);
-
-    cout << graph->getNode(0)->searchEdge(1) << endl << "Grau: " << graph->getNode(1)->getOutDegree() << endl;
-    graph->print();*/
 
 
     return 0;

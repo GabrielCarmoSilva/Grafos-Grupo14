@@ -23,8 +23,10 @@ private:
     Node* first_node;
     Node* last_node;
 
-    //private aux methods
-    void auxSave(Node* node, ofstream& output_file);
+    //métodos auxiliares
+    void auxFTI(int id, int visited[]);
+    void auxFTD(int id, int visited[]);
+    void auxBuscaEmProfundidade(int id, int visited[], Graph* retorno);
 
 public:
     //Constructor
@@ -56,6 +58,9 @@ public:
     void dijkstra(int idSource, int idTarget, ofstream& output_file);
     void directedTransitiveClosure(int id);
     int procuraMenorDistancia(float *dist, int *visitado, int NV);//
+    Graph* FTI(int id);
+    Graph* FTD(int id);
+    Graph* BuscaEmProfundidade(int id);
 
     //methods phase1
     float greed();
@@ -65,6 +70,10 @@ public:
     //imprimir e salvar
     void print();
     void save(ofstream& output_file);
+
+    //static e helpers
+    bool isInList(int* list, int id);
+    Graph* listToGraph(int nodeList[]);
 
 private:
     //Auxiliar methods
