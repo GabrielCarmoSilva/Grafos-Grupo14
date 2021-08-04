@@ -122,6 +122,24 @@ int menu(){
 
 }
 
+bool salvar(){
+    int resposta = 0;
+    while(true){
+        cout << "Voce deseja salvar o grafo resultante deste algoritmo?" << endl;
+        cout << "[1] Sim" << endl;
+        cout << "[2] Nao" << endl;
+        cin >> resposta;
+        if(resposta == 1 || resposta == 2){
+            break;
+        } else{
+            cout << "Resposta invalida, por favor digite novamente!" << endl;
+        }
+    }
+
+    return resposta == 1;
+
+}
+
 void selecionar(int selecao, Graph* graph, ofstream& output_file){
 
     switch (selecao) {
@@ -139,7 +157,9 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
         case 1:{
 
             Graph* aux = graph->BuscaEmProfundidade(1);
-            aux->save(output_file);
+            if(salvar())
+                aux->save(output_file);
+
             break;
         }
             //Caminho mÃ­nimo entre dois vÃ©rtices usando Dijkstra;
@@ -183,11 +203,11 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
         }
         default:
         {
-
             cout << " Error!!! invalid option!!" << endl;
         }
 
     }
+
 }
 
 int mainMenu(ofstream& output_file, Graph* graph){
@@ -195,7 +215,7 @@ int mainMenu(ofstream& output_file, Graph* graph){
     int selecao = 1;
 
     while(selecao != 0){
-        system("cls");
+        //system("cls");
         selecao = menu();
 
         if(output_file.is_open())
