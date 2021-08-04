@@ -134,11 +134,8 @@ void Graph::insertEdge(int id, int target_id, float weight)
         Node* origin_node = this->getNode(id);
         if(!origin_node->searchEdge(target_id)){
             origin_node->insertEdge(this->getNode(target_id), this->directed, weight);
-<<<<<<< HEAD
-=======
             this->number_edges++;
             //cout <<"aresta criada com no de origem " << id << " e no alvo " << target_id << endl;
->>>>>>> Kruskal
         }
         else{
             cout << "ERROR: A aresta com no de origem" << id << " e no alvo " << target_id << " ja existe!" << endl;
