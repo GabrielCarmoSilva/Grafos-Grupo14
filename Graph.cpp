@@ -151,6 +151,22 @@ void Graph::insertEdge(int id, int target_id, float weight)
     }
 }
 
+void Graph::markEdge(int id, int target_id)
+{
+    if(searchNode(id) && searchNode(target_id)){
+        Edge* edge = this->getNode(id)->hasEdgeBetween(target_id);
+        if(edge != nullptr){
+            edge->setMarked(true);
+        } else{
+            cout << "ERROR: ARESTA NÃO EXISTE!" << endl;
+        }
+    } else if(!searchNode(id)){
+        cout << "ERROR: NO DE ORIGEM NAO EXISTE!" << endl;
+    } else{
+        cout << "ERROR: NO ALVO NAO EXISTE!" << endl;
+    }
+}
+
 void Graph::removeNode(int id){
 
     if(searchNode(id)) {
@@ -249,6 +265,8 @@ void Graph::save(ofstream& output_file){
     //definindo tipo de grafo para o dot
     string graphType = this->directed ? "strict digraph {" : "strict graph {";
     output_file << graphType << endl;
+
+    //imprimindo todos os nós
     for(Node* aux = this->first_node; aux != nullptr; aux = aux->getNextNode()){
         output_file << aux->getId();
         if(this->weighted_node){
@@ -257,13 +275,20 @@ void Graph::save(ofstream& output_file){
         output_file << ";" << endl;
     }
 
+    //imprimindo todas as arestas
     if(this->directed){
         for(Node* node = this->first_node; node != nullptr; node = node->getNextNode()){
             for(Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()){
                 output_file << node->getId() << " -> " << edge->getTargetId();
+
                 if(this->weighted_edge) {
                     output_file << " " << "[label=\"" << edge->getWeight() << "\",weight=\"" << edge->getWeight() << "\"]";
                 }
+
+                if(edge->isMarked()){
+                    output_file <<  "[color=\"red\"][penwidth = 2]";
+                }
+
                 output_file << ";" << endl;
             }
         }
@@ -272,9 +297,15 @@ void Graph::save(ofstream& output_file){
             for(Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()){
                 if(!edge->isDirected()){
                     output_file << node->getId() << " -- " << edge->getTargetId();
+
                     if(this->weighted_edge){
                         output_file << " " << "[label=\"" << edge->getWeight() << "\",weight=\"" << edge->getWeight() << "\"]";
                     }
+
+                    if(edge->isMarked()){
+                        output_file <<  "[color=\"red\"][penwidth = 2]";
+                    }
+
                     output_file << ";" << endl;
                 }
             }
@@ -599,6 +630,8 @@ void Graph::auxBuscaEmProfundidade(int id, int visited[], Graph* retorno){
 
                 //preenchendo grafo com as arestas de retorno
                 retorno->insertEdge(node->getId(), aux->getTargetId(), 0);
+                retorno->markEdge(node->getId(), aux->getTargetId());
+
             }
         }
         visited[node->getId()] = -2;

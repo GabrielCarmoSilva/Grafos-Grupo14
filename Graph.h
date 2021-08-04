@@ -28,6 +28,9 @@ private:
     void auxFTD(int id, int visited[]);
     void auxBuscaEmProfundidade(int id, int visited[], Graph* retorno);
 
+    //marcar arestas
+    void markEdge(int id, int target_id);
+
 public:
     //Constructor
     Graph(int order, bool directed, bool weighted_edge, bool weighted_node);
