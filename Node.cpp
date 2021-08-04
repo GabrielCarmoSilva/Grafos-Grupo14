@@ -98,11 +98,11 @@ void Node::setWeight(float weight){
 void Node::insertEdge(Node* target_node, bool directed,  float weight){
     // Verifies whether there are at least one edge in the node
     Edge* edge = new Edge(target_node->getId());
+    edge->setWeight(weight);
 
     if(this->first_edge != nullptr){
         // caso não seja a primeira
 
-        edge->setWeight(weight);
         this->last_edge->setNextEdge(edge);
         this->last_edge = edge;
 
@@ -110,7 +110,6 @@ void Node::insertEdge(Node* target_node, bool directed,  float weight){
     else{
         // caso seja a primeira aresta
         this->first_edge = edge;
-        this->first_edge->setWeight(weight);
         this->last_edge = this->first_edge;
 
     }
@@ -222,10 +221,10 @@ bool Node::searchEdge(int target_id){
     // Verifies whether there are at least one edge in the node
     if(this->first_edge != nullptr){
         // Searching for a specific edge of target id equal to target id
-        for(Edge* aux = this->first_edge; aux != nullptr; aux = aux->getNextEdge())
+        for(Edge* aux = this->first_edge; aux != nullptr; aux = aux->getNextEdge()){
             if(aux->getTargetId() == target_id)
                 return true;
-
+        }
     }
 
     return false;
