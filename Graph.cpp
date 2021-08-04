@@ -382,7 +382,6 @@ Graph* Graph::FTD(int id) {
                 cout << visited[k] << endl;
         }
 
-
         return this->listToGraph(visited);
 
     } else{
@@ -448,6 +447,7 @@ Graph* Graph::BuscaEmProfundidade(int id){
     //para armazenar as arestas de retorno
     int visited[this->order+1];
     Graph *retorno = new Graph(0, this->directed, this->weighted_edge, this->weighted_node);
+    Graph *resultado = new Graph(0, this->directed, this->weighted_edge, this->weighted_node);
 
     for(int i = 1; i <= this->order; i++){
         visited[i] = -1;
@@ -481,6 +481,7 @@ void Graph::auxBuscaEmProfundidade(int id, int visited[], Graph* retorno){
     if(node != nullptr){
         for(Edge* aux = node->getFirstEdge(); aux != nullptr; aux = aux->getNextEdge()){
 
+
             if(visited[aux->getTargetId()] == -1){
 
                 //caso seja um grafo nao direcionado
@@ -491,11 +492,8 @@ void Graph::auxBuscaEmProfundidade(int id, int visited[], Graph* retorno){
 
                 visited[aux->getTargetId()] = node->getId();
 
-                this->auxBuscaEmProfundidade(aux->getTargetId(), visited, retorno);
 
-            } else if(visited[aux->getTargetId()] >= 0 && visited[aux->getTargetId()] != node->getId() ){
-
-                //preenchendo grafo com arestas de retorno
+                //adicionando nós ao grafo de retonro
                 if(!retorno->searchNode(node->getId())){
                     retorno->insertNode(node->getId());
                 }
@@ -504,6 +502,15 @@ void Graph::auxBuscaEmProfundidade(int id, int visited[], Graph* retorno){
                     retorno->insertNode(aux->getTargetId());
                 }
 
+                retorno->insertEdge(node->getId(), aux->getTargetId(), aux->getWeight());
+
+                this->auxBuscaEmProfundidade(aux->getTargetId(), visited, retorno);
+
+            } else if(visited[aux->getTargetId()] >= 0 && visited[aux->getTargetId()] != node->getId() ){
+
+                //adicionando nós ao grafo de retonro caso nao existam
+
+                //preenchendo grafo com as arestas de retorno
                 retorno->insertEdge(node->getId(), aux->getTargetId(), 0);
             }
         }

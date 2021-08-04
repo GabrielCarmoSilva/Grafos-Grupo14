@@ -16,6 +16,7 @@ private:
     Edge* next_edge;
     float weight;
     bool directed;
+    bool marked;
 
 public:
     // Constructor
@@ -33,6 +34,10 @@ public:
     bool isDirected() const;
 
     void setDirected(bool directed);
+
+    bool isMarked() const;
+
+    void setMarked(bool marked);
 
 };
 

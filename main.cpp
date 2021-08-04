@@ -130,7 +130,7 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
         }
         case 1:{
 
-            Graph* aux = graph->FTD(1);
+            Graph* aux = graph->BuscaEmProfundidade(1);
             aux->save(output_file);
             break;
         }
