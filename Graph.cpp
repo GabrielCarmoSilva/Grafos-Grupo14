@@ -415,17 +415,22 @@ void Graph::dijkstra(int idSource, int idTarget, ofstream& output_file) {
         }
     }
     Graph* graph = new Graph(0, this->directed, this->weighted_edge, this->weighted_node);
-    while(idTarget != idSource && idTarget != -1 && ant[idTarget] != -1) {
-        if(!graph->searchNode(idTarget)) {
-            graph->insertNode(idTarget);
-        }
-        if(!graph->searchNode(ant[idTarget])) {    
-            graph->insertNode(ant[idTarget]);
-        }
-        graph->insertEdge(ant[idTarget], idTarget, this->getNode(ant[idTarget])->hasEdgeBetween(idTarget)->getWeight());
-        idTarget = ant[idTarget];
+    if(idTarget == -1 || ant[idTarget] == -1) {
+        cout << "Caminho não encontrado!" << endl;
     }
-    graph->save(output_file);
+    else {
+        while(idTarget != idSource && idTarget != -1 && ant[idTarget] != -1) {
+            if(!graph->searchNode(idTarget)) {
+                graph->insertNode(idTarget);
+            }
+            if(!graph->searchNode(ant[idTarget])) {    
+                graph->insertNode(ant[idTarget]);
+            }
+            graph->insertEdge(ant[idTarget], idTarget, this->getNode(ant[idTarget])->hasEdgeBetween(idTarget)->getWeight());
+            idTarget = ant[idTarget];
+        }
+        graph->save(output_file);
+    }       
 }
 
 //function that prints a topological sorting
