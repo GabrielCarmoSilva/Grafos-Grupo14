@@ -426,9 +426,6 @@ void Graph::dijkstra(int idSource, int idTarget, ofstream& output_file) {
         idTarget = ant[idTarget];
     }
     graph->save(output_file);
-    if(idTarget == -1 || ant[idTarget] == -1) {
-        cout << "Caminho não encontrado!" << endl;
-    }
 }
 
 //function that prints a topological sorting
