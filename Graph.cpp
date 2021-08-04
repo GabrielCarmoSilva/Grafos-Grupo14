@@ -134,6 +134,11 @@ void Graph::insertEdge(int id, int target_id, float weight)
         Node* origin_node = this->getNode(id);
         if(!origin_node->searchEdge(target_id)){
             origin_node->insertEdge(this->getNode(target_id), this->directed, weight);
+<<<<<<< HEAD
+=======
+            this->number_edges++;
+            //cout <<"aresta criada com no de origem " << id << " e no alvo " << target_id << endl;
+>>>>>>> Kruskal
         }
         else{
             cout << "ERROR: A aresta com no de origem" << id << " e no alvo " << target_id << " ja existe!" << endl;
@@ -462,8 +467,6 @@ void Graph::dijkstra(int idSource, int idTarget, ofstream& output_file) {
         }
         graph->save(output_file);
     }       
-}
-
 //function that prints a topological sorting
 void topologicalSorting(){
 
@@ -476,8 +479,170 @@ Graph* getVertexInduced(int* listIdNodes){
 
 }
 
-Graph* agmKuskal() {
+void Graph::agmKruskal(ofstream& output_file){
+    int i, j, dest, primeiro, NV = this->order, cont = 0;
+    int pai[order+1];
+    int vizinhos[this->order];
+    double menorPeso;
+    int orig = this->getFirstNode()->getId();
+    int *arv = (int*) malloc(NV*sizeof(int));
+    for(i = 1; i <= NV; i++) {
+        arv[i] = i;
+        pai[i] = -1;
+        vizinhos[i] = -1;
+    }
+    pai[orig] = orig;
+    while(1) {
+        primeiro = 1;
+        for(i = 1; i <= NV; i++) {
+            for(int k = 1; k <= NV; k++) {
+                if(this->getNode(i)->searchEdge(k)) {
+                    vizinhos[cont] = k;
+                    cont++; 
+                }
+            }
+            cont = 0;
+            for(j = 0; j < this->getNode(i)->getOutDegree(); j++) {
+                if(arv[i] != arv[vizinhos[j]]) {
+                    if(primeiro) {
+                        menorPeso = this->getNode(i)->hasEdgeBetween(vizinhos[j])->getWeight();
+                        orig = i;
+                        dest = vizinhos[j];
+                        primeiro = 0;
+                    }
+                    else {
+                        if(menorPeso > this->getNode(i)->hasEdgeBetween(vizinhos[j])->getWeight()) {
+                            menorPeso = this->getNode(i)->hasEdgeBetween(vizinhos[j])->getWeight();
+                            orig = i;
+                            dest = vizinhos[j];
+                        } 
+                    }
+                }
+            }
+            for(int t = 1; t <= NV; t++) {
+                vizinhos[t] = -1;
+            }
+        }
+        if(primeiro == 1) break;
+        if(pai[orig] == -1) pai[orig] = dest;
+        else pai[dest] = orig;
+
+        for(i = 1; i <= NV; i++) {
+            if(arv[i] == arv[dest]) {
+                arv[i] = arv[orig];
+            }
+        }
+    }
+    Graph* graph = new Graph(0, this->directed, this->weighted_edge, this->weighted_node);
+    for(int i = 1; i <= NV; i++) {
+        if(pai[i] != i) {
+            if(!graph->searchNode(i)) {
+                graph->insertNode(i);
+            }
+            if(!graph->searchNode(pai[i]) && pai[i] != -1) {
+                graph->insertNode(pai[i]);
+            }
+            if(graph->searchNode(pai[i]) && graph->searchNode(i) && pai[i] != -1) {
+                if(!this->directed) {
+                    graph->insertEdge(i, pai[i], this->getNode(i)->hasEdgeBetween(pai[i])->getWeight());
+                }
+                else {
+                    if(this->getNode(i)->searchEdge(pai[i])) {
+                        graph->insertEdge(i, pai[i], this->getNode(i)->hasEdgeBetween(pai[i])->getWeight());
+                    }
+                    else if(this->getNode(pai[i])->searchEdge(i)) {
+                        graph->insertEdge(pai[i], i, this->getNode(pai[i])->hasEdgeBetween(i)->getWeight());
+                    }
+                }
+            }
+        }    
+    }
+    graph->save(output_file);
 }
+
+// void Graph::agmKruskal(ofstream& output_file){
+//     Edge* S[this->getNumberEdges()] = {};
+//     Node* node = this->getFirstNode();
+//     Node* aux = node;
+//     Node* aux2 = nullptr;
+//     int i = 0;
+//     int index = 0;
+//     int flag_insert = 0;
+//     while(node != nullptr) {
+//         while(aux != nullptr) {
+//             if(node->searchEdge(aux->getId())) {
+//                 S[i] = node->hasEdgeBetween(aux->getId());
+//                 i++;
+//             }
+//             if(aux == this->last_node) {
+//                 break;
+//             }
+//             aux = aux->getNextNode();
+//         }
+//         if(node == this->last_node) {
+//             break;
+//         }
+//         node = node->getNextNode();
+//         aux = node;
+//     }
+//     Node *node1 = this->getFirstNode();
+//     //aresta nao pode ter inicio e fim em elementos que ja estao no grafo
+//     Graph* graph = new Graph(0, 0, 1, 0);
+//     Edge* minWeightEdge = S[0];
+//     for(int k = 0; k < this->getNumberEdges(); k++) {
+//         for(int i = 0; i < this->getNumberEdges(); i++) {
+//             if(S[i] != nullptr && S[i]->getWeight() <= minWeightEdge->getWeight()) {
+//                 minWeightEdge = S[i];
+//                 index = i;
+//             }
+//         }
+//         S[index] = nullptr;
+//         if(graph->getFirstNode() != nullptr) {
+//             Node* aux2 = graph->getFirstNode();
+//         }
+//         flag_insert = false;
+//         while(node1 != nullptr) {
+//             cout << "Node 1: " << node1->getId() << endl;
+//             if(node1->searchEdge(minWeightEdge->getTargetId())) {
+//                 if(aux2 == nullptr) {
+//                     cout << "Entrou nesse if" << endl;
+//                     flag_insert = 0;
+//                 }
+//                 else {
+//                     while(aux2 != nullptr) {
+//                         cout << "Aux2: " << aux2->getId() << endl;
+//                         cout << "Target Id: " << minWeightEdge->getTargetId() << endl;
+//                         if(aux2->getId() == minWeightEdge->getTargetId() || aux2->getId() == node1->getId()) {
+//                             flag_insert++;
+//                         }
+//                         aux2 = aux2->getNextNode();
+//                     }
+//                 }
+//                 if(flag_insert < 2) {
+//                     cout << "Entrou aqui para inserir os nós" << endl;
+//                     graph->insertNode(node1->getId());
+//                     graph->insertNode(minWeightEdge->getTargetId());
+//                     graph->insertEdge(node1->getId(), minWeightEdge->getTargetId(), this->directed);
+//                     cout << "Inseriu aresta do " << node1->getId() << " pro " << minWeightEdge->getTargetId() << endl;
+//                 }
+//             }
+//             node1 = node1->getNextNode();
+//             if(graph->getFirstNode() != nullptr) {
+//                 aux2 = graph->getFirstNode();
+//             }
+//             flag_insert = 0;
+//         }
+//         node1 = this->first_node;
+//         if(graph->getFirstNode() != nullptr) {
+//             aux2 = graph->getFirstNode();
+//         }
+//         flag_insert = 0;
+//     }
+//     graph->print();   
+//     graph->save(output_file);
+// }
+
+
 
 Graph* agmPrim(){
 
