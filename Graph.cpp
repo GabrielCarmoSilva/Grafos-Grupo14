@@ -374,14 +374,15 @@ float Graph::floydMarshall(int idSource, int idTarget){
 
 
 int Graph::procuraMenorDistancia(float *dist, int *visitado, int NV) {
+    //procura o vertice com a menor distancia para o vertice de origem 
     int i, menor = -1, primeiro = 1;
     for(i = 0; i < NV; i++) {
-        if(dist[i] >= 0 && visitado[i] == 0) {
-            if(primeiro) {
-                menor = i;
+        if(dist[i] >= 0 && visitado[i] == 0) { //verifica se a distancia realmente existe e se o vertice ainda nao foi visitado pelo caminho minimo
+            if(primeiro) { //verifica se foi visitado pela primeira vez
+                menor = i; //recebe vertice
                 primeiro = 0;
             } else {
-                if(dist[menor] > dist[i])
+                if(dist[menor] > dist[i]) //verifica se a distancia do menor achado é maior do que a distancia para o vertice origem da iteração atual
                     menor = i;
             }
         }
@@ -390,79 +391,80 @@ int Graph::procuraMenorDistancia(float *dist, int *visitado, int NV) {
 }
 
 void Graph::dijkstra(int idSource, int idTarget, ofstream& output_file) {
-    int ant[this->order+1];
-    float dist[this->order+1];
-    int vizinhos[this->order+1];
+    int ant[this->order+1]; // armazena o vertice anterior de cada indice no caminho minimo
+    float dist[this->order+1]; //armazena a distancia de cada vertice ao vertice inicial
+    int vizinhos[this->order+1]; //armazena todas os nos do vertice nos quais possuem arestas
     int i, cont, NV, ind, *visitado, u;
-    cont = NV = this->order+1;
-    visitado = (int*) malloc(NV * sizeof(int));
-    for(i = 0; i < NV; i++) {
+    cont = NV = this->order+1; //achar numero de vertices do grafo
+    visitado = (int*) malloc(NV * sizeof(int)); //aloca dinamicamente vetor com numero de vertices e verifica se ja foi visitado
+    for(i = 0; i < NV; i++) { //inicializando vetores
         ant[i] = -1;
         dist[i] = -1;
         visitado[i] = 0;
     }
-    dist[idSource] = 0;
+    dist[idSource] = 0; //distancia do idSource pra ele mesmo é 0
     while(cont > 0) {
-        u = procuraMenorDistancia(dist, visitado, NV);
+        u = procuraMenorDistancia(dist, visitado, NV); //procura o vertice com menor distancia para o vertice de origem
         if(u == -1)
             break;
-        visitado[u] = 1;
-        cont--;
+        visitado[u] = 1; //indica que o vertice u ja foi visitado pelo caminho
+        cont--; //subtrai o vertice ja visitado da contagem
         int j = 0;
         for(int k = 0; k < this->order+1; k++) {
             if(this->getNode(u)->searchEdge(k)) {
-                vizinhos[j] = k;
+                vizinhos[j] = k; //acha todos os vertices vizinhos de u
                 j++; 
             }
         }
         for(i = 0; i < this->getNode(u)->getOutDegree(); i++) {
-            ind = vizinhos[i];
-            if(dist[ind] < 0) {
+            ind = vizinhos[i]; //vertice que possui aresta em u
+            if(dist[ind] < 0) { //se a distancia de ind é -1, ou seja, se ainda não foi calculada a distancia desse vertice para o vertice inicial
                 if(!this->weighted_edge) {
-                    dist[ind] = dist[u] + 1;
-                    ant[ind] = u;
+                    dist[ind] = dist[u] + 1; //se a aresta nao tem peso, soma mais 1 na distancia
+                    ant[ind] = u; //o anterior de ind no caminho é u
                 }
                 else {
                     if(this->getNode(u)->searchEdge(ind)) {
-                        dist[ind] = dist[u] + this->getNode(u)->hasEdgeBetween(ind)->getWeight();
-                        ant[ind] = u;
+                        dist[ind] = dist[u] + this->getNode(u)->hasEdgeBetween(ind)->getWeight(); //aresta tem peso, entao soma o peso da aresta
+                        ant[ind] = u; //o anterior de ind no caminho é u
                     }
                 }    
             }
-            else {
+            else { //se a distancia desse vertice para o vertice inicial ja foi calculada
                 if(!this->weighted_edge) {
-                    if(dist[ind] > dist[u] + 1) {
-                        dist[ind] = dist[u] + 1;
-                        ant[ind] = u;
+                    if(dist[ind] > dist[u] + 1) { //se a distancia ja setada para esse vertice é maior do que a distancia calculada agora
+                        dist[ind] = dist[u] + 1; //se a aresta nao tem peso, soma mais 1 na distancia
+                        ant[ind] = u; //o anterior de ind no caminho é u
                     }
                 }
                 else {
                     if(this->getNode(u)->searchEdge(ind)) {
                         if(dist[ind] > dist[u] + this->getNode(u)->hasEdgeBetween(ind)->getWeight()) {
-                            dist[ind] = dist[u] + this->getNode(u)->hasEdgeBetween(ind)->getWeight();
-                            ant[ind] = u;
+                            dist[ind] = dist[u] + this->getNode(u)->hasEdgeBetween(ind)->getWeight(); //aresta tem peso, entao soma o peso da aresta
+                            ant[ind] = u; //o anterior de ind no caminho é u
                         }
                     }
                 }    
             }
         }
     }
-    Graph* graph = new Graph(0, this->directed, this->weighted_edge, this->weighted_node);
-    if(idTarget == -1 || ant[idTarget] == -1) {
+    Graph* graph = new Graph(0, this->directed, this->weighted_edge, this->weighted_node); //cria o grafo que ira armazenar o caminho minimo
+    if(idTarget == -1 || ant[idTarget] == -1) { //se nao tem caminho, o anterior nunca deixou de ser -1
         cout << "Caminho não encontrado!" << endl;
     }
     else {
+        //todos os vertices do caminho estao no vetor ant. exemplo: se o grafo tem aresta de 1 para 2, o ant de 2 é 1. logo, o idSource será a última posição setada do vetor ant, e o idTarget, a primeira.
         while(idTarget != idSource && idTarget != -1 && ant[idTarget] != -1) {
-            if(!graph->searchNode(idTarget)) {
-                graph->insertNode(idTarget);
+            if(!graph->searchNode(idTarget)) { //verifica se nó já foi inserido
+                graph->insertNode(idTarget); //insere nó
             }
-            if(!graph->searchNode(ant[idTarget])) {    
-                graph->insertNode(ant[idTarget]);
+            if(!graph->searchNode(ant[idTarget])) {  //verifica se nó já foi inserido  
+                graph->insertNode(ant[idTarget]); //insere o nó anterior
             }
-            graph->insertEdge(ant[idTarget], idTarget, this->getNode(ant[idTarget])->hasEdgeBetween(idTarget)->getWeight());
-            idTarget = ant[idTarget];
+            graph->insertEdge(ant[idTarget], idTarget, this->getNode(ant[idTarget])->hasEdgeBetween(idTarget)->getWeight()); //insere aresta entre os dois nós que foram inseridos com o peso do grafo original
+            idTarget = ant[idTarget]; //recebe o vértice anterior a ele mesmo
         }
-        graph->save(output_file);
+        graph->save(output_file); //salva o grafo no arquivo
     }       
 //function that prints a topological sorting
 void topologicalSorting(){
@@ -478,38 +480,38 @@ Graph* getVertexInduced(int* listIdNodes){
 
 void Graph::agmKruskal(ofstream& output_file){
     int i, j, dest, primeiro, NV = this->order, cont = 0;
-    int pai[order+1];
-    int vizinhos[this->order];
+    int pai[order+1]; //vetor para setar o pai de cada vertice na arvore
+    int vizinhos[this->order]; //vetor para encontrar todos os vertices que possuem arestas em um vertice especifico
     double menorPeso;
     int orig = this->getFirstNode()->getId();
-    int *arv = (int*) malloc(NV*sizeof(int));
-    for(i = 1; i <= NV; i++) {
+    int *arv = (int*) malloc(NV*sizeof(int)); //vetor para encontrar a arvore de cada vertice
+    for(i = 1; i <= NV; i++) { //inicializando vetores
         arv[i] = i;
         pai[i] = -1;
         vizinhos[i] = -1;
     }
-    pai[orig] = orig;
-    while(1) {
+    pai[orig] = orig; //seta o pai de origem como a própria origem
+    while(1) { //loop infinito até ser quebrado
         primeiro = 1;
         for(i = 1; i <= NV; i++) {
             for(int k = 1; k <= NV; k++) {
                 if(this->getNode(i)->searchEdge(k)) {
-                    vizinhos[cont] = k;
+                    vizinhos[cont] = k; //seta todos os vertices vizinhos de i
                     cont++; 
                 }
             }
-            cont = 0;
-            for(j = 0; j < this->getNode(i)->getOutDegree(); j++) {
-                if(arv[i] != arv[vizinhos[j]]) {
-                    if(primeiro) {
-                        menorPeso = this->getNode(i)->hasEdgeBetween(vizinhos[j])->getWeight();
+            cont = 0; //zera a variavel para o proximo vertice
+            for(j = 0; j < this->getNode(i)->getOutDegree(); j++) { //analisa todas as arestas do vertice
+                if(arv[i] != arv[vizinhos[j]]) { //se a arvore de i e de seus vizinhos sao diferentes, caso seja, o vertice vizinho pode ser inserido
+                    if(primeiro) { //verifica se é a primeira vez que está visitando esse vértice
+                        menorPeso = this->getNode(i)->hasEdgeBetween(vizinhos[j])->getWeight(); //seta o peso da aresta de i para seu vizinho como a menor
                         orig = i;
                         dest = vizinhos[j];
                         primeiro = 0;
                     }
-                    else {
-                        if(menorPeso > this->getNode(i)->hasEdgeBetween(vizinhos[j])->getWeight()) {
-                            menorPeso = this->getNode(i)->hasEdgeBetween(vizinhos[j])->getWeight();
+                    else { //caso nao seja a primeira vez que esse vertice esta visitado
+                        if(menorPeso > this->getNode(i)->hasEdgeBetween(vizinhos[j])->getWeight()) { //se o peso atual é maior do que o peso da aresta de i para seu vizinho em questão
+                            menorPeso = this->getNode(i)->hasEdgeBetween(vizinhos[j])->getWeight(); //seta o menor peso como o peso da aresta de i para seu vizinho
                             orig = i;
                             dest = vizinhos[j];
                         } 
@@ -517,35 +519,35 @@ void Graph::agmKruskal(ofstream& output_file){
                 }
             }
             for(int t = 1; t <= NV; t++) {
-                vizinhos[t] = -1;
+                vizinhos[t] = -1; //inicializa o vetor como -1 para o proximo vertice
             }
         }
-        if(primeiro == 1) break;
-        if(pai[orig] == -1) pai[orig] = dest;
-        else pai[dest] = orig;
+        if(primeiro == 1) break; //achou a arvore minima, entao sai do loop
+        if(pai[orig] == -1) pai[orig] = dest; //se o pai de tal vertice é -1, significa que ele não tem um vertice pai, entao setando como ele mesmo
+        else pai[dest] = orig; //setando o pai do vertice caso ele tenha
 
         for(i = 1; i <= NV; i++) {
             if(arv[i] == arv[dest]) {
-                arv[i] = arv[orig];
+                arv[i] = arv[orig]; //colocando todos os vertices achados na mesma arvore
             }
         }
     }
-    Graph* graph = new Graph(0, this->directed, this->weighted_edge, this->weighted_node);
+    Graph* graph = new Graph(0, this->directed, this->weighted_edge, this->weighted_node); //criando grafo
     for(int i = 1; i <= NV; i++) {
-        if(pai[i] != i) {
+        if(pai[i] != i) { //verifica se o pai de i e i não são iguais, porque nesse caso teriamos um self-loop, o que nao é o caso
             if(!graph->searchNode(i)) {
-                graph->insertNode(i);
+                graph->insertNode(i); //insere i
             }
             if(!graph->searchNode(pai[i]) && pai[i] != -1) {
-                graph->insertNode(pai[i]);
+                graph->insertNode(pai[i]); //insere pai de i
             }
             if(graph->searchNode(pai[i]) && graph->searchNode(i) && pai[i] != -1) {
-                if(!this->directed) {
+                if(!this->directed) { //verifica se aresta nao e direcionada, entao nao existe preocupacao com a ordem dos vertices na aresta 
                     graph->insertEdge(i, pai[i], this->getNode(i)->hasEdgeBetween(pai[i])->getWeight());
                 }
                 else {
-                    if(this->getNode(i)->searchEdge(pai[i])) {
-                        graph->insertEdge(i, pai[i], this->getNode(i)->hasEdgeBetween(pai[i])->getWeight());
+                    if(this->getNode(i)->searchEdge(pai[i])) { //caso a aresta seja direcionada, preciso saber se a aresta vai de i pra pai ou de pai pra i
+                        graph->insertEdge(i, pai[i], this->getNode(i)->hasEdgeBetween(pai[i])->getWeight()); //insere aresta de forma correta
                     }
                     else if(this->getNode(pai[i])->searchEdge(i)) {
                         graph->insertEdge(pai[i], i, this->getNode(pai[i])->hasEdgeBetween(i)->getWeight());
@@ -554,92 +556,8 @@ void Graph::agmKruskal(ofstream& output_file){
             }
         }    
     }
-    graph->save(output_file);
+    graph->save(output_file); //salva no grafo
 }
-
-// void Graph::agmKruskal(ofstream& output_file){
-//     Edge* S[this->getNumberEdges()] = {};
-//     Node* node = this->getFirstNode();
-//     Node* aux = node;
-//     Node* aux2 = nullptr;
-//     int i = 0;
-//     int index = 0;
-//     int flag_insert = 0;
-//     while(node != nullptr) {
-//         while(aux != nullptr) {
-//             if(node->searchEdge(aux->getId())) {
-//                 S[i] = node->hasEdgeBetween(aux->getId());
-//                 i++;
-//             }
-//             if(aux == this->last_node) {
-//                 break;
-//             }
-//             aux = aux->getNextNode();
-//         }
-//         if(node == this->last_node) {
-//             break;
-//         }
-//         node = node->getNextNode();
-//         aux = node;
-//     }
-//     Node *node1 = this->getFirstNode();
-//     //aresta nao pode ter inicio e fim em elementos que ja estao no grafo
-//     Graph* graph = new Graph(0, 0, 1, 0);
-//     Edge* minWeightEdge = S[0];
-//     for(int k = 0; k < this->getNumberEdges(); k++) {
-//         for(int i = 0; i < this->getNumberEdges(); i++) {
-//             if(S[i] != nullptr && S[i]->getWeight() <= minWeightEdge->getWeight()) {
-//                 minWeightEdge = S[i];
-//                 index = i;
-//             }
-//         }
-//         S[index] = nullptr;
-//         if(graph->getFirstNode() != nullptr) {
-//             Node* aux2 = graph->getFirstNode();
-//         }
-//         flag_insert = false;
-//         while(node1 != nullptr) {
-//             cout << "Node 1: " << node1->getId() << endl;
-//             if(node1->searchEdge(minWeightEdge->getTargetId())) {
-//                 if(aux2 == nullptr) {
-//                     cout << "Entrou nesse if" << endl;
-//                     flag_insert = 0;
-//                 }
-//                 else {
-//                     while(aux2 != nullptr) {
-//                         cout << "Aux2: " << aux2->getId() << endl;
-//                         cout << "Target Id: " << minWeightEdge->getTargetId() << endl;
-//                         if(aux2->getId() == minWeightEdge->getTargetId() || aux2->getId() == node1->getId()) {
-//                             flag_insert++;
-//                         }
-//                         aux2 = aux2->getNextNode();
-//                     }
-//                 }
-//                 if(flag_insert < 2) {
-//                     cout << "Entrou aqui para inserir os nós" << endl;
-//                     graph->insertNode(node1->getId());
-//                     graph->insertNode(minWeightEdge->getTargetId());
-//                     graph->insertEdge(node1->getId(), minWeightEdge->getTargetId(), this->directed);
-//                     cout << "Inseriu aresta do " << node1->getId() << " pro " << minWeightEdge->getTargetId() << endl;
-//                 }
-//             }
-//             node1 = node1->getNextNode();
-//             if(graph->getFirstNode() != nullptr) {
-//                 aux2 = graph->getFirstNode();
-//             }
-//             flag_insert = 0;
-//         }
-//         node1 = this->first_node;
-//         if(graph->getFirstNode() != nullptr) {
-//             aux2 = graph->getFirstNode();
-//         }
-//         flag_insert = 0;
-//     }
-//     graph->print();   
-//     graph->save(output_file);
-// }
-
-
 
 Graph* agmPrim(){
 
