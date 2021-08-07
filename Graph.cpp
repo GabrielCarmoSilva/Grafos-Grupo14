@@ -723,14 +723,21 @@ Graph* Graph::aciclicoDirecionado(){
     for(int i = 1; i <= this->order; i++){
         visited[i] = -1;
     }
-    int id=0;
+    int id=1;
     visited[id] = 0;
 
     //Possíveis valores no vetor visited, que representa os nos do grafo
     // -1 -> no não visitado
     //  numero >= 0 (id do no anterior) -> visitado 1 vez
     //  -2 -> no que todas as arestas já foram visitadas
-    auxBuscaEmProfundidade(id, visited, retorno);
+
+    //verifica se o grafo eh direcionado
+    if(!this->directed){
+        cout <<"Grafo nao direcionado, logo nao pode ser aciclico direcionado"<<endl;
+        exit(1);
+    } else{
+        auxBuscaEmProfundidade(id, visited, retorno);
+    }
 
 
 }
@@ -739,19 +746,10 @@ void Graph::auxaciclicoDirecionado(int id, int visited[], Graph* retorno){
     if(node != nullptr){
         for(Edge* aux = node->getFirstEdge(); aux != nullptr; aux = aux->getNextEdge()){
 
-
             if(visited[aux->getTargetId()] == -1){
 
-                //deveria mandr sair do if p ver se o prox if tb retorna q nao eh aciclico p dar o erro
-                if(!this->directed){
-                    cout <<"erro?"<<endl;
-                    exit(1);
-                }   
-
-                else{
-                    visited[aux->getTargetId()] = node->getId();
-                    this->auxBuscaEmProfundidade(aux->getTargetId(), visited, retorno);
-                }
+                visited[aux->getTargetId()] = node->getId();
+                this->auxBuscaEmProfundidade(aux->getTargetId(), visited, retorno);
 
             } else if(visited[aux->getTargetId()] >= 0 && visited[aux->getTargetId()] != node->getId() ){
 
