@@ -557,7 +557,45 @@ void Graph::agmKruskal(ofstream& output_file){
     graph->save(output_file); //salva no grafo
 }
 
-Graph* Graph::agmPrim(){
+void Graph::agmPrim(Graph* graph, int id_origin, int* parent){
+    int dest, first_node;
+    Node* current_node;
+    Edge* current_edge;
+    double path;
+
+    for(int i=0; i < graph->getOrder(); i++)
+        parent[i] = -1;
+    parent[id_origin] = id_origin;
+
+    while (1)
+    {
+        first_node = 1;
+        for (int i = 0; i < graph->getOrder(); i++)
+        {
+            if(parent[i] != -1)
+            {
+                current_node = graph->getNode(i);
+                current_edge = current_node->getFirstEdge();
+                
+                for (int j = 0; j < current_node->getOutDegree(); j++)
+                {
+
+                    if (parent[current_edge->getTargetId()] == -1)
+                    {
+                        /* code */
+                    }
+
+                    current_edge = current_edge->getNextEdge();
+                    
+                }
+            }
+                
+        }
+        if(first_node == 1)
+            break;
+        parent[dest] = id_origin;
+    }
+    
 
 }
 
