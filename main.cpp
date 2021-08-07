@@ -151,25 +151,31 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
             cout << "Digite o id de destino: " << endl;
             cin >> idTarget;
             Graph* aux = graph->dijkstra(idSource, idTarget);
-            if(salvar())
+            if(aux != nullptr && salvar())
                 aux->save(output_file);
             break;
         }
         case 1:{
 
-            Graph* aux = graph->BuscaEmProfundidade(1);
-            if(salvar())
+            Graph* aux = graph->aciclicoDirecionado();
+            if(aux != nullptr && salvar())
                 aux->save(output_file);
 
             break;
         }
             //Caminho mÃ­nimo entre dois vÃ©rtices usando Dijkstra;
         case 2:{
+            Graph* aux = graph->BuscaEmProfundidade(1);
+            if(aux != nullptr && salvar())
+                aux->save(output_file);
+
             break;
         }
             //Caminho mÃ­nimo entre dois vÃ©rtices usando Floyd;
         case 3:{
-
+            Graph* aux = graph->aciclicoDirecionado();
+            if(aux != nullptr && salvar())
+                aux->save(output_file);
             break;
         }
 
@@ -177,13 +183,14 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
         case 4:{
             Graph* aux = graph->agmKruskal();
             if(salvar())
+            if(aux != nullptr && salvar())
                 aux->save(output_file);
             break;
         }
 
             //AGM Prim;
         case 5:{
-
+            graph->print();
             break;
         }
 
