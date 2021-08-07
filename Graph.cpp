@@ -478,8 +478,15 @@ Graph* Graph::getVertexInduced(int* listIdNodes){
 
 Graph* Graph::agmKruskal(){
     int i, j, dest, primeiro, NV = this->order, cont = 0;
+    cout << "Entrou" << endl;
     int pai[order+1]; //vetor para setar o pai de cada vertice na arvore
-    int vizinhos[this->order][this->order]; //matriz para encontrar todos os vertices que possuem arestas em um vertice especifico
+    cout << "Entrou" << endl;
+    cout << this->order+1 << endl;
+    int** vizinhos = new int*[NV]; //matriz para encontrar todos os vertices que possuem arestas em um vertice especifico
+    for(i = 1; i <= this->order+1; i++)
+        vizinhos[i] = new int[this->order+1];
+
+    cout << "Entrou" << endl;
     double menorPeso;
     int orig = this->getFirstNode()->getId();
     int arv[NV]; //vetor para encontrar a arvore de cada vertice
@@ -519,15 +526,21 @@ Graph* Graph::agmKruskal(){
                 }
             }
         }
-        if(primeiro == 1) break; //achou a arvore minima, entao sai do loop
+        if(primeiro == 1) {
+            break;
+        } //achou a arvore minima, entao sai do loop
         //tratamento para ver quem é o pai de quem. se orig nao tem pai, colocando dest como pai dele. se orig já tem pai, colocando orig como o pai de dest
         if(pai[orig] == -1) pai[orig] = dest; 
         else pai[dest] = orig; 
+
+        cout << pai[dest] << endl;
+        cout << pai[orig] << endl;
 
         for(i = 1; i <= NV; i++) {
             if(arv[i] == arv[dest]) {
                 arv[i] = arv[orig]; //colocando todos os vertices achados na mesma arvore, já que dest e orig já estão conectados
             }
+            cout << arv[i] << endl;
         }
     }
     Graph* graph = new Graph(0, this->directed, this->weighted_edge, this->weighted_node); //criando grafo
@@ -554,6 +567,9 @@ Graph* Graph::agmKruskal(){
             }
         }    
     }
+    // for(int i = 1; i <= NV; i++)
+    //     delete[] vizinhos[i];
+    // delete[] vizinhos;
     return graph;
 }
 
