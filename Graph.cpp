@@ -479,45 +479,44 @@ Graph* Graph::getVertexInduced(int* listIdNodes){
 Graph* Graph::agmKruskal(){
     int i, j, dest, primeiro, NV = this->order, cont = 0;
     int pai[order+1]; //vetor para setar o pai de cada vertice na arvore
-    int vizinhos[this->order]; //vetor para encontrar todos os vertices que possuem arestas em um vertice especifico
+    int vizinhos[this->order][this->order]; //matriz para encontrar todos os vertices que possuem arestas em um vertice especifico
     double menorPeso;
     int orig = this->getFirstNode()->getId();
     int arv[NV]; //vetor para encontrar a arvore de cada vertice
     for(i = 1; i <= NV; i++) { //inicializando vetores
         arv[i] = i;
         pai[i] = -1;
-        vizinhos[i] = -1;
     }
     pai[orig] = orig; //seta o pai de origem como a própria origem
+    for(int v = 1; v <= NV; v++) {
+        for(j = 1; j <= NV; j++) {
+            if(this->getNode(v)->searchEdge(j)) {
+                vizinhos[v][cont] = j; //achando a matriz de vertices. se v for 1, j será todos os vertices que possuem arestas em 1
+                cont++; 
+            }
+        }
+        cont = 0;
+    }
     while(1) { //loop infinito até ser quebrado
         primeiro = 1;
         for(i = 1; i <= NV; i++) {
-            for(int k = 1; k <= NV; k++) {
-                if(this->getNode(i)->searchEdge(k)) {
-                    vizinhos[cont] = k; //seta todos os vertices vizinhos de i
-                    cont++; 
-                }
-            }
             cont = 0; //zera a variavel para o proximo vertice
             for(j = 0; j < this->getNode(i)->getOutDegree(); j++) { //analisa todas as arestas do vertice
-                if(arv[i] != arv[vizinhos[j]]) { //se a arvore de i e de seus vizinhos sao diferentes, caso seja, o vertice vizinho pode ser inserido
+                if(arv[i] != arv[vizinhos[i][j]]) { //se a arvore de i e de seus vizinhos sao diferentes, caso seja, o vertice vizinho pode ser inserido
                     if(primeiro) { //verifica se é a primeira vez que está visitando esse vértice
-                        menorPeso = this->getNode(i)->hasEdgeBetween(vizinhos[j])->getWeight(); //seta o peso da aresta de i para seu vizinho como a menor
+                        menorPeso = this->getNode(i)->hasEdgeBetween(vizinhos[i][j])->getWeight(); //seta o peso da aresta de i para seu vizinho como a menor
                         orig = i;
-                        dest = vizinhos[j];
+                        dest = vizinhos[i][j];
                         primeiro = 0;
                     }
                     else { //caso nao seja a primeira vez que esse vertice esta visitado
-                        if(menorPeso > this->getNode(i)->hasEdgeBetween(vizinhos[j])->getWeight()) { //se o peso atual é maior do que o peso da aresta de i para seu vizinho em questão
-                            menorPeso = this->getNode(i)->hasEdgeBetween(vizinhos[j])->getWeight(); //seta o menor peso como o peso da aresta de i para seu vizinho
+                        if(menorPeso > this->getNode(i)->hasEdgeBetween(vizinhos[i][j])->getWeight()) { //se o peso atual é maior do que o peso da aresta de i para seu vizinho em questão
+                            menorPeso = this->getNode(i)->hasEdgeBetween(vizinhos[i][j])->getWeight(); //seta o menor peso como o peso da aresta de i para seu vizinho
                             orig = i;
-                            dest = vizinhos[j];
+                            dest = vizinhos[i][j];
                         } 
                     }
                 }
-            }
-            for(int t = 1; t <= NV; t++) {
-                vizinhos[t] = -1; //inicializa o vetor como -1 para o proximo vertice
             }
         }
         if(primeiro == 1) break; //achou a arvore minima, entao sai do loop
