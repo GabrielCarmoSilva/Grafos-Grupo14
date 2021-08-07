@@ -27,6 +27,7 @@ private:
     void auxFTI(int id, int visited[]);
     void auxFTD(int id, int visited[]);
     void auxBuscaEmProfundidade(int id, int visited[], Graph* retorno);
+    void auxaciclicoDirecionado(int id, int visited[], Graph* retorno);
 
     //marcar arestas
     void markEdge(int id, int target_id);
@@ -64,6 +65,7 @@ public:
     Graph* FTI(int id);
     Graph* FTD(int id);
     Graph* BuscaEmProfundidade(int id);
+    void aciclicoDirecionado();
 
     //methods phase1
     float greed();

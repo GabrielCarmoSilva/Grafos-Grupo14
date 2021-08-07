@@ -362,11 +362,6 @@ bool Graph::isInList(int* list, int id){
     return false;
 }
 
-void Graph::breadthFirstSearch(ofstream &output_file){
-
-}
-
-
 
 float Graph::floydMarshall(int idSource, int idTarget){
 
@@ -465,7 +460,8 @@ void Graph::dijkstra(int idSource, int idTarget, ofstream& output_file) {
             idTarget = ant[idTarget]; //recebe o vértice anterior a ele mesmo
         }
         graph->save(output_file); //salva o grafo no arquivo
-    }       
+    }
+}       
 //function that prints a topological sorting
 void topologicalSorting(){
 
@@ -716,4 +712,63 @@ void Graph::auxBuscaEmProfundidade(int id, int visited[], Graph* retorno){
         }
         visited[node->getId()] = -2;
     }
+}
+void Graph::aciclicoDirecionado(){
+    
+    //criação e preenchimento das lista de nos visitados e o grafo
+    //para armazenar as arestas de retorno
+    int visited[this->order+1];
+    Graph *retorno = new Graph(0, this->directed, this->weighted_edge, this->weighted_node);
+    Graph *resultado = new Graph(0, this->directed, this->weighted_edge, this->weighted_node);
+
+    for(int i = 1; i <= this->order; i++){
+        visited[i] = -1;
+    }
+    int id=0;
+    visited[id] = 0;
+
+    //Possíveis valores no vetor visited, que representa os nos do grafo
+    // -1 = no não visitado
+    //  numero > 0 (id do no anterior) = visitado 1 vez
+    //  -2 = no que todas as arestas já foram visitadas
+    auxBuscaEmProfundidade(id, visited, retorno);
+
+    //imprimindo no console caminho realizado
+    cout << "Ordenacao topologica do grafo" << endl;
+    for(int k = 1; k <= this->order; k++){
+        if(visited[k] != -1){
+            cout << "No: " << k << endl;
+        }
+    }
+
+}
+void Graph::auxaciclicoDirecionado(int id, int visited[], Graph* retorno){
+    Node* node = this->getNode(id);
+    if(node != nullptr){
+        for(Edge* aux = node->getFirstEdge(); aux != nullptr; aux = aux->getNextEdge()){
+
+
+            if(visited[aux->getTargetId()] == -1){
+
+                //deveria mandr sair do if p ver se o prox if tb retorna q nao eh aciclico p dar o erro
+                if(!this->directed){
+                    exit(1);
+                }   
+
+                else{
+                    visited[aux->getTargetId()] = node->getId();
+                    this->auxBuscaEmProfundidade(aux->getTargetId(), visited, retorno);
+                }
+
+            } else if(visited[aux->getTargetId()] >= 0 && visited[aux->getTargetId()] != node->getId() ){
+
+                //ERRO Q JA FOI VISITADO ENTAO NAO PODE SER ACICLICO CARALHO
+                retorno->markEdge(node->getId(), aux->getTargetId());
+                cout <<"erro?"<<endl;
+
+            }
+        }
+        visited[node->getId()] = -2;
+    }
+
 }
