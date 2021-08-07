@@ -255,11 +255,19 @@ void Graph::print()
             cout << endl << "No: " << node->getId() << endl;
             cout << "Arestas do No: " << endl;
             int i = 1;
+            int j = 1;
             for(Edge* aux = node->getFirstEdge(); aux != nullptr; aux = aux->getNextEdge()){
-                if(!aux->isDirected() || this->directed){
-                    cout << "Aresta " << i << ": " << node->getId()  << " " << aux->getTargetId() << endl;
+                if(aux->isMarked()){
+                    cout << "Aresta de RETORNO" << j << ": ";
+                    j++;
+                } else{
+                    cout << "Aresta " << i << ": ";
+                    i++;
                 }
-                i++;
+                if(!aux->isDirected() || this->directed){
+                    cout << node->getId()  << " " << aux->getTargetId() << endl;
+                }
+
             }
         }
     }
@@ -660,15 +668,10 @@ Graph* Graph::BuscaEmProfundidade(int id){
     auxBuscaEmProfundidade(id, visited, retorno);
 
     //imprimindo no console caminho realizado
-    cout << "Arvore gerada pela busca em profundidade" << endl;
-    for(int k = 1; k <= this->order; k++){
-        if(visited[k] != -1){
-            cout << "No: " << k << endl;
-        }
-    }
 
-    //imprimindo as areas de retorno no padrão "Nó origem Nó alvo"
-    cout << "Arestas de retorno: " << endl;
+
+    //imprimindo as arestas de retorno eo próprio grafo gerado
+    cout << "Arvore gerada pela busca em profundidade" << endl;
     retorno->print();
     return retorno;
 }
