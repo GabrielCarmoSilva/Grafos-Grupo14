@@ -482,7 +482,7 @@ Graph* Graph::agmKruskal(){
     int vizinhos[this->order]; //vetor para encontrar todos os vertices que possuem arestas em um vertice especifico
     double menorPeso;
     int orig = this->getFirstNode()->getId();
-    int *arv = (int*) malloc(NV*sizeof(int)); //vetor para encontrar a arvore de cada vertice
+    int arv[NV]; //vetor para encontrar a arvore de cada vertice
     for(i = 1; i <= NV; i++) { //inicializando vetores
         arv[i] = i;
         pai[i] = -1;
@@ -521,12 +521,13 @@ Graph* Graph::agmKruskal(){
             }
         }
         if(primeiro == 1) break; //achou a arvore minima, entao sai do loop
-        if(pai[orig] == -1) pai[orig] = dest; //se o pai de tal vertice é -1, significa que ele não tem um vertice pai, entao setando como ele mesmo
-        else pai[dest] = orig; //setando o pai do vertice caso ele tenha
+        //tratamento para ver quem é o pai de quem. se orig nao tem pai, colocando dest como pai dele. se orig já tem pai, colocando orig como o pai de dest
+        if(pai[orig] == -1) pai[orig] = dest; 
+        else pai[dest] = orig; 
 
         for(i = 1; i <= NV; i++) {
             if(arv[i] == arv[dest]) {
-                arv[i] = arv[orig]; //colocando todos os vertices achados na mesma arvore
+                arv[i] = arv[orig]; //colocando todos os vertices achados na mesma arvore, já que dest e orig já estão conectados
             }
         }
     }
