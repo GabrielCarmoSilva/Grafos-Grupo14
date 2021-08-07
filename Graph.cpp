@@ -250,12 +250,24 @@ void Graph::print()
     // impressão de todas as arestas do grafo
     if(this->first_node != nullptr)
     {
+        cout << "Imprimindo Grafo: " << endl;
         for(Node* node = this->first_node; node != nullptr; node = node->getNextNode()){
-            cout << "No: " << node->getId() << endl;
+            cout << endl << "No: " << node->getId() << endl;
+            cout << "Arestas do No: " << endl;
+            int i = 1;
+            int j = 1;
             for(Edge* aux = node->getFirstEdge(); aux != nullptr; aux = aux->getNextEdge()){
+                if(aux->isMarked()){
+                    cout << "Aresta de RETORNO " << j << ": ";
+                    j++;
+                } else{
+                    cout << "Aresta " << i << ": ";
+                    i++;
+                }
                 if(!aux->isDirected() || this->directed){
                     cout << node->getId()  << " " << aux->getTargetId() << endl;
                 }
+
             }
         }
     }
@@ -362,11 +374,6 @@ bool Graph::isInList(int* list, int id){
     return false;
 }
 
-void Graph::breadthFirstSearch(ofstream &output_file){
-
-}
-
-
 
 float Graph::floydMarshall(int idSource, int idTarget){
 
@@ -469,6 +476,10 @@ Graph* Graph::dijkstra(int idSource, int idTarget) {
 }      
     //function that prints a topological sorting
 void Graph::topologicalSorting(){
+}
+
+//function that prints a topological sorting
+void topologicalSorting(){
 
 }
 
@@ -659,7 +670,6 @@ Graph* Graph::BuscaEmProfundidade(int id){
     //para armazenar as arestas de retorno
     int visited[this->order+1];
     Graph *retorno = new Graph(0, this->directed, this->weighted_edge, this->weighted_node);
-    Graph *resultado = new Graph(0, this->directed, this->weighted_edge, this->weighted_node);
 
     for(int i = 1; i <= this->order; i++){
         visited[i] = -1;
@@ -674,15 +684,10 @@ Graph* Graph::BuscaEmProfundidade(int id){
     auxBuscaEmProfundidade(id, visited, retorno);
 
     //imprimindo no console caminho realizado
-    cout << "Arvore gerada pela busca em profundidade" << endl;
-    for(int k = 1; k <= this->order; k++){
-        if(visited[k] != -1){
-            cout << "No: " << k << endl;
-        }
-    }
 
-    //imprimindo as areas de retorno no padrão "Nó origem Nó alvo"
-    cout << "Arestas de retorno: " << endl;
+
+    //imprimindo as arestas de retorno eo próprio grafo gerado
+    cout << "Arvore gerada pela busca em profundidade" << endl;
     retorno->print();
     return retorno;
 }
@@ -718,10 +723,7 @@ void Graph::auxBuscaEmProfundidade(int id, int visited[], Graph* retorno){
 
                 this->auxBuscaEmProfundidade(aux->getTargetId(), visited, retorno);
 
-            } else if(visited[aux->getTargetId()] >= 0 && visited[aux->getTargetId()] != node->getId() ){
-
-                //adicionando nós ao grafo de retonro caso nao existam
-
+            } else if(visited[aux->getTargetId()] >= 0 && visited[node->getId()] >= 0 && (this->directed || visited[aux->getTargetId()] != node->getId()) ){
                 //preenchendo grafo com as arestas de retorno
                 retorno->insertEdge(node->getId(), aux->getTargetId(), 0);
                 retorno->markEdge(node->getId(), aux->getTargetId());
@@ -730,4 +732,89 @@ void Graph::auxBuscaEmProfundidade(int id, int visited[], Graph* retorno){
         }
         visited[node->getId()] = -2;
     }
+}
+Graph* Graph::aciclicoDirecionado(){
+
+    if(this->directed){
+        //criação e preenchimento das lista de nos visitados e o grafo
+        //para armazenar as arestas de retorno
+        int visited[this->order+1];
+        int order[this->order+1];
+        Graph *retorno = new Graph(0, this->directed, this->weighted_edge, this->weighted_node);
+
+        for(int i = 1; i <= this->order; i++){
+            visited[i] = -1;
+            order[i] = -1;
+        }
+
+        //Possíveis valores no vetor visited, que representa os nos do grafo
+        // -1 = no não visitado
+        //  numero >= 0 (id do no anterior) = visitado 1 vez
+        //  -2 = no que todas as arestas já foram visitadas
+        for(Node* node = this->getFirstNode(); node != nullptr; node = node->getNextNode()){
+            if(visited[node->getId()] == -1){
+                if(!auxaciclicoDirecionado(node->getId(), visited, retorno, order)){
+                    cout << "Grafo nao eh aciclico!" << endl;
+                    return nullptr;
+                }
+            }
+        }
+
+        //imprimindo no console ordem topologica
+        cout << "Ordem topológica gerada pela busca em profundidade" << endl;
+        for(int k = 1; k <= this->order; k++){
+            if(order[k] != -1){
+                cout << "No: " << order[k] << endl;
+            }
+        }
+
+        return retorno;
+    } else{
+
+        cout << "O grafo deve ser direcionado!" << endl;
+        return nullptr;
+    }
+
+}
+bool Graph::auxaciclicoDirecionado(int id, int visited[], Graph* retorno, int order[]){
+    Node* node = this->getNode(id);
+    if(node != nullptr){
+        bool condition = true;
+        //adicionando nós ao grafo de retonro
+        if(!retorno->searchNode(node->getId())){
+            retorno->insertNode(node->getId());
+        }
+
+        for(Edge* aux = node->getFirstEdge(); aux != nullptr; aux = aux->getNextEdge()){
+
+
+            if(visited[aux->getTargetId()] == -1){
+
+                visited[node->getId()] = node->getId();
+                visited[aux->getTargetId()] = node->getId();
+
+                if(!retorno->searchNode(aux->getTargetId())){
+                    retorno->insertNode(aux->getTargetId());
+                }
+
+                condition = this->auxaciclicoDirecionado(aux->getTargetId(), visited, retorno, order);
+
+                retorno->insertEdge(node->getId(), aux->getTargetId(), aux->getWeight());
+
+            } else if(visited[aux->getTargetId()] >= 0 && visited[node->getId()] >= 0){
+
+                return false;
+            }
+        }
+        visited[node->getId()] = -2;
+        for(int i = this->order; i > 0; i--){
+            if(order[i] == -1){
+                order[i] = node->getId();
+                break;
+            }
+        }
+        return condition;
+    }
+    return true;
+
 }
