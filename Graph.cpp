@@ -390,7 +390,7 @@ int Graph::procuraMenorDistancia(float *dist, int *visitado, int NV) {
     return menor;
 }
 
-void Graph::dijkstra(int idSource, int idTarget, ofstream& output_file) {
+Graph* Graph::dijkstra(int idSource, int idTarget) {
     int ant[this->order+1]; // armazena o vertice anterior de cada indice no caminho minimo
     float dist[this->order+1]; //armazena a distancia de cada vertice ao vertice inicial
     int vizinhos[this->order+1]; //armazena todas os nos do vertice nos quais possuem arestas
@@ -464,8 +464,8 @@ void Graph::dijkstra(int idSource, int idTarget, ofstream& output_file) {
             graph->insertEdge(ant[idTarget], idTarget, this->getNode(ant[idTarget])->hasEdgeBetween(idTarget)->getWeight()); //insere aresta entre os dois nós que foram inseridos com o peso do grafo original
             idTarget = ant[idTarget]; //recebe o vértice anterior a ele mesmo
         }
-        graph->save(output_file); //salva o grafo no arquivo
     }
+    return graph;
 }      
     //function that prints a topological sorting
 void Graph::topologicalSorting(){
@@ -476,7 +476,7 @@ Graph* Graph::getVertexInduced(int* listIdNodes){
 
 }
 
-void Graph::agmKruskal(ofstream& output_file){
+Graph* Graph::agmKruskal(){
     int i, j, dest, primeiro, NV = this->order, cont = 0;
     int pai[order+1]; //vetor para setar o pai de cada vertice na arvore
     int vizinhos[this->order]; //vetor para encontrar todos os vertices que possuem arestas em um vertice especifico
@@ -554,7 +554,7 @@ void Graph::agmKruskal(ofstream& output_file){
             }
         }    
     }
-    graph->save(output_file); //salva no grafo
+    return graph;
 }
 
 Graph* Graph::agmPrim(){

@@ -55,10 +55,10 @@ public:
     void topologicalSorting();
     void breadthFirstSearch(ofstream& output_file);
     Graph* getVertexInduced(int* listIdNodes);
-    void agmKruskal(ofstream& output_file);
+    Graph* agmKruskal();
     Graph* agmPrim();
     float floydMarshall(int idSource, int idTarget);
-    void dijkstra(int idSource, int idTarget, ofstream& output_file);
+    Graph* dijkstra(int idSource, int idTarget);
     void directedTransitiveClosure(int id);
     int procuraMenorDistancia(float *dist, int *visitado, int NV);//
     Graph* FTI(int id);

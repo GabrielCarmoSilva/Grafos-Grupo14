@@ -150,8 +150,9 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
             cin >> idSource;
             cout << "Digite o id de destino: " << endl;
             cin >> idTarget;
-            graph->dijkstra(idSource, idTarget, output_file);
-            exit(1);
+            Graph* aux = graph->dijkstra(idSource, idTarget);
+            if(salvar())
+                aux->save(output_file);
             break;
         }
         case 1:{
@@ -174,9 +175,9 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
 
             //AGM - Kruscal;
         case 4:{
-
-
-
+            Graph* aux = graph->agmKruskal();
+            if(salvar())
+                aux->save(output_file);
             break;
         }
 
