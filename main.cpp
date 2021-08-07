@@ -188,7 +188,7 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
 
             //AGM Prim;
         case 5:{
-
+            graph->print();
             break;
         }
 

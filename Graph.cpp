@@ -250,12 +250,16 @@ void Graph::print()
     // impressão de todas as arestas do grafo
     if(this->first_node != nullptr)
     {
+        cout << "Imprimindo Grafo: " << endl;
         for(Node* node = this->first_node; node != nullptr; node = node->getNextNode()){
-            cout << "No: " << node->getId() << endl;
+            cout << endl << "No: " << node->getId() << endl;
+            cout << "Arestas do No: " << endl;
+            int i = 1;
             for(Edge* aux = node->getFirstEdge(); aux != nullptr; aux = aux->getNextEdge()){
                 if(!aux->isDirected() || this->directed){
-                    cout << node->getId()  << " " << aux->getTargetId() << endl;
+                    cout << "Aresta " << i << ": " << node->getId()  << " " << aux->getTargetId() << endl;
                 }
+                i++;
             }
         }
     }
