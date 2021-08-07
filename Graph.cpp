@@ -465,16 +465,14 @@ void Graph::dijkstra(int idSource, int idTarget, ofstream& output_file) {
             idTarget = ant[idTarget]; //recebe o vértice anterior a ele mesmo
         }
         graph->save(output_file); //salva o grafo no arquivo
-    }       
-//function that prints a topological sorting
-void topologicalSorting(){
+    }
+}      
+    //function that prints a topological sorting
+void Graph::topologicalSorting(){
 
 }
 
-void breadthFirstSearch(ofstream& output_file){
-
-}
-Graph* getVertexInduced(int* listIdNodes){
+Graph* Graph::getVertexInduced(int* listIdNodes){
 
 }
 
@@ -559,7 +557,7 @@ void Graph::agmKruskal(ofstream& output_file){
     graph->save(output_file); //salva no grafo
 }
 
-Graph* agmPrim(){
+Graph* Graph::agmPrim(){
 
 }
 
