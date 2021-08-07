@@ -156,7 +156,7 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
         }
         case 1:{
 
-            Graph* aux = graph->BuscaEmProfundidade(1);
+            Graph* aux = graph->aciclicoDirecionado();
             if(salvar())
                 aux->save(output_file);
 
@@ -164,6 +164,10 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
         }
             //Caminho mÃ­nimo entre dois vÃ©rtices usando Dijkstra;
         case 2:{
+            Graph* aux = graph->BuscaEmProfundidade(1);
+            if(salvar())
+                aux->save(output_file);
+
             break;
         }
             //Caminho mÃ­nimo entre dois vÃ©rtices usando Floyd;

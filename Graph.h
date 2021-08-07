@@ -65,7 +65,7 @@ public:
     Graph* FTI(int id);
     Graph* FTD(int id);
     Graph* BuscaEmProfundidade(int id);
-    void aciclicoDirecionado();
+    Graph* aciclicoDirecionado();
 
     //methods phase1
     float greed();
