@@ -27,7 +27,7 @@ private:
     void auxFTI(int id, int visited[]);
     void auxFTD(int id, int visited[]);
     void auxBuscaEmProfundidade(int id, int visited[], Graph* retorno);
-    void auxaciclicoDirecionado(int id, int visited[], Graph* retorno);
+    bool auxaciclicoDirecionado(int id, int visited[], Graph* retorno, int order[]);
 
     //marcar arestas
     void markEdge(int id, int target_id);

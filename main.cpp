@@ -172,15 +172,17 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
         }
             //Caminho mÃ­nimo entre dois vÃ©rtices usando Floyd;
         case 3:{
-
+            Graph* aux = graph->aciclicoDirecionado();
+            if(aux != nullptr && salvar())
+                aux->save(output_file);
             break;
         }
 
             //AGM - Kruscal;
         case 4:{
-
-
-
+            Graph* aux = graph->BuscaEmProfundidade(1);
+            if(aux != nullptr && salvar())
+                aux->save(output_file);
             break;
         }
 
