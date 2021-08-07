@@ -258,7 +258,7 @@ void Graph::print()
             int j = 1;
             for(Edge* aux = node->getFirstEdge(); aux != nullptr; aux = aux->getNextEdge()){
                 if(aux->isMarked()){
-                    cout << "Aresta de RETORNO" << j << ": ";
+                    cout << "Aresta de RETORNO " << j << ": ";
                     j++;
                 } else{
                     cout << "Aresta " << i << ": ";
