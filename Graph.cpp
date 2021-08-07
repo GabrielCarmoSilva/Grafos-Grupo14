@@ -557,24 +557,24 @@ void Graph::agmKruskal(ofstream& output_file){
     graph->save(output_file); //salva no grafo
 }
 
-void Graph::agmPrim(Graph* graph, int id_origin, int* parent){
-    int dest, first_node;
+Graph* Graph::agmPrim(int id_parent){
+    int id_child, first_node, parent[this->getOrder()];
     Node* current_node;
     Edge* current_edge;
-    double path;
-
-    for(int i=0; i < graph->getOrder(); i++)
+    double minimal_weight;
+    Graph* final_graph = new Graph(0, this->directed, this->weighted_edge, this->weighted_node); //criando grafo
+    for(int i=0; i < this->getOrder(); i++)
         parent[i] = -1;
-    parent[id_origin] = id_origin;
+    parent[id_parent] = id_parent;
 
     while (1)
     {
         first_node = 1;
-        for (int i = 0; i < graph->getOrder(); i++)
+        for (int i = 0; i < this->getOrder(); i++)
         {
             if(parent[i] != -1)
             {
-                current_node = graph->getNode(i);
+                current_node = this->getNode(i);
                 current_edge = current_node->getFirstEdge();
                 
                 for (int j = 0; j < current_node->getOutDegree(); j++)
@@ -582,21 +582,51 @@ void Graph::agmPrim(Graph* graph, int id_origin, int* parent){
 
                     if (parent[current_edge->getTargetId()] == -1)
                     {
-                        /* code */
+                        if(first_node == 1)
+                        {
+                            minimal_weight = current_edge->getWeight();
+                            id_parent = i;
+                            id_child = i;
+                            current_edge = current_edge->getNextEdge();
+                            first_node = 0;
+                        }
+                        else
+                        {
+                            if (minimal_weight > current_edge->getWeight())
+                            {
+                                minimal_weight = current_edge->getWeight();
+                                id_parent = i;
+                                id_child = current_edge->getTargetId();
+                                current_edge = current_edge->getNextEdge();
+                            }
+                            
+                        }
                     }
-
-                    current_edge = current_edge->getNextEdge();
                     
                 }
             }
                 
         }
+
         if(first_node == 1)
             break;
-        parent[dest] = id_origin;
-    }
-    
+        else
+        {
+            if(!final_graph->searchNode(id_parent))
+            {
+                final_graph->insertNode(id_parent);
+            }
+            if(!final_graph->searchNode(id_child))
+            {
+                final_graph->insertNode(id_child);
+            }
 
+            final_graph->insertEdge(id_parent, id_child, minimal_weight);
+        }
+        parent[id_child] = id_parent;
+    }
+
+    return final_graph;
 }
 
 //FECHO TRANSITIVO DIRETO

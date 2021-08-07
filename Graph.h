@@ -56,7 +56,7 @@ public:
     void breadthFirstSearch(ofstream& output_file);
     Graph* getVertexInduced(int* listIdNodes);
     void agmKruskal(ofstream& output_file);
-    void agmPrim(Graph* graph, int id_origin, int* nodes);
+    Graph* agmPrim(int id_origin);
     float floydMarshall(int idSource, int idTarget);
     void dijkstra(int idSource, int idTarget, ofstream& output_file);
     void directedTransitiveClosure(int id);
