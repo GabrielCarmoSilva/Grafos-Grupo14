@@ -57,7 +57,7 @@ public:
     void breadthFirstSearch(ofstream& output_file);
     Graph* getVertexInduced(int* listIdNodes);
     Graph* agmKruskal();
-    Graph* agmPrim(int n);
+    Graph* agmPrim(int id_origin);
     float floydMarshall(int idSource, int idTarget);
     Graph* dijkstra(int idSource, int idTarget);
     void directedTransitiveClosure(int id);

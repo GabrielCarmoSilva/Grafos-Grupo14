@@ -638,8 +638,70 @@ Graph* Graph::agmKruskal(){
     return graph;
 }
 
-Graph* Graph::agmPrim(int n){
+Graph* Graph::agmPrim(int id_parent){
+    int id_child, first_node; //Variaveis de controle para a funcao
+    Node* current_node; //No atual da iteracao
+    Edge* current_edge; //Aresta atual da iteracao
+    double minimal_weight; //Variavel que armazena o peso do caminho atual
+    Graph* final_graph = new Graph(0, this->directed, this->weighted_edge, this->weighted_node); //criando grafo
+    int* parent = new int[this->getOrder() + 1]; //Vetor para guardar os nos pai de cada vértice da árvore
+    for(int i=0; i <= this->getOrder(); i++) //Inicializando vetor de pais
+        parent[i] = -1;
+    parent[id_parent] = id_parent; //Vértice inicial considera que e o proprio pai para o algoritmo (mesmo nao tendo pai)
 
+    while (1)//Loop para definir o pai de cada vertice da arvore
+    {
+        first_node = 1; //Variavel de controle para continuar ou nao o loop
+        for (int i = 1; i <= this->getOrder(); i++)//Loop para iterar entre todos os nos e gerar a arvore
+        {
+            if(parent[i] != -1) //Se o valor no vetor foi -1, nao tem pai, entao pode ser introduzido na arvore
+            {
+                current_node = this->getNode(i); //Pegando o no dessa iteracao
+                current_edge = current_node->getFirstEdge(); //Pegando aresta que liga esse no a outro
+                for (int j = 0; j < current_node->getOutDegree(); j++) //Iterando entre todas as arestas desse no, para ver qual tem o menor peso
+                {
+                    if (parent[current_edge->getTargetId()] == -1) //Se o no que esta ligado ao da iteracao atual nao tiver pai, entra nessa condicional
+                    {
+                        if(first_node == 1) //Se for o primeio no a ser visitado entra nessa condicional
+                        {
+                            minimal_weight = current_edge->getWeight(); //Salva o peso dessa aresta
+                            id_parent = current_node->getId(); //Salva esse no como pai
+                            id_child = current_edge->getTargetId(); //Salva o outro no que a aresta aponta como filho
+                            first_node = 0; //Coloca a variavel de controle como 0 para continuar o loop
+                        }
+                        else //Se nao for o primeiro no
+                        {
+                            if (minimal_weight > current_edge->getWeight()) //Compara o peso da aresta atual com a menor, se o da atual for menor entra na condicao
+                            {
+                                minimal_weight = current_edge->getWeight(); //Salva o novo peso como menor peso
+                                id_parent = current_node->getId(); //Salva o id do no atual como pai
+                                id_child = current_edge->getTargetId(); //Salva o outro no que a aresta aponta como filho
+                            }
+                        }
+                    }
+                    current_edge = current_edge->getNextEdge(); //Atualiza o valor da aresta atual para a proxima deste no, para continuar corretamente o loop
+                }
+            }    
+        }
+        if(first_node == 1)//Se first node chegar como 1 significa que deve para parar o loop
+            break;
+        else
+        {
+            if(!final_graph->searchNode(id_parent))//Verifica se o no pai ja foi criado
+            {
+                final_graph->insertNode(id_parent);//Cria o no pai se nao tiver sido criado
+            }
+            if(!final_graph->searchNode(id_child));//Verifica se o no filho ja foi criado
+            {
+                final_graph->insertNode(id_child);//Cria o no filho se nao tiver sido criado
+            }
+
+            final_graph->insertEdge(id_parent, id_child, minimal_weight); //Insere a aresta encontrada pelo loop
+        }
+        parent[id_child] = id_parent; //Salva o no pai no indice do filho no vetor, para continuar adequadamente o algoritmo
+    }
+
+    return final_graph;//Retorna a arvore encontrada para a main
 }
 
 //FECHO TRANSITIVO DIRETO
