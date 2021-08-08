@@ -558,36 +558,35 @@ void Graph::agmKruskal(ofstream& output_file){
 }
 
 Graph* Graph::agmPrim(int id_parent){
-    int id_child, first_node, parent[this->getOrder()];
+    int id_child, first_node, parent[this->getOrder() + 1];
     Node* current_node;
     Edge* current_edge;
     double minimal_weight;
     Graph* final_graph = new Graph(0, this->directed, this->weighted_edge, this->weighted_node); //criando grafo
-    for(int i=0; i < this->getOrder(); i++)
+    for(int i=0; i <= this->getOrder(); i++)
         parent[i] = -1;
     parent[id_parent] = id_parent;
 
     while (1)
     {
         first_node = 1;
-        for (int i = 0; i < this->getOrder(); i++)
+        for (int i = 1; i <= this->getOrder(); i++)
         {
             if(parent[i] != -1)
             {
                 current_node = this->getNode(i);
+                cout << "No atual: " << current_node->getId() << endl;
                 current_edge = current_node->getFirstEdge();
-                
+                cout << "Aresta atual: " << current_edge->getTargetId() << endl;
                 for (int j = 0; j < current_node->getOutDegree(); j++)
                 {
-
                     if (parent[current_edge->getTargetId()] == -1)
                     {
                         if(first_node == 1)
                         {
                             minimal_weight = current_edge->getWeight();
-                            id_parent = i;
-                            id_child = i;
-                            current_edge = current_edge->getNextEdge();
+                            id_parent = current_node->getId();
+                            id_child = current_edge->getTargetId();
                             first_node = 0;
                         }
                         else
@@ -595,19 +594,15 @@ Graph* Graph::agmPrim(int id_parent){
                             if (minimal_weight > current_edge->getWeight())
                             {
                                 minimal_weight = current_edge->getWeight();
-                                id_parent = i;
+                                id_parent = current_node->getId();
                                 id_child = current_edge->getTargetId();
-                                current_edge = current_edge->getNextEdge();
                             }
-                            
                         }
                     }
-                    
+                    current_edge = current_edge->getNextEdge();
                 }
-            }
-                
+            }    
         }
-
         if(first_node == 1)
             break;
         else
@@ -625,7 +620,11 @@ Graph* Graph::agmPrim(int id_parent){
         }
         parent[id_child] = id_parent;
     }
-
+    for (int i = 1; i <= this->getOrder(); i++)
+    {
+        cout << parent[i] << endl;
+    }
+    
     return final_graph;
 }
 
