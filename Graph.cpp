@@ -11,6 +11,7 @@
 #include <ctime>
 #include <float.h>
 #include <iomanip>
+#include <limits>
 
 using namespace std;
 
@@ -393,8 +394,57 @@ bool Graph::isInList(int* list, int id){
 }
 
 
-float Graph::floydMarshall(int idSource, int idTarget){
+void Graph::floydMarshall(int idSource, int idTarget){
+    int infinity = numeric_limits<int>::max(), order = this->getOrder();
+    int** cost = new int*[this->order];
+    Edge* current_edge;
+    Graph* final_graph = new Graph(0, this->directed, this->weighted_edge, this->weighted_node); //criando grafo para ser retornado
+    for (int i = 0; i < this->order; i++)
+    {
+        for (int j = 0; j < this->order; j++)
+        {
+            if(this->getNode(i)->searchEdge(j))
+            {
+                current_edge = this->getNode(i)->getFirstEdge();
+                for (int k = 0; k < this->getNode(i)->getOutDegree(); k++)
+                {
+                    if (current_edge->getTargetId() == j)
+                    {
+                        cost[i][j] = current_edge->getWeight();
+                        break;
+                    }
+                    current_edge = current_edge->getNextEdge();
+                }
+            }
+        }
+        
+    }
+    for (int k = 0; k < order; k++)
+    {
+        for (int i = 0; i < order; i++)
+        {
+            for (int j = 0; j < order; j++)
+            {
+                if(cost[i][k]+cost[k][j] < cost[i][j])
+                {
+                    cost[i][j] = cost[i][k]+cost[k][j];
+                }
+            }
+            
+        }
+        
+    }
 
+    for (int i = 0; i < order; i++)
+    {
+        for (int j = 0; j < order; j++)
+        {
+            cout << cost[i][j] << " ";
+        }
+        cout << endl;
+    }
+    
+        
 }
 
 
@@ -643,7 +693,7 @@ Graph* Graph::agmPrim(int id_parent){
     Node* current_node; //No atual da iteracao
     Edge* current_edge; //Aresta atual da iteracao
     double minimal_weight; //Variavel que armazena o peso do caminho atual
-    Graph* final_graph = new Graph(0, this->directed, this->weighted_edge, this->weighted_node); //criando grafo
+    Graph* final_graph = new Graph(0, this->directed, this->weighted_edge, this->weighted_node); //criando grafo para ser retornado
     int* parent = new int[this->getOrder() + 1]; //Vetor para guardar os nos pai de cada vértice da árvore
     for(int i=0; i <= this->getOrder(); i++) //Inicializando vetor de pais
         parent[i] = -1;
@@ -700,7 +750,7 @@ Graph* Graph::agmPrim(int id_parent){
         }
         parent[id_child] = id_parent; //Salva o no pai no indice do filho no vetor, para continuar adequadamente o algoritmo
     }
-
+    this->print();
     return final_graph;//Retorna a arvore encontrada para a main
 }
 
