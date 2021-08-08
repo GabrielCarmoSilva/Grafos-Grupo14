@@ -176,7 +176,7 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
         }
         //Caminho minimo entre dois vertices - Floyd
         case 4:{
-
+            graph->floydMarshall(1, 2);
             break;
         }
         //Arvore Geradora minimo de Prim

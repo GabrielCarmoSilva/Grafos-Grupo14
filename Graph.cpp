@@ -395,18 +395,22 @@ bool Graph::isInList(int* list, int id){
 
 
 void Graph::floydMarshall(int idSource, int idTarget){
-    int infinity = numeric_limits<int>::max(), order = this->getOrder();
-    int** cost = new int*[this->order];
+    int infinity = 10000000, order = this->getOrder(), cost[order][order];
     Edge* current_edge;
     Graph* final_graph = new Graph(0, this->directed, this->weighted_edge, this->weighted_node); //criando grafo para ser retornado
-    for (int i = 0; i < this->order; i++)
+    for (int i = 1; i <= this->order; i++)
     {
-        for (int j = 0; j < this->order; j++)
+        for (int j = 1; j <= this->order; j++)
         {
-            if(this->getNode(i)->searchEdge(j))
+            
+            if(i == j)
+            {
+                cost[i][j] = 0;
+            }
+            else if(this->getNode(i)->searchEdge(j))
             {
                 current_edge = this->getNode(i)->getFirstEdge();
-                for (int k = 0; k < this->getNode(i)->getOutDegree(); k++)
+                for (int k = 1; k <= this->getNode(i)->getOutDegree(); k++)
                 {
                     if (current_edge->getTargetId() == j)
                     {
@@ -416,14 +420,17 @@ void Graph::floydMarshall(int idSource, int idTarget){
                     current_edge = current_edge->getNextEdge();
                 }
             }
+            else
+            {
+                cost[i][j] = infinity;
+            }
         }
-        
     }
-    for (int k = 0; k < order; k++)
+    for (int k = 1; k <= order; k++)
     {
-        for (int i = 0; i < order; i++)
+        for (int i = 1; i <= order; i++)
         {
-            for (int j = 0; j < order; j++)
+            for (int j = 1; j <= order; j++)
             {
                 if(cost[i][k]+cost[k][j] < cost[i][j])
                 {
@@ -435,9 +442,9 @@ void Graph::floydMarshall(int idSource, int idTarget){
         
     }
 
-    for (int i = 0; i < order; i++)
+    for (int i = 1; i <= order; i++)
     {
-        for (int j = 0; j < order; j++)
+        for (int j = 1; j <= order; j++)
         {
             cout << cost[i][j] << " ";
         }
