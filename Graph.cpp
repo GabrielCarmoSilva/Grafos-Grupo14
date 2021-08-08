@@ -395,7 +395,8 @@ bool Graph::isInList(int* list, int id){
 
 
 void Graph::floydMarshall(int idSource, int idTarget){
-    int infinity = 10000000, order = this->getOrder(), cost[order][order];
+    int order = this->getOrder(); 
+    double infinity = std::numeric_limits<double>::infinity(), cost[order][order];
     Edge* current_edge;
     Graph* final_graph = new Graph(0, this->directed, this->weighted_edge, this->weighted_node); //criando grafo para ser retornado
     for (int i = 1; i <= this->order; i++)
@@ -432,7 +433,7 @@ void Graph::floydMarshall(int idSource, int idTarget){
         {
             for (int j = 1; j <= order; j++)
             {
-                if(cost[i][k]+cost[k][j] < cost[i][j])
+                if(cost[i][k]+cost[k][j] < cost[i][j] || cost[i][j] == NAN)
                 {
                     cost[i][j] = cost[i][k]+cost[k][j];
                 }
@@ -441,7 +442,6 @@ void Graph::floydMarshall(int idSource, int idTarget){
         }
         
     }
-
     for (int i = 1; i <= order; i++)
     {
         for (int j = 1; j <= order; j++)
