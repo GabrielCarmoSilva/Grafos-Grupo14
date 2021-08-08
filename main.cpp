@@ -182,7 +182,10 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
 
             //AGM Prim;
         case 5:{ 
-            Graph* aux = graph->agmPrim(1);
+            int n;
+            cout << "Digite o no inicial: " << endl;
+            cin >> n;
+            Graph* aux = graph->agmPrim(n);
             if(salvar())
                 aux->save(output_file);
             break;
