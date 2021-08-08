@@ -534,7 +534,10 @@ Graph* Graph::getVertexInduced(int* listIdNodes){
 Graph* Graph::agmKruskal(){
     int i, j, dest, primeiro, NV = this->order, cont = 0;
     int pai[order+1]; //vetor para setar o pai de cada vertice na arvore
-    int vizinhos[this->order][this->order]; //matriz para encontrar todos os vertices que possuem arestas em um vertice especifico
+    int** vizinhos = new int*[NV]; //matriz para encontrar todos os vertices que possuem arestas em um vertice especifico
+    for(i = 1; i <= this->order+1; i++)
+        vizinhos[i] = new int[this->order+1];
+
     double menorPeso;
     int orig = this->getFirstNode()->getId();
     int arv[NV]; //vetor para encontrar a arvore de cada vertice
@@ -589,10 +592,9 @@ Graph* Graph::agmKruskal(){
         if(pai[orig] == -1) pai[orig] = dest; 
         else pai[dest] = orig; 
 
-        for(i = 1; i <= NV; i++)
-        {
-            if(arv[i] == arv[dest])
-            {
+
+        for(i = 1; i <= NV; i++) {
+            if(arv[i] == arv[dest]) {
                 arv[i] = arv[orig]; //colocando todos os vertices achados na mesma arvore, já que dest e orig já estão conectados
             }
         }
@@ -630,10 +632,13 @@ Graph* Graph::agmKruskal(){
             }
         }    
     }
+    // for(int i = 1; i <= NV; i++)
+    //     delete[] vizinhos[i];
+    // delete[] vizinhos;
     return graph;
 }
 
-Graph* Graph::agmPrim(){
+Graph* Graph::agmPrim(int n){
 
 }
 
