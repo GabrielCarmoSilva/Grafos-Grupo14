@@ -13,7 +13,7 @@ using namespace std;
 
 class Graph{
 
-    //Atributes
+//Atributes
 private:
     int order;
     int number_edges;
@@ -57,7 +57,7 @@ public:
     void breadthFirstSearch(ofstream& output_file);
     Graph* getVertexInduced(int* listIdNodes);
     Graph* agmKruskal();
-    Graph* agmPrim();
+    Graph* agmPrim(int n);
     float floydMarshall(int idSource, int idTarget);
     Graph* dijkstra(int idSource, int idTarget);
     void directedTransitiveClosure(int id);
