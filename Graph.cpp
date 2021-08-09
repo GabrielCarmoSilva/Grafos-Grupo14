@@ -636,6 +636,7 @@ Graph* Graph::dijkstra(int idSource, int idTarget) {
             idTarget = ant[idTarget]; //recebe o vértice anterior a ele mesmo
         }
     }
+    graph->print();
     return graph;
 }      
 
@@ -753,6 +754,7 @@ Graph* Graph::agmKruskal(){
             }
         }    
     }
+    graph->print();
     // for(int i = 1; i <= NV; i++)
     //     delete[] vizinhos[i];
     // delete[] vizinhos;

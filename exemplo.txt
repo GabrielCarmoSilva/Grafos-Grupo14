@@ -1,3 +1,10 @@
+
+strict digraph {
+841;
+179;
+179 -> 841;
+}
+
 strict digraph {
 2;
 3;
