@@ -197,12 +197,21 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
         case 5:
         {
             int n;
+            cout << "Digite a quantidade de vertices" << endl;
             cin >> n;
-            Graph* aux = graph->agmPrim(n);
-
+            int *nodes = new int[n];
+            for (int i = 0; i < n; i++)
+            {
+                while (!graph->searchNode(nodes[i]))
+                {
+                    cout << "Digite o vertice " << i << ":" << endl;
+                    cin >> nodes[i];
+                }
+                
+            }
+            Graph* aux = graph->agmPrim(n, nodes);
             if(aux != nullptr && salvar())
                 aux->save(output_file);
-
             break;
         }
         //Arvore Geradora minimo de Kruskal

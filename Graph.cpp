@@ -380,6 +380,43 @@ Graph* Graph::listToGraph(int nodeList[]){
     return result;
 }
 
+//Função que transformara uma lista de nos visitados no grafo resultante baseado no grafo existente
+Graph* Graph::listToGraphPrim(int nodeList[], int size){
+    //grafo que será gerado
+    Graph* result = new Graph(0, this->directed, this->weighted_edge, this->weighted_node);
+
+    for(Node *node = this->first_node; node != nullptr; node = node->getNextNode())
+    {
+
+        //verificando se o nó está na lista      
+        if(this->isInListPrim(nodeList, size, node->getId()))
+        {
+            //verificando se o nó existe no grafo resultante
+            if(!result->searchNode(node->getId()))
+            {
+                result->insertNode(node->getId());
+            }
+            for(Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge())
+            {
+
+                //verificando se o nó alvo existe na lista
+                if(this->isInListPrim(nodeList, size, edge->getTargetId()))
+                {
+                    //verificando se o nó alvo existe no grafo resultante
+                    if(!result->searchNode(edge->getTargetId()))
+                    {
+                        result->insertNode(edge->getTargetId());
+                    }
+
+                    //inserindo aresta ao grafo resultante
+                    if(!result->getNode(node->getId())->searchEdge(edge->getTargetId()))
+                        result->insertEdge(node->getId(), edge->getTargetId(), edge->getWeight());
+                }
+            }
+        }
+    }
+    return result;
+}
 
 //função para verificar a existencia de um nó em uma lista de nos visitados
 bool Graph::isInList(int* list, int id){
@@ -393,64 +430,90 @@ bool Graph::isInList(int* list, int id){
     return false;
 }
 
+//função para verificar a existencia de um nó em uma lista de nos visitados para o algoritmo de prim
+bool Graph::isInListPrim(int list[], int size, int id){
+    for(int i = 0; i < size; i++)
+    {
+        if(list[i] == id)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+//função para pegar o valor do id do vertice na lista
+int Graph::getFromList(int list[], int size, int id){
+    for(int i = 0; i < size; i++)
+    {
+        if(list[i] == id)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
 
 Graph* Graph::floydMarshall(int idSource, int idTarget){
-    int order = this->getOrder();
-    double infinity = std::numeric_limits<double>::infinity();
-    double **cost;
-    cost = (double**)malloc(order*sizeof(double*));
-    for (int i = 1; i < order; i++)
+    int order = this->getOrder(); //Pegando ordem do grafo
+    double infinity = std::numeric_limits<double>::infinity(); //Definindo um valor infinito
+    double **cost; //Alocando matriz para aplicar o algoritmo
+    cost = (double**)malloc(order*sizeof(double*)); //Alocando matriz para aplicar o algoritmo
+    for (int i = 1; i < order; i++) //Alocando matriz para aplicar o algoritmo
     {
-        cost[i] = (double*)malloc(order*sizeof(double));
+        cost[i] = (double*)malloc(order*sizeof(double)); //Alocando matriz para aplicar o algoritmo
     }
-    Edge* current_edge;
+    Edge* current_edge; //Variavel para aresta
     Graph* final_graph = new Graph(0, this->directed, this->weighted_edge, this->weighted_node); //criando grafo para ser retornado
-    final_graph->insertNode(idSource);
-    final_graph->insertNode(idTarget);
-    for (int i = 1; i < order; i++)
+    final_graph->insertNode(idSource); //Inserindo no inicial
+    final_graph->insertNode(idTarget); //Inserindo no final
+    for (int i = 1; i < order; i++) //Loop para alocar os valores de custo de arestas diretas entre dois nos do grafo
     {
         for (int j = 1; j < order; j++)
         {
             
-            if(i == j)
+            if(i == j)//O no para ele mesmo com custo 0
             {
                 cost[i][j] = 0;
             }
-            else if(this->getNode(i)->searchEdge(j))
+            else if(this->getNode(i)->searchEdge(j)) //Entra nessa condicao se tiver aresta para o outro no da iteracao
             {
                 current_edge = this->getNode(i)->getFirstEdge();
-                for (int k = 1; k <= this->getNode(i)->getOutDegree(); k++)
+                for (int k = 1; k <= this->getNode(i)->getOutDegree(); k++) //Procura a aresta entre os 2 nos
                 {
-                    if (current_edge->getTargetId() == j)
+                    if (current_edge->getTargetId() == j) //Pega a resta entre os 2 nos
                     {
-                        cost[i][j] = current_edge->getWeight();
+                        cost[i][j] = current_edge->getWeight(); //Define o valor inicial da aresta direta
                         break;
                     }
-                    current_edge = current_edge->getNextEdge();
+                    current_edge = current_edge->getNextEdge(); //Atualiza variavel para continuar o loop
                 }
             }
             else
             {
-                cost[i][j] = infinity;
+                cost[i][j] = infinity; //Caso nao tenha aresta direta coloca o valor como infinito
             }
         }
     }
-    for (int k = 1; k < order; k++)
+    for (int k = 1; k < order; k++) //Algoritmo de floyd
     {
         for (int i = 1; i < order; i++)
         {
             for (int j = 1; j < order; j++)
             {
-                if(cost[i][k]+cost[k][j] < cost[i][j] || cost[i][j] == infinity)
+                if(cost[i][k]+cost[k][j] < cost[i][j] || cost[i][j] == infinity) //Verifica se o caminho do no (i) ate o da iteracao atual + o caminho do no da iteracao atual ate o (j) é mais custoso ou não que o caminho direto entre o no (i) e o (j)
                 {
-                    cost[i][j] = cost[i][k]+cost[k][j];
+                    cost[i][j] = cost[i][k]+cost[k][j]; //Se o caminho de (i) a (k) + (k) a (j) for menor que o caminho de (i) a (j), altera o valor na matriz
                 }
             }
             
         }      
     }
-    final_graph->insertEdge(idSource, idTarget, cost[idSource][idTarget]);
-    final_graph->print();
+    final_graph->insertEdge(idSource, idTarget, cost[idSource][idTarget]); //Cria uma aresta direta entre os 2 nos com o valor total do custo do caminho minimo entre eles
+    final_graph->print(); //imprime o grafo
+    cout << endl;
+    cout << "Caminho minimo entre " << idSource << " e " << idTarget << ": " << cost[idSource][idTarget] << endl; //Imprime o caminho minimo
     return final_graph;
         
 }
@@ -696,29 +759,31 @@ Graph* Graph::agmKruskal(){
     return graph;
 }
 
-Graph* Graph::agmPrim(int id_parent){
-    int id_child, first_node; //Variaveis de controle para a funcao
+Graph* Graph::agmPrim(int total_nodes, int nodes[]){
+    int id_child, first_node, id_parent; //Variaveis de controle para a funcao
     Node* current_node; //No atual da iteracao
     Edge* current_edge; //Aresta atual da iteracao
     double minimal_weight; //Variavel que armazena o peso do caminho atual
+    Graph* aux_graph = this->listToGraphPrim(nodes, total_nodes); //criando grafo auxiliar para a função
     Graph* final_graph = new Graph(0, this->directed, this->weighted_edge, this->weighted_node); //criando grafo para ser retornado
-    int* parent = new int[this->getOrder() + 1]; //Vetor para guardar os nos pai de cada vértice da árvore
-    for(int i=0; i <= this->getOrder(); i++) //Inicializando vetor de pais
-        parent[i] = -1;
-    parent[id_parent] = id_parent; //Vértice inicial considera que e o proprio pai para o algoritmo (mesmo nao tendo pai)
-
+    int* parent = new int[total_nodes]; //Vetor para guardar os nos pai de cada vértice da árvore
+    for(int i = 0; i < total_nodes ; i++) //Inicializando vetor de pais
+        parent[i] = -1; 
+    parent[0] = 0; //Vértice inicial considera que e o proprio pai para o algoritmo (mesmo nao tendo pai)
+    
     while (1)//Loop para definir o pai de cada vertice da arvore
     {
         first_node = 1; //Variavel de controle para continuar ou nao o loop
-        for (int i = 1; i <= this->getOrder(); i++)//Loop para iterar entre todos os nos e gerar a arvore
+        for (int i = 0; i < aux_graph->getOrder(); i++)//Loop para iterar entre todos os nos e gerar a arvore
         {
             if(parent[i] != -1) //Se o valor no vetor foi -1, nao tem pai, entao pode ser introduzido na arvore
             {
-                current_node = this->getNode(i); //Pegando o no dessa iteracao
+                current_node = aux_graph->getNode(nodes[i]); //Pegando o no dessa iteracao
                 current_edge = current_node->getFirstEdge(); //Pegando aresta que liga esse no a outro
                 for (int j = 0; j < current_node->getOutDegree(); j++) //Iterando entre todas as arestas desse no, para ver qual tem o menor peso
                 {
-                    if (parent[current_edge->getTargetId()] == -1) //Se o no que esta ligado ao da iteracao atual nao tiver pai, entra nessa condicional
+                    int index = this->getFromList(nodes, total_nodes, current_edge->getTargetId()); //
+                    if (index != -1 && parent[index] == -1) //Se o no que esta ligado ao da iteracao atual nao tiver pai, entra nessa condicional
                     {
                         if(first_node == 1) //Se for o primeio no a ser visitado entra nessa condicional
                         {
@@ -756,9 +821,12 @@ Graph* Graph::agmPrim(int id_parent){
 
             final_graph->insertEdge(id_parent, id_child, minimal_weight); //Insere a aresta encontrada pelo loop
         }
-        parent[id_child] = id_parent; //Salva o no pai no indice do filho no vetor, para continuar adequadamente o algoritmo
+        int index = this->getFromList(nodes, total_nodes, id_child);
+        if(index != -1)
+            parent[index] = this->getFromList(nodes, total_nodes, id_parent); //Salva o no pai no indice do filho no vetor, para continuar adequadamente o algoritmo
+        
     }
-    this->print();
+    final_graph->print();
     return final_graph;//Retorna a arvore encontrada para a main
 }
 

@@ -57,7 +57,7 @@ public:
     void breadthFirstSearch(ofstream& output_file);
     Graph* getVertexInduced(int* listIdNodes);
     Graph* agmKruskal();
-    Graph* agmPrim(int id_origin);
+    Graph* agmPrim(int total_nodes, int nodes[]);
     Graph* floydMarshall(int idSource, int idTarget);
     Graph* dijkstra(int idSource, int idTarget);
     void directedTransitiveClosure(int id);
@@ -79,6 +79,9 @@ public:
     //static e helpers
     bool isInList(int* list, int id);
     Graph* listToGraph(int nodeList[]);
+    bool isInListPrim(int list[], int size, int id);
+    Graph* listToGraphPrim(int nodeList[], int size);
+    int getFromList(int list[], int size, int id);
 
 private:
     //Auxiliar methods
