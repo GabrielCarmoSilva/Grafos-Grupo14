@@ -784,7 +784,7 @@ Graph* Graph::agmPrim(int total_nodes, int nodes[]){
                 current_edge = current_node->getFirstEdge(); //Pegando aresta que liga esse no a outro
                 for (int j = 0; j < current_node->getOutDegree(); j++) //Iterando entre todas as arestas desse no, para ver qual tem o menor peso
                 {
-                    int index = this->getFromList(nodes, total_nodes, current_edge->getTargetId()); //
+                    int index = this->getFromList(nodes, total_nodes, current_edge->getTargetId()); //Usa o valor do id do vertice no grafo gerado para achar na lista do node o indice do vertice correspondente
                     if (index != -1 && parent[index] == -1) //Se o no que esta ligado ao da iteracao atual nao tiver pai, entra nessa condicional
                     {
                         if(first_node == 1) //Se for o primeio no a ser visitado entra nessa condicional
@@ -823,7 +823,7 @@ Graph* Graph::agmPrim(int total_nodes, int nodes[]){
 
             final_graph->insertEdge(id_parent, id_child, minimal_weight); //Insere a aresta encontrada pelo loop
         }
-        int index = this->getFromList(nodes, total_nodes, id_child);
+        int index = this->getFromList(nodes, total_nodes, id_child); //Usa o valor do id do vertice no grafo gerado para achar na lista do node o indice do vertice correspondente
         if(index != -1)
             parent[index] = this->getFromList(nodes, total_nodes, id_parent); //Salva o no pai no indice do filho no vetor, para continuar adequadamente o algoritmo
         
