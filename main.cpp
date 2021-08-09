@@ -176,14 +176,27 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
         }
         //Caminho minimo entre dois vertices - Floyd
         case 4:{
-            graph->floydMarshall(1, 2);
+            int idSource;
+            int idTarget;
+            while (!graph->searchNode(idSource))
+            {
+                cout << "Digite o id do primeiro vertice" << endl;
+                cin >> idSource;
+            }
+            while (!graph->searchNode(idTarget))
+            {
+                cout << "Digite o id do outro vertice" << endl;
+                cin >> idTarget;
+            }
+            Graph* aux = graph->floydMarshall(idSource, idTarget);
+            if(aux != nullptr && salvar())
+                aux->save(output_file);
             break;
         }
         //Arvore Geradora minimo de Prim
         case 5:
         {
             int n;
-            cout << "Digite o no inicial: " << endl;
             cin >> n;
             Graph* aux = graph->agmPrim(n);
 

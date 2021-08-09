@@ -394,14 +394,22 @@ bool Graph::isInList(int* list, int id){
 }
 
 
-void Graph::floydMarshall(int idSource, int idTarget){
-    int order = this->getOrder(); 
-    double infinity = std::numeric_limits<double>::infinity(), cost[order][order];
+Graph* Graph::floydMarshall(int idSource, int idTarget){
+    int order = this->getOrder();
+    double infinity = std::numeric_limits<double>::infinity();
+    double **cost;
+    cost = (double**)malloc(order*sizeof(double*));
+    for (int i = 1; i < order; i++)
+    {
+        cost[i] = (double*)malloc(order*sizeof(double));
+    }
     Edge* current_edge;
     Graph* final_graph = new Graph(0, this->directed, this->weighted_edge, this->weighted_node); //criando grafo para ser retornado
-    for (int i = 1; i <= this->order; i++)
+    final_graph->insertNode(idSource);
+    final_graph->insertNode(idTarget);
+    for (int i = 1; i < order; i++)
     {
-        for (int j = 1; j <= this->order; j++)
+        for (int j = 1; j < order; j++)
         {
             
             if(i == j)
@@ -427,30 +435,23 @@ void Graph::floydMarshall(int idSource, int idTarget){
             }
         }
     }
-    for (int k = 1; k <= order; k++)
+    for (int k = 1; k < order; k++)
     {
-        for (int i = 1; i <= order; i++)
+        for (int i = 1; i < order; i++)
         {
-            for (int j = 1; j <= order; j++)
+            for (int j = 1; j < order; j++)
             {
-                if(cost[i][k]+cost[k][j] < cost[i][j] || cost[i][j] == NAN)
+                if(cost[i][k]+cost[k][j] < cost[i][j] || cost[i][j] == infinity)
                 {
                     cost[i][j] = cost[i][k]+cost[k][j];
                 }
             }
             
-        }
-        
+        }      
     }
-    for (int i = 1; i <= order; i++)
-    {
-        for (int j = 1; j <= order; j++)
-        {
-            cout << cost[i][j] << " ";
-        }
-        cout << endl;
-    }
-    
+    final_graph->insertEdge(idSource, idTarget, cost[idSource][idTarget]);
+    final_graph->print();
+    return final_graph;
         
 }
 
