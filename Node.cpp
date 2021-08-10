@@ -232,7 +232,6 @@ bool Node::searchEdge(int target_id){
 }
 
 
-
 void Node::incrementInDegree(){
 
     this->in_degree++;
