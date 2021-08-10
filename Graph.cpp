@@ -460,7 +460,7 @@ Graph* Graph::floydMarshall(int idSource, int idTarget){
     double infinity = std::numeric_limits<double>::infinity(); //Definindo um valor infinito
     double **cost; //Alocando matriz para aplicar o algoritmo
     cost = (double**)malloc(order*sizeof(double*)); //Alocando matriz para aplicar o algoritmo
-    for (int i = 1; i < order; i++) //Alocando matriz para aplicar o algoritmo
+    for (int i = 1; i <= order; i++) //Alocando matriz para aplicar o algoritmo
     {
         cost[i] = (double*)malloc(order*sizeof(double)); //Alocando matriz para aplicar o algoritmo
     }
@@ -468,9 +468,9 @@ Graph* Graph::floydMarshall(int idSource, int idTarget){
     Graph* final_graph = new Graph(0, this->directed, this->weighted_edge, this->weighted_node); //criando grafo para ser retornado
     final_graph->insertNode(idSource); //Inserindo no inicial
     final_graph->insertNode(idTarget); //Inserindo no final
-    for (int i = 1; i < order; i++) //Loop para alocar os valores de custo de arestas diretas entre dois nos do grafo
+    for (int i = 1; i <= order; i++) //Loop para alocar os valores de custo de arestas diretas entre dois nos do grafo
     {
-        for (int j = 1; j < order; j++)
+        for (int j = 1; j <= order; j++)
         {
             
             if(i == j)//O no para ele mesmo com custo 0
@@ -479,7 +479,7 @@ Graph* Graph::floydMarshall(int idSource, int idTarget){
             }
             else if(this->getNode(i)->searchEdge(j)) //Entra nessa condicao se tiver aresta para o outro no da iteracao
             {
-                current_edge = this->getNode(i)->getFirstEdge();
+                current_edge = this->getNode(i)->getFirstEdge(); //Pega a primeira aresta da iteracao
                 for (int k = 1; k <= this->getNode(i)->getOutDegree(); k++) //Procura a aresta entre os 2 nos
                 {
                     if (current_edge->getTargetId() == j) //Pega a resta entre os 2 nos
@@ -496,11 +496,11 @@ Graph* Graph::floydMarshall(int idSource, int idTarget){
             }
         }
     }
-    for (int k = 1; k < order; k++) //Algoritmo de floyd
+    for (int k = 1; k <= order; k++) //Algoritmo de floyd
     {
-        for (int i = 1; i < order; i++)
+        for (int i = 1; i <= order; i++)
         {
-            for (int j = 1; j < order; j++)
+            for (int j = 1; j <= order; j++)
             {
                 if(cost[i][k]+cost[k][j] < cost[i][j] || cost[i][j] == infinity) //Verifica se o caminho do no (i) ate o da iteracao atual + o caminho do no da iteracao atual ate o (j) é mais custoso ou não que o caminho direto entre o no (i) e o (j)
                 {
@@ -510,12 +510,11 @@ Graph* Graph::floydMarshall(int idSource, int idTarget){
             
         }      
     }
-    final_graph->insertEdge(idSource, idTarget, cost[idSource][idTarget]); //Cria uma aresta direta entre os 2 nos com o valor total do custo do caminho minimo entre eles
+    final_graph->insertEdge(idSource, idTarget, cost[idSource][idTarget]); //Cria uma aresta direta entre os 2 nos com o valor total do custo do caminho minimo entre eles 
     final_graph->print(); //imprime o grafo
     cout << endl;
     cout << "Caminho minimo entre " << idSource << " e " << idTarget << ": " << cost[idSource][idTarget] << endl; //Imprime o caminho minimo
     return final_graph;
-        
 }
 
 
