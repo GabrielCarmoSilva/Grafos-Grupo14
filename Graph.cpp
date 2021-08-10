@@ -458,8 +458,14 @@ int Graph::getFromList(int list[], int size, int id){
 Graph* Graph::floydMarshall(int idSource, int idTarget){
     int order = this->getOrder(); //Pegando ordem do grafo
     double infinity = std::numeric_limits<double>::infinity(); //Definindo um valor infinito
-    double **cost; //Alocando matriz para aplicar o algoritmo
-    cost = (double**)malloc(order*sizeof(double*)); //Alocando matriz para aplicar o algoritmo
+    double** cost = new double*[order];
+    for (int i = 0; i < order; i++)
+    {
+        cost[i] = new double[order];
+    }
+    
+    // double **cost; //Alocando matriz para aplicar o algoritmo
+    // cost = (double**)malloc(order*sizeof(double*)); //Alocando matriz para aplicar o algoritmo
     for (int i = 1; i <= order; i++) //Alocando matriz para aplicar o algoritmo
     {
         cost[i] = (double*)malloc(order*sizeof(double)); //Alocando matriz para aplicar o algoritmo
