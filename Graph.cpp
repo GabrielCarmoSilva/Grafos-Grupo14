@@ -520,6 +520,13 @@ Graph* Graph::floydMarshall(int idSource, int idTarget){
     final_graph->print(); //imprime o grafo
     cout << endl;
     cout << "Caminho minimo entre " << idSource << " e " << idTarget << ": " << cost[idSource][idTarget] << endl; //Imprime o caminho minimo
+
+    for(int p = 0; p < order; p++){
+        delete[] cost[p];
+    }
+
+    delete[] cost;
+
     return final_graph;
 }
 
