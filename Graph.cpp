@@ -813,7 +813,7 @@ Graph* Graph::agmPrim(int total_nodes, int nodes[]){
             {
                 final_graph->insertNode(id_parent);//Cria o no pai se nao tiver sido criado
             }
-            if(!final_graph->searchNode(id_child));//Verifica se o no filho ja foi criado
+            if(!final_graph->searchNode(id_child))//Verifica se o no filho ja foi criado
             {
                 final_graph->insertNode(id_child);//Cria o no filho se nao tiver sido criado
             }
