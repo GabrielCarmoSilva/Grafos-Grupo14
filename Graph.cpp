@@ -645,18 +645,6 @@ Graph* Graph::dijkstra(int idSource, int idTarget) {
     return graph;
 }      
 
-//function that prints a topological sorting
-void Graph::topologicalSorting(){
-}
-
-//function that prints a topological sorting
-void topologicalSorting(){
-
-}
-
-Graph* Graph::getVertexInduced(int* listIdNodes){
-
-}
 //Arvore Geradora minimo de Kruskal
 Graph* Graph::agmKruskal(int total_nodes, int nodes[]){
     int i, j, dest, primeiro, NV = total_nodes, cont = 0;
@@ -999,13 +987,12 @@ void Graph::auxBuscaEmProfundidade(int id, int visited[], Graph* retorno){
         visited[node->getId()] = -2;
     }
 }
-//
+//ORDENACAO TOPOLOGICA DE GRAFO ACICLICO DIRECIONADO
 Graph* Graph::aciclicoDirecionado(){
     //verifica se o grafo eh direcionado, sendo essa uma das condicoes
     if(this->directed)
     {
-        //criação e preenchimento das lista de nos visitados e o grafo
-        //para armazenar as arestas de retorno
+        //criação e preenchimento das lista de nos visitados e de ordem
         int visited[this->order+1];
         int order[this->order+1];
         Graph *retorno = new Graph(0, this->directed, this->weighted_edge, this->weighted_node);
@@ -1025,7 +1012,7 @@ Graph* Graph::aciclicoDirecionado(){
             if(visited[node->getId()] == -1)
             {
                 if(!auxaciclicoDirecionado(node->getId(), visited, retorno, order))
-                {
+                { //retornando erro de grafo nao aciclico
                     cout << "ERROR: Grafo nao eh aciclico!" << endl;
                     return nullptr;
                 }
@@ -1044,7 +1031,7 @@ Graph* Graph::aciclicoDirecionado(){
 
         return retorno;
     } else
-    {
+    { //retornando erro de grafo nao direcionado
         cout << "ERROR: O grafo deve ser direcionado!" << endl;
         return nullptr;
     }
@@ -1055,7 +1042,7 @@ bool Graph::auxaciclicoDirecionado(int id, int visited[], Graph* retorno, int or
     if(node != nullptr)
     {
         bool condition = true;
-        //adicionando nós ao grafo de retonro
+        //adicionando nós ao grafo de retorno
         if(!retorno->searchNode(node->getId()))
         {
             retorno->insertNode(node->getId());
@@ -1063,6 +1050,7 @@ bool Graph::auxaciclicoDirecionado(int id, int visited[], Graph* retorno, int or
 
         for(Edge* aux = node->getFirstEdge(); aux != nullptr; aux = aux->getNextEdge())
         {
+            //conferindo se o no ja foi visitado
             if(visited[aux->getTargetId()] == -1)
             {
                 visited[node->getId()] = node->getId();
@@ -1085,7 +1073,7 @@ bool Graph::auxaciclicoDirecionado(int id, int visited[], Graph* retorno, int or
 
         visited[node->getId()] = -2;
 
-        for(int i = this->order; i > 0; i--)
+        for(int i = this->order; i > 0; i--) //preenche vetor de ordem
         {
             if(order[i] == -1)
             {
