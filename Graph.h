@@ -53,9 +53,6 @@ public:
     Node* getNode(int id);
 
     //methods phase1
-    void topologicalSorting();
-    void breadthFirstSearch(ofstream& output_file);
-    Graph* getVertexInduced(int* listIdNodes);
     Graph* agmKruskal(int total_nodes, int nodes[]);
     Graph* agmPrim(int total_nodes, int nodes[]);
     Graph* floydMarshall(int idSource, int idTarget);
@@ -68,9 +65,9 @@ public:
     Graph* aciclicoDirecionado();
 
     //methods phase1
-    float greed();
-    float greedRandom();
-    float greedRactiveRandom();
+    //float greed();
+    //float greedRandom();
+    //float greedRactiveRandom();
 
     //imprimir e salvar
     void print();

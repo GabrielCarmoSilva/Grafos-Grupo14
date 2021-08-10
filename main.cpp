@@ -82,11 +82,12 @@ Graph* leitura(ifstream& input_file, int directed, int weightedEdge, int weighte
 }
 
 int menu(){
-
     int selecao;
 
     cout << "MENU" << endl;
     cout << "----" << endl;
+    cout << "Favor, utilize os vértices numerados de 1 a n" << endl;
+    cout << endl;
     cout << "[1] Fecho transitivo direto do vertice de um grafo direcionado" << endl;
     cout << "[2] Fecho transitivo indireto do vertice de um grafo direcionado" << endl;
     cout << "[3] Caminho minimo entre dois vertices - Dijkstra" << endl;
@@ -100,7 +101,6 @@ int menu(){
     cin >> selecao;
 
     return selecao;
-
 }
 
 bool salvar(){
@@ -265,7 +265,6 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
 }
 
 int mainMenu(ofstream& output_file, Graph* graph){
-
     int selecao = 1;
 
     while(selecao != 0)
@@ -311,7 +310,6 @@ int main(int argc, char const *argv[]) {
     ofstream output_file;
     input_file.open(argv[1], ios::in);
     output_file.open(argv[2], ios::out | ios::trunc);
-
 
 
     Graph* graph;
