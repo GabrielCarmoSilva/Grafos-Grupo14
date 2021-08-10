@@ -65,9 +65,9 @@ public:
     Graph* aciclicoDirecionado();
 
     //methods phase1
-    float greed();
-    float greedRandom();
-    float greedRactiveRandom();
+    //float greed();
+    //float greedRandom();
+    //float greedRactiveRandom();
 
     //imprimir e salvar
     void print();
