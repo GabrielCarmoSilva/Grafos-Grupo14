@@ -764,9 +764,9 @@ Graph* Graph::agmKruskal(int total_nodes, int nodes[]){
         }    
     }
     graph->print();
-    // for(int i = 1; i <= NV; i++)
-    //     delete[] vizinhos[i];
-    // delete[] vizinhos;
+    for(int i = 0; i < NV; i++)
+        delete[] vizinhos[i];
+    delete[] vizinhos;
     return graph;
 }
 
