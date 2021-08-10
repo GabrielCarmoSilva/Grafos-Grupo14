@@ -217,11 +217,22 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
         //Arvore Geradora minimo de Kruskal
         case 6:
         {
-            Graph* aux = graph->agmKruskal();
-
+            int n;
+            cout << "Digite a quantidade de vertices" << endl;
+            cin >> n;
+            int *nodes = new int[n];
+            for (int i = 0; i < n; i++)
+            {
+                while (!graph->searchNode(nodes[i]))
+                {
+                    cout << "Digite o vertice " << i << ":" << endl;
+                    cin >> nodes[i];
+                }
+                
+            }
+            Graph* aux = graph->agmKruskal(n, nodes);
             if(aux != nullptr && salvar())
                 aux->save(output_file);
-
             break;
         }
         //Arvore dada pela ordem de caminhamento em profundidade, destacando as arestas de retorno

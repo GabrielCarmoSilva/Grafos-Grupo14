@@ -56,7 +56,7 @@ public:
     void topologicalSorting();
     void breadthFirstSearch(ofstream& output_file);
     Graph* getVertexInduced(int* listIdNodes);
-    Graph* agmKruskal();
+    Graph* agmKruskal(int total_nodes, int nodes[]);
     Graph* agmPrim(int total_nodes, int nodes[]);
     Graph* floydMarshall(int idSource, int idTarget);
     Graph* dijkstra(int idSource, int idTarget);
@@ -80,7 +80,7 @@ public:
     bool isInList(int* list, int id);
     Graph* listToGraph(int nodeList[]);
     bool isInListPrim(int list[], int size, int id);
-    Graph* listToGraphPrim(int nodeList[], int size);
+    Graph* listToGraphTree(int size, int nodeList[]);
     int getFromList(int list[], int size, int id);
 
 private:

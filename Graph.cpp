@@ -381,7 +381,7 @@ Graph* Graph::listToGraph(int nodeList[]){
 }
 
 //Função que transformara uma lista de nos visitados no grafo resultante baseado no grafo existente
-Graph* Graph::listToGraphPrim(int nodeList[], int size){
+Graph* Graph::listToGraphTree(int size, int nodeList[]){
     //grafo que será gerado
     Graph* result = new Graph(0, this->directed, this->weighted_edge, this->weighted_node);
 
@@ -653,27 +653,27 @@ Graph* Graph::getVertexInduced(int* listIdNodes){
 
 }
 //Arvore Geradora minimo de Kruskal
-Graph* Graph::agmKruskal(){
-    int i, j, dest, primeiro, NV = this->order, cont = 0;
-    int pai[order+1]; //vetor para setar o pai de cada vertice na arvore
+Graph* Graph::agmKruskal(int total_nodes, int nodes[]){
+    int i, j, dest, primeiro, NV = total_nodes, cont = 0;
+    Graph *auxGraph = this->listToGraphTree(total_nodes, nodes);
+    int pai[total_nodes]; //vetor para setar o pai de cada vertice na arvore
     int** vizinhos = new int*[NV]; //matriz para encontrar todos os vertices que possuem arestas em um vertice especifico
-    for(i = 1; i <= this->order+1; i++)
-        vizinhos[i] = new int[this->order+1];
-
+    for(i = 0; i < total_nodes; i++)
+        vizinhos[i] = new int[total_nodes];
     double menorPeso;
-    int orig = this->getFirstNode()->getId();
+    int orig = 0;
     int arv[NV]; //vetor para encontrar a arvore de cada vertice
-    for(i = 1; i <= NV; i++) //inicializando vetores
+    for(i = 0; i < NV; i++) //inicializando vetores
     {
         arv[i] = i;
         pai[i] = -1;
     }
     pai[orig] = orig; //seta o pai de origem como a própria origem
-    for(int v = 1; v <= NV; v++)
+    for(int v = 0; v < NV; v++)
     {
-        for(j = 1; j <= NV; j++)
+        for(j = 0; j < NV; j++)
         {
-            if(this->getNode(v)->searchEdge(j))
+            if(auxGraph->getNode(nodes[v])->searchEdge(nodes[j]))
             {
                 vizinhos[v][cont] = j; //achando a matriz de vertices. se v for 1, j será todos os vertices que possuem arestas em 1
                 cont++; 
@@ -684,24 +684,24 @@ Graph* Graph::agmKruskal(){
     while(1) //loop infinito até ser quebrado
         {
         primeiro = 1;
-        for(i = 1; i <= NV; i++)
+        for(i = 0; i < NV; i++)
         {
             cont = 0; //zera a variavel para o proximo vertice
-            for(j = 0; j < this->getNode(i)->getOutDegree(); j++) //analisa todas as arestas do vertice
+            for(j = 0; j < auxGraph->getNode(nodes[i])->getOutDegree(); j++) //analisa todas as arestas do vertice
             {
                 if(arv[i] != arv[vizinhos[i][j]]) //se a arvore de i e de seus vizinhos sao diferentes, caso seja, o vertice vizinho pode ser inserido
                 {
                     if(primeiro) //verifica se é a primeira vez que está visitando esse vértice
                     {
-                        menorPeso = this->getNode(i)->hasEdgeBetween(vizinhos[i][j])->getWeight(); //seta o peso da aresta de i para seu vizinho como a menor
+                        menorPeso = this->getNode(nodes[i])->hasEdgeBetween(nodes[vizinhos[i][j]])->getWeight(); //seta o peso da aresta de i para seu vizinho como a menor
                         orig = i;
                         dest = vizinhos[i][j];
                         primeiro = 0;
                     }
                     else //caso nao seja a primeira vez que esse vertice esta visitado
                     {
-                        if(menorPeso > this->getNode(i)->hasEdgeBetween(vizinhos[i][j])->getWeight()) { //se o peso atual é maior do que o peso da aresta de i para seu vizinho em questão
-                            menorPeso = this->getNode(i)->hasEdgeBetween(vizinhos[i][j])->getWeight(); //seta o menor peso como o peso da aresta de i para seu vizinho
+                        if(menorPeso > this->getNode(nodes[i])->hasEdgeBetween(nodes[vizinhos[i][j]])->getWeight()) { //se o peso atual é maior do que o peso da aresta de i para seu vizinho em questão
+                            menorPeso = this->getNode(nodes[i])->hasEdgeBetween(nodes[vizinhos[i][j]])->getWeight(); //seta o menor peso como o peso da aresta de i para seu vizinho
                             orig = i;
                             dest = vizinhos[i][j];
                         } 
@@ -722,34 +722,48 @@ Graph* Graph::agmKruskal(){
         }
     }
     Graph* graph = new Graph(0, this->directed, this->weighted_edge, this->weighted_node); //criando grafo
-    for(int i = 1; i <= NV; i++)
+    for(int i = 0; i < NV; i++)
+    {
+        cout << pai[i] << endl;
+        cout << i << endl;
+    }
+    for(int i = 0; i < NV; i++)
     {
         if(pai[i] != i) //verifica se o pai de i e i não são iguais, porque nesse caso teriamos um self-loop, o que nao é o caso
         {
-            if(!graph->searchNode(i))
+            int id_child = nodes[i];
+            int id_parent = nodes[pai[i]];
+            cout << "Id_child: " << id_child << endl;
+            cout << "Id_parent: " << id_parent << endl;
+            if(!graph->searchNode(id_child))
             {
-                graph->insertNode(i); //insere i
+                graph->insertNode(id_child); //insere i
             }
-            if(!graph->searchNode(pai[i]) && pai[i] != -1)
+            if(!graph->searchNode(id_parent) && pai[i] != -1)
             {
-                graph->insertNode(pai[i]); //insere pai de i
+                graph->insertNode(id_parent); //insere pai de i
             }
-            if(graph->searchNode(pai[i]) && graph->searchNode(i) && pai[i] != -1)
+            if(pai[i] != -1 && pai[i] != i)
             {
-                if(!this->directed) //verifica se aresta nao e direcionada, entao nao existe preocupacao com a ordem dos vertices na aresta
+                if(!auxGraph->directed) //verifica se aresta nao e direcionada, entao nao existe preocupacao com a ordem dos vertices na aresta
                 {
-                    graph->insertEdge(i, pai[i], this->getNode(i)->hasEdgeBetween(pai[i])->getWeight());
+                    if(!graph->getNode(id_child)->searchEdge(id_parent)) {     
+                        graph->insertEdge(id_child, id_parent, auxGraph->getNode(id_child)->hasEdgeBetween(id_parent)->getWeight());
+                    }
+                    cout << "Exemplo 1" << endl;
                 }
                 else
                 {
-                    if(this->getNode(i)->searchEdge(pai[i])) //caso a aresta seja direcionada, preciso saber se a aresta vai de i pra pai ou de pai pra i
+                    if(auxGraph->getNode(id_child)->searchEdge(id_parent)) //caso a aresta seja direcionada, preciso saber se a aresta vai de id_child pra pai ou de pai pra id_child
                     {
-                        graph->insertEdge(i, pai[i], this->getNode(i)->hasEdgeBetween(pai[i])->getWeight()); //insere aresta de forma correta
+                        graph->insertEdge(id_child, id_parent, auxGraph->getNode(id_child)->hasEdgeBetween(id_parent)->getWeight()); //insere aresta de forma correta
+                        cout << "Exemplo 2" << endl;
                     }
-                    else if(this->getNode(pai[i])->searchEdge(i))
-                        {
-                            graph->insertEdge(pai[i], i, this->getNode(pai[i])->hasEdgeBetween(i)->getWeight());
-                        }
+                    else if(auxGraph->getNode(id_parent)->searchEdge(id_child))
+                    {
+                        graph->insertEdge(id_parent, id_child, auxGraph->getNode(id_parent)->hasEdgeBetween(id_child)->getWeight());
+                        cout << "Exemplo 3" << endl;
+                    }
                 }
             }
         }    
@@ -766,7 +780,7 @@ Graph* Graph::agmPrim(int total_nodes, int nodes[]){
     Node* current_node; //No atual da iteracao
     Edge* current_edge; //Aresta atual da iteracao
     double minimal_weight; //Variavel que armazena o peso do caminho atual
-    Graph* aux_graph = this->listToGraphPrim(nodes, total_nodes); //criando grafo auxiliar para a função
+    Graph* aux_graph = this->listToGraphTree(total_nodes, nodes); //criando grafo auxiliar para a função
     Graph* final_graph = new Graph(0, this->directed, this->weighted_edge, this->weighted_node); //criando grafo para ser retornado
     int* parent = new int[total_nodes]; //Vetor para guardar os nos pai de cada vértice da árvore
     for(int i = 0; i < total_nodes ; i++) //Inicializando vetor de pais
