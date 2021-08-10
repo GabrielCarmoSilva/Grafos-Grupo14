@@ -131,7 +131,7 @@ void Graph::insertEdge(int id, int target_id, float weight)
         }
         else
         {
-            cout << "ERROR: A aresta com no de origem" << id << " e no alvo " << target_id << " ja existe!" << endl;
+            cout << "ERROR: A aresta com no de origem " << id << " e no alvo " << target_id << " ja existe!" << endl;
         }
     }
     else
@@ -140,7 +140,7 @@ void Graph::insertEdge(int id, int target_id, float weight)
         if(!origin_node_check && !target_node_check)
             cout << "ERROR: nenhum dos nos existe!" << endl;
         else if(!origin_node_check)
-            cout << "ERROR: O no origem com id: <<" << id << " nao existe!" << endl;
+            cout << "ERROR: O no origem com id: " << id << " nao existe!" << endl;
         else
             cout << "ERROR: O no alvo com id: " << target_id << " nao existe!" << endl;
     }

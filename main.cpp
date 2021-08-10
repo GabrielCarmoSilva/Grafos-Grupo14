@@ -86,6 +86,8 @@ int menu(){
 
     cout << "MENU" << endl;
     cout << "----" << endl;
+    cout << "Favor, utilize os vértices numerados de 1 a n" << endl;
+    cout << endl;
     cout << "[1] Fecho transitivo direto do vertice de um grafo direcionado" << endl;
     cout << "[2] Fecho transitivo indireto do vertice de um grafo direcionado" << endl;
     cout << "[3] Caminho minimo entre dois vertices - Dijkstra" << endl;
