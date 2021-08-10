@@ -682,7 +682,7 @@ Graph* Graph::agmKruskal(int total_nodes, int nodes[]){
         cont = 0;
     }
     while(1) //loop infinito até ser quebrado
-        {
+    {
         primeiro = 1;
         for(i = 0; i < NV; i++)
         {
@@ -715,7 +715,7 @@ Graph* Graph::agmKruskal(int total_nodes, int nodes[]){
         else pai[dest] = orig; 
 
 
-        for(i = 1; i <= NV; i++) {
+        for(i = 0; i < NV; i++) {
             if(arv[i] == arv[dest]) {
                 arv[i] = arv[orig]; //colocando todos os vertices achados na mesma arvore, já que dest e orig já estão conectados
             }
@@ -724,17 +724,10 @@ Graph* Graph::agmKruskal(int total_nodes, int nodes[]){
     Graph* graph = new Graph(0, this->directed, this->weighted_edge, this->weighted_node); //criando grafo
     for(int i = 0; i < NV; i++)
     {
-        cout << pai[i] << endl;
-        cout << i << endl;
-    }
-    for(int i = 0; i < NV; i++)
-    {
         if(pai[i] != i) //verifica se o pai de i e i não são iguais, porque nesse caso teriamos um self-loop, o que nao é o caso
         {
             int id_child = nodes[i];
             int id_parent = nodes[pai[i]];
-            cout << "Id_child: " << id_child << endl;
-            cout << "Id_parent: " << id_parent << endl;
             if(!graph->searchNode(id_child))
             {
                 graph->insertNode(id_child); //insere i
@@ -743,26 +736,23 @@ Graph* Graph::agmKruskal(int total_nodes, int nodes[]){
             {
                 graph->insertNode(id_parent); //insere pai de i
             }
-            if(pai[i] != -1 && pai[i] != i)
+            if(pai[i] != -1)
             {
                 if(!auxGraph->directed) //verifica se aresta nao e direcionada, entao nao existe preocupacao com a ordem dos vertices na aresta
                 {
                     if(!graph->getNode(id_child)->searchEdge(id_parent)) {     
                         graph->insertEdge(id_child, id_parent, auxGraph->getNode(id_child)->hasEdgeBetween(id_parent)->getWeight());
                     }
-                    cout << "Exemplo 1" << endl;
                 }
                 else
                 {
                     if(auxGraph->getNode(id_child)->searchEdge(id_parent)) //caso a aresta seja direcionada, preciso saber se a aresta vai de id_child pra pai ou de pai pra id_child
                     {
                         graph->insertEdge(id_child, id_parent, auxGraph->getNode(id_child)->hasEdgeBetween(id_parent)->getWeight()); //insere aresta de forma correta
-                        cout << "Exemplo 2" << endl;
                     }
                     else if(auxGraph->getNode(id_parent)->searchEdge(id_child))
                     {
                         graph->insertEdge(id_parent, id_child, auxGraph->getNode(id_parent)->hasEdgeBetween(id_child)->getWeight());
-                        cout << "Exemplo 3" << endl;
                     }
                 }
             }
