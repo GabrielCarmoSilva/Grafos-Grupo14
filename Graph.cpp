@@ -725,20 +725,20 @@ Graph* Graph::agmKruskal(int total_nodes, int nodes[]){
     for(int i = 0; i < NV; i++)
     {
 
-        int id_child = nodes[i];
-        int id_parent = nodes[pai[i]];
-
-        if(!graph->searchNode(id_parent) && pai[i] != -1)
-        {
-            graph->insertNode(id_parent); //insere pai de i
-        }
 
         if(pai[i] != i) //verifica se o pai de i e i não são iguais, porque nesse caso teriamos um self-loop, o que nao é o caso
         {
 
+            int id_child = nodes[i];
+            int id_parent = nodes[pai[i]];
+
             if(!graph->searchNode(id_child))
             {
                 graph->insertNode(id_child); //insere i
+            }
+            if(!graph->searchNode(id_parent) && pai[i] != -1)
+            {
+                graph->insertNode(id_parent); //insere pai de i
             }
 
             if(pai[i] != -1)
@@ -770,6 +770,37 @@ Graph* Graph::agmKruskal(int total_nodes, int nodes[]){
     return graph;
 }
 
+
+int Graph::findMinimumEdge(int visited[], int nodes[], int total_nodes){
+    //parametros para achar a menor aresta e consequentemente o nó inicial do algorítmo
+    int min_index = -1;
+    float min_weight = 0;
+    bool check = true;
+
+
+    //loopando pelos nos e arestas para achar a de menor peso
+    for(Node* node = this->first_node; node != nullptr; node = node->getNextNode()){
+        for(Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()){
+            int index = this->getFromList(nodes, total_nodes, edge->getTargetId());
+            if(index != -1 && visited[index] == -1){
+                if(check){
+                    min_index = node->getId();
+                    min_weight = edge->getWeight();
+                    check = false;
+                } else{
+                    if(min_weight > edge->getWeight()){
+                        min_index = node->getId();
+                        min_weight = edge->getWeight();
+                    }
+                }
+            }
+
+        }
+    }
+
+    return this->getFromList(nodes, total_nodes, min_index); //traduzindo de volta para o array passado
+}
+
 Graph* Graph::agmPrim(int total_nodes, int nodes[]){
     int id_child, first_node, id_parent; //Variaveis de controle para a funcao
     Node* current_node; //No atual da iteracao
@@ -781,27 +812,7 @@ Graph* Graph::agmPrim(int total_nodes, int nodes[]){
     for(int i = 0; i < total_nodes ; i++) //Inicializando vetor de pais
         parent[i] = -1;
 
-    //parametros para achar a menor aresta e consequentemente o nó inicial do algorítmo
-    int min_index = -1;
-    float min_weight = 0;
-    bool check = true;
-
-
-    //loopando pelos nos e arestas para achar a de menor peso
-    for(Node* node = aux_graph->first_node; node != nullptr; node = node->getNextNode()){
-        for(Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()){
-            if(check){
-                min_index = node->getId();
-                min_weight = edge->getWeight();
-                check = false;
-            } else{
-                if(min_weight > edge->getWeight()){
-                    min_index = node->getId();
-                    min_weight = edge->getWeight();
-                }
-            }
-        }
-    }
+    int min_index = aux_graph->findMinimumEdge(parent, nodes, total_nodes); //procurando pelo
 
     parent[min_index] = min_index; //Vértice inicial considera que eh o proprio pai para o algoritmo (mesmo nao tendo pai)
     
@@ -810,10 +821,6 @@ Graph* Graph::agmPrim(int total_nodes, int nodes[]){
         first_node = 1; //Variavel de controle para continuar ou nao o loop
         for (int i = 0; i < aux_graph->getOrder(); i++)//Loop para iterar entre todos os nos e gerar a arvore
         {
-            if(!final_graph->searchNode(nodes[i]))//Verifica se o no pai ja foi criado
-            {
-                final_graph->insertNode(nodes[i]);//Cria o no pai se nao tiver sido criado
-            }
 
             if(parent[i] != -1) //Se o valor no vetor foi -1, nao tem pai, entao pode ser introduzido na arvore
             {
@@ -847,14 +854,17 @@ Graph* Graph::agmPrim(int total_nodes, int nodes[]){
                 }
             }    
         }
-        if(first_node == 1)//Se first node chegar como 1 significa que deve para parar o loop
+        if(first_node == 1){ //Se first node chegar como 1 significa que não tem mais arestas esse nó
             break;
+        }
+
         else
         {
             if(!final_graph->searchNode(id_parent))//Verifica se o no pai ja foi criado
             {
                 final_graph->insertNode(id_parent);//Cria o no pai se nao tiver sido criado
             }
+
             if(!final_graph->searchNode(id_child))//Verifica se o no filho ja foi criado
             {
                 final_graph->insertNode(id_child);//Cria o no filho se nao tiver sido criado

@@ -28,6 +28,7 @@ private:
     void auxFTD(int id, int visited[]);
     void auxBuscaEmProfundidade(int id, int visited[], Graph* retorno);
     bool auxaciclicoDirecionado(int id, int visited[], Graph* retorno, int order[]);
+    int findMinimumEdge(int visited[], int nodes[], int total_nodes);
 
     //marcar arestas
     void markEdge(int id, int target_id);
