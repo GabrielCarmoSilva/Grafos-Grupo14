@@ -238,7 +238,10 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
         //Arvore dada pela ordem de caminhamento em profundidade, destacando as arestas de retorno
         case 7:
         {
-            Graph* aux = graph->BuscaEmProfundidade(1);
+            int n;
+            cout << "Escolha o vértice inicial: " << endl;
+            cin >> n;
+            Graph* aux = graph->BuscaEmProfundidade(n);
 
             if(aux != nullptr && salvar())
                 aux->save(output_file);

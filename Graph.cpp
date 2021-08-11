@@ -724,18 +724,23 @@ Graph* Graph::agmKruskal(int total_nodes, int nodes[]){
     Graph* graph = new Graph(0, this->directed, this->weighted_edge, this->weighted_node); //criando grafo
     for(int i = 0; i < NV; i++)
     {
+
+        int id_child = nodes[i];
+        int id_parent = nodes[pai[i]];
+
+        if(!graph->searchNode(id_parent) && pai[i] != -1)
+        {
+            graph->insertNode(id_parent); //insere pai de i
+        }
+
         if(pai[i] != i) //verifica se o pai de i e i não são iguais, porque nesse caso teriamos um self-loop, o que nao é o caso
         {
-            int id_child = nodes[i];
-            int id_parent = nodes[pai[i]];
+
             if(!graph->searchNode(id_child))
             {
                 graph->insertNode(id_child); //insere i
             }
-            if(!graph->searchNode(id_parent) && pai[i] != -1)
-            {
-                graph->insertNode(id_parent); //insere pai de i
-            }
+
             if(pai[i] != -1)
             {
                 if(!auxGraph->directed) //verifica se aresta nao e direcionada, entao nao existe preocupacao com a ordem dos vertices na aresta
@@ -774,21 +779,51 @@ Graph* Graph::agmPrim(int total_nodes, int nodes[]){
     Graph* final_graph = new Graph(0, this->directed, this->weighted_edge, this->weighted_node); //criando grafo para ser retornado
     int* parent = new int[total_nodes]; //Vetor para guardar os nos pai de cada vértice da árvore
     for(int i = 0; i < total_nodes ; i++) //Inicializando vetor de pais
-        parent[i] = -1; 
-    parent[0] = 0; //Vértice inicial considera que e o proprio pai para o algoritmo (mesmo nao tendo pai)
+        parent[i] = -1;
+
+    //parametros para achar a menor aresta e consequentemente o nó inicial do algorítmo
+    int min_index = -1;
+    float min_weight = 0;
+    bool check = true;
+
+
+    //loopando pelos nos e arestas para achar a de menor peso
+    for(Node* node = aux_graph->first_node; node != nullptr; node = node->getNextNode()){
+        for(Edge* edge = node->getFirstEdge(); edge != nullptr; edge = edge->getNextEdge()){
+            if(check){
+                min_index = node->getId();
+                min_weight = edge->getWeight();
+                check = false;
+            } else{
+                if(min_weight > edge->getWeight()){
+                    min_index = node->getId();
+                    min_weight = edge->getWeight();
+                }
+            }
+        }
+    }
+
+    parent[min_index] = min_index; //Vértice inicial considera que eh o proprio pai para o algoritmo (mesmo nao tendo pai)
     
     while (1)//Loop para definir o pai de cada vertice da arvore
     {
         first_node = 1; //Variavel de controle para continuar ou nao o loop
         for (int i = 0; i < aux_graph->getOrder(); i++)//Loop para iterar entre todos os nos e gerar a arvore
         {
+            if(!final_graph->searchNode(nodes[i]))//Verifica se o no pai ja foi criado
+            {
+                final_graph->insertNode(nodes[i]);//Cria o no pai se nao tiver sido criado
+            }
+
             if(parent[i] != -1) //Se o valor no vetor foi -1, nao tem pai, entao pode ser introduzido na arvore
             {
                 current_node = aux_graph->getNode(nodes[i]); //Pegando o no dessa iteracao
                 current_edge = current_node->getFirstEdge(); //Pegando aresta que liga esse no a outro
+
                 for (int j = 0; j < current_node->getOutDegree(); j++) //Iterando entre todas as arestas desse no, para ver qual tem o menor peso
                 {
                     int index = this->getFromList(nodes, total_nodes, current_edge->getTargetId()); //Usa o valor do id do vertice no grafo gerado para achar na lista do node o indice do vertice correspondente
+
                     if (index != -1 && parent[index] == -1) //Se o no que esta ligado ao da iteracao atual nao tiver pai, entra nessa condicional
                     {
                         if(first_node == 1) //Se for o primeio no a ser visitado entra nessa condicional
