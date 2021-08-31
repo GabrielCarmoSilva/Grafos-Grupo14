@@ -458,10 +458,10 @@ int Graph::getFromList(int list[], int size, int id){
 Graph* Graph::floydMarshall(int idSource, int idTarget){
     int order = this->getOrder(); //Pegando ordem do grafo
     double infinity = std::numeric_limits<double>::infinity(); //Definindo um valor infinito
-    double** cost = new double*[order];
+    double** cost = new double*[order+1];
     for (int i = 0; i < order; i++)
     {
-        cost[i] = new double[order];
+        cost[i] = new double[order+1];
     }
     
     // double **cost; //Alocando matriz para aplicar o algoritmo
@@ -521,11 +521,14 @@ Graph* Graph::floydMarshall(int idSource, int idTarget){
     cout << endl;
     cout << "Caminho minimo entre " << idSource << " e " << idTarget << ": " << cost[idSource][idTarget] << endl; //Imprime o caminho minimo
 
-    for(int p = 0; p < order; p++){
-        delete[] cost[p];
-    }
 
-    delete[] cost;
+
+    for(int j = 1; j <= order; j++){
+        for(int k = 1; k <= order; k++){
+            cout << cost[j][k] << " ";
+        }
+        cout << endl;
+    }
 
     return final_graph;
 }
