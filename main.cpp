@@ -84,26 +84,26 @@ Graph* leitura(ifstream& input_file, int directed, int weightedEdge, int weighte
 
 Graph* leituraAGMG(ifstream& input_file){
 
-        // o AGMG é sempre não direcionado e com peso nas arestas
-        Graph* graph = new Graph(0, 0, 1, 0);
+    // o AGMG é sempre não direcionado e com peso nas arestas
+    Graph* graph = new Graph(0, 0, 1, 0);
 
-        int idNodeSource;
-        string group;
-        int currentVertex = 0;
-        int idNodeTarget;
-        float edgeWeight;
+    int idNodeSource;
+    string group;
+    int currentVertex = 0;
+    int idNodeTarget;
+    float edgeWeight;
 
-        while(getline(input_file, group) && !group.empty()){
-            graph->insertNodeWithGroup(currentVertex, stoi(group));
-            currentVertex++;
-        }
+    while(getline(input_file, group) && !group.empty()){
+        graph->insertNodeWithGroup(currentVertex, stoi(group));
+        currentVertex++;
+    }
 
-        while(input_file >> idNodeSource >> idNodeTarget >> edgeWeight)
-        {
-            graph->insertEdge(idNodeSource, idNodeTarget, edgeWeight);
-        }
+    while(input_file >> idNodeSource >> idNodeTarget >> edgeWeight)
+    {
+        graph->insertEdge(idNodeSource, idNodeTarget, edgeWeight);
+    }
 
-        return graph;
+    return graph;
 }
 
 int menu(){
@@ -154,6 +154,7 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
         //Sair
         case 0:
         {
+            graph->auxPrimAGMG(4, 1);
             graph->save(output_file);
             exit(0);
             break;

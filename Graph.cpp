@@ -1124,27 +1124,22 @@ Graph* Graph::aciclicoDirecionado(){
     }
 
 }
-bool Graph::auxaciclicoDirecionado(int id, int visited[], Graph* retorno, int order[]){
-    Node* node = this->getNode(id);
-    if(node != nullptr)
-    {
+bool Graph::auxaciclicoDirecionado(int id, int visited[], Graph* retorno, int order[]) {
+    Node *node = this->getNode(id);
+    if (node != nullptr) {
         bool condition = true;
         //adicionando nós ao grafo de retorno
-        if(!retorno->searchNode(node->getId()))
-        {
+        if (!retorno->searchNode(node->getId())) {
             retorno->insertNode(node->getId());
         }
 
-        for(Edge* aux = node->getFirstEdge(); aux != nullptr; aux = aux->getNextEdge())
-        {
+        for (Edge *aux = node->getFirstEdge(); aux != nullptr; aux = aux->getNextEdge()) {
             //conferindo se o no ja foi visitado
-            if(visited[aux->getTargetId()] == -1)
-            {
+            if (visited[aux->getTargetId()] == -1) {
                 visited[node->getId()] = node->getId();
                 visited[aux->getTargetId()] = node->getId();
 
-                if(!retorno->searchNode(aux->getTargetId()))
-                {
+                if (!retorno->searchNode(aux->getTargetId())) {
                     retorno->insertNode(aux->getTargetId());
                 }
 
@@ -1152,18 +1147,16 @@ bool Graph::auxaciclicoDirecionado(int id, int visited[], Graph* retorno, int or
 
                 retorno->insertEdge(node->getId(), aux->getTargetId(), aux->getWeight());
 
-            } else if(visited[aux->getTargetId()] >= 0 && visited[node->getId()] >= 0)
-                    {
-                        return false;
-                    }
+            } else if (visited[aux->getTargetId()] >= 0 && visited[node->getId()] >= 0) {
+                return false;
+            }
         }
 
         visited[node->getId()] = -2;
 
-        for(int i = this->order; i > 0; i--) //preenche vetor de ordem
+        for (int i = this->order; i > 0; i--) //preenche vetor de ordem
         {
-            if(order[i] == -1)
-            {
+            if (order[i] == -1) {
                 order[i] = node->getId();
                 break;
             }
@@ -1171,5 +1164,73 @@ bool Graph::auxaciclicoDirecionado(int id, int visited[], Graph* retorno, int or
         return condition;
     }
     return true;
+}
+
+void Graph::auxPrimAGMG(int initial_node, float alpha){
+
+    int id_child, first_node, id_parent; //Variaveis de controle para a funcao
+    int total_nodes = this->getOrder();
+    Node* current_node; //No atual da iteracao
+    Edge* current_edge; //Aresta atual da iteracao
+    double minimal_weight; //Variavel que armazena o peso do caminho atual
+    int* parent = new int[total_nodes]; //Vetor para guardar os nos pai de cada vértice da árvore
+    double* weight = new double[total_nodes];
+
+
+    for(int i = 0; i < total_nodes ; i++) //Inicializando vetor de pais
+        parent[i] = -1;
+
+    parent[initial_node] = initial_node; //Vértice inicial considera que eh o proprio pai para o algoritmo (mesmo nao tendo pai)
+
+    while (1)//Loop para definir o pai de cada vertice da arvore
+    {
+        first_node = 1; //Variavel de controle para continuar ou nao o loop
+        for (int i = 0; i < this->getOrder(); i++)//Loop para iterar entre todos os nos e gerar a arvore
+        {
+
+            if(parent[i] != -1) //Se o valor no vetor foi -1, nao tem pai, entao pode ser introduzido na arvore
+            {
+                current_node = this->getNode(i); //Pegando o no dessa iteracao
+                current_edge = current_node->getFirstEdge(); //Pegando aresta que liga esse no a outro
+
+                for (int j = 0; j < current_node->getOutDegree(); j++) //Iterando entre todas as arestas desse no, para ver qual tem o menor peso
+                {
+                    int index = current_edge->getTargetId(); //Usa o valor do id do vertice no grafo gerado para achar na lista do node o indice do vertice correspondente
+
+                    if (parent[index] == -1) //Se o no que esta ligado ao da iteracao atual nao tiver pai, entra nessa condicional
+                    {
+                        if(first_node == 1) //Se for o primeio no a ser visitado entra nessa condicional
+                        {
+                            minimal_weight = current_edge->getWeight(); //Salva o peso dessa aresta
+                            id_parent = current_node->getId(); //Salva esse no como pai
+                            id_child = current_edge->getTargetId(); //Salva o outro no que a aresta aponta como filho
+                            first_node = 0; //Coloca a variavel de controle como 0 para continuar o loop
+                        }
+                        else //Se nao for o primeiro no
+                        {
+                            if (minimal_weight > current_edge->getWeight()) //Compara o peso da aresta atual com a menor, se o da atual for menor entra na condicao
+                            {
+                                minimal_weight = current_edge->getWeight(); //Salva o novo peso como menor peso
+                                id_parent = current_node->getId(); //Salva o id do no atual como pai
+                                id_child = current_edge->getTargetId(); //Salva o outro no que a aresta aponta como filho
+                            }
+                        }
+                    }
+                    current_edge = current_edge->getNextEdge(); //Atualiza o valor da aresta atual para a proxima deste no, para continuar corretamente o loop
+                }
+            }
+        }
+        if(first_node == 1){ //Se first node chegar como 1 significa que não tem mais arestas esse nó
+            break;
+        }
+
+        if(id_child != -1)
+            parent[id_child] = id_parent; //Salva o no pai no indice do filho no vetor, para continuar adequadamente o algoritmo
+
+    }
+
+    for(int i =0; i < total_nodes; i++){
+        cout << "No filho: " << i << " Pai: " << parent[i] << endl;
+    }
 
 }

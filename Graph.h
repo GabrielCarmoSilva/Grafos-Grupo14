@@ -70,6 +70,10 @@ public:
     //float greedRandom();
     //float greedRactiveRandom();
 
+
+    //AGMG
+    void auxPrimAGMG(int initial_node, float alpha);
+
     //imprimir e salvar
     void print();
     void save(ofstream& output_file);
