@@ -92,11 +92,22 @@ Graph* leituraAGMG(ifstream& input_file){
     int currentVertex = 0;
     int idNodeTarget;
     float edgeWeight;
+    int total_groups = 0;
 
     while(getline(input_file, group) && !group.empty()){
+
+        if(!graph->graphHasGroup(stoi(group))){
+            total_groups++;
+        }
+
         graph->insertNodeWithGroup(currentVertex, stoi(group));
         currentVertex++;
+
     }
+
+    cout << "numero total de grupos " << total_groups << endl;
+
+    graph->setTotalGroups(total_groups);
 
     while(input_file >> idNodeSource >> idNodeTarget >> edgeWeight)
     {
@@ -154,8 +165,9 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
         //Sair
         case 0:
         {
-            graph->auxPrimAGMG(4, 1);
-            graph->save(output_file);
+           // Graph* aux = graph->PrimAGMG(1);
+            Graph* aux = graph->PrimAGMG(1);
+            aux->save(output_file);
             exit(0);
             break;
         }

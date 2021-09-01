@@ -5,6 +5,7 @@
 #ifndef GRAPH_H_INCLUDED
 #define GRAPH_H_INCLUDED
 #include "Node.h"
+#include "Solution.h"
 #include <fstream>
 #include <stack>
 #include <list>
@@ -17,11 +18,13 @@ class Graph{
 private:
     int order;
     int number_edges;
+    int total_groups;
     bool directed;
     bool weighted_edge;
     bool weighted_node;
     Node* first_node;
     Node* last_node;
+
 
     //métodos auxiliares
     void auxFTI(int id, int visited[]);
@@ -29,6 +32,7 @@ private:
     void auxBuscaEmProfundidade(int id, int visited[], Graph* retorno);
     bool auxaciclicoDirecionado(int id, int visited[], Graph* retorno, int order[]);
     int findMinimumEdge(int visited[], int nodes[], int total_nodes);
+
 
     //marcar arestas
     void markEdge(int id, int target_id);
@@ -72,7 +76,10 @@ public:
 
 
     //AGMG
-    void auxPrimAGMG(int initial_node, float alpha);
+    int* auxPrimAGMG(int initial_node, float alpha, int* parent, int* groups);
+    Graph* PrimAGMG(float alpha);
+    Graph* ArrayToGraph(int* nodes, int total_nodes);
+    float ArrayWeight(int* nodes, int total_nodes);
 
     //imprimir e salvar
     void print();
@@ -85,10 +92,13 @@ public:
     Graph* listToGraphTree(int size, int nodeList[]);
     int getFromList(int list[], int size, int id);
     void insertNodeWithGroup(int id, int group);
+    bool hasGroup(int groups[], int group);
+    bool graphHasGroup(int group);
+    bool addToGroup(int groups[], int group);
 
-    int getGroup() const;
+    int getTotalGroups() const;
 
-    void setGroup(int group);
+    void setTotalGroups(int totalGroups);
 
 private:
     //Auxiliar methods

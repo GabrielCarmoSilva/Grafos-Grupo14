@@ -1,6 +1,7 @@
 #include "Graph.h"
 #include "Node.h"
 #include "Edge.h"
+#include "Solution.h"
 #include <iostream>
 #include <fstream>
 #include <stack>
@@ -28,6 +29,7 @@ Graph::Graph(int order, bool directed, bool weighted_edge, bool weighted_node)
     this->weighted_node = weighted_node;
     this->first_node = this->last_node = nullptr;
     this->number_edges = 0;
+    this->total_groups = 0;
 
     //preenchendo grafo com os nos
     for(int i = 1; i <= order; i++)
@@ -46,6 +48,7 @@ Graph::~Graph()
         delete next_node;
         next_node = aux_node;
     }
+
 }
 
 // Getters
@@ -271,6 +274,47 @@ Node *Graph::getNode(int id)
     return nullptr;
 }
 
+int Graph::getTotalGroups() const {
+    return total_groups;
+}
+
+void Graph::setTotalGroups(int totalGroups) {
+    total_groups = totalGroups;
+}
+
+bool Graph::hasGroup(int groups[], int group){
+    for(int i = 0; i < this->total_groups; i++){
+        if(groups[i] == group){
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Graph::addToGroup(int groups[], int group){
+    if(!this->hasGroup(groups, group)){
+        for(int i = 0; i < this->total_groups; i++){
+            if(groups[i] == -1){
+                groups[i] = group;
+                return true;
+            }
+        }
+        cout << "ERROR: Vetor de grupos de cheio!" << endl;
+        return false;
+    }
+    cout << "ERROR: Vetor ja possui esse grupo!" << endl;
+    return false;
+}
+
+bool Graph::graphHasGroup(int group){
+    for(Node* node = this->getFirstNode(); node != nullptr; node = node->getNextNode()){
+        if(node->getGroup() == group){
+            return true;
+        }
+    }
+    return false;
+}
+
 //printar todos os nós com suas respectivas arestas no console
 void Graph::print()
 {
@@ -317,7 +361,7 @@ void Graph::save(ofstream& output_file){
     {
         output_file << aux->getId();
 
-        if(aux->getGroup() > 0 && aux->getGroup() < 5){
+        if(aux->getGroup() >= 0 && aux->getGroup() < 5){
             output_file << "[color= " << colors[aux->getGroup()] << "]";
         }
 
@@ -1166,25 +1210,98 @@ bool Graph::auxaciclicoDirecionado(int id, int visited[], Graph* retorno, int or
     return true;
 }
 
-void Graph::auxPrimAGMG(int initial_node, float alpha){
 
-    int id_child, first_node, id_parent; //Variaveis de controle para a funcao
+Graph* Graph::ArrayToGraph(int* nodes, int total_nodes){
+    Graph* graph = new Graph(0, 0, 1, 0);
+    for(int i = 0; i < total_nodes; i++){
+
+        if(nodes[i] != -1){
+
+            if(!graph->searchNode(i)){
+                graph->insertNodeWithGroup(i, this->getNode(i)->getGroup());
+            }
+
+            if(nodes[i] != i){
+
+                if(!graph->searchNode(nodes[i])){
+                    graph->insertNodeWithGroup(nodes[i] , this->getNode(nodes[i])->getGroup());
+                }
+
+                graph->insertEdge(i, nodes[i], this->getNode(i)->hasEdgeBetween(nodes[i])->getWeight());
+            }
+        }
+    }
+
+    return graph;
+}
+
+float Graph::ArrayWeight(int* nodes, int total_nodes){
+    float total = 0;
+
+    for(int i = 0; i < total_nodes; i++){
+
+        if(nodes[i] != -1 && nodes[i] != i){
+            total += this->getNode(nodes[i])->hasEdgeBetween(i)->getWeight();
+
+        }
+    }
+
+    return total;
+}
+
+
+Graph* Graph::PrimAGMG(float alpha){
+    int* parent = new int[this->getOrder()];
+    int* best = new int[this->getOrder()];
+    int* groups = new int[this->getTotalGroups()];
+    bool first = true;
+
+    for(int i = 0; i < this->getOrder(); i++){
+        auxPrimAGMG(i, alpha, parent, groups);
+        if(first){
+            for(int k = 0; k < this->getOrder(); k++)
+                best[k] = parent[k];
+
+        } else if(this->ArrayWeight(best, this->getOrder()) > this->ArrayWeight(parent, this->getOrder())){
+            for(int j = 0; j < this->getOrder(); j++)
+                best[j] = parent[j];
+        }
+    }
+
+    Graph* graph = this->ArrayToGraph(best, this->getOrder());
+
+    delete []parent;
+    delete []groups;
+    delete []best;
+
+    return graph;
+}
+
+int* Graph::auxPrimAGMG(int initial_node, float alpha, int* parent, int* groups){
+
+    int id_child, first, id_parent; //Variaveis de controle para a funcao
     int total_nodes = this->getOrder();
     Node* current_node; //No atual da iteracao
     Edge* current_edge; //Aresta atual da iteracao
-    double minimal_weight; //Variavel que armazena o peso do caminho atual
-    int* parent = new int[total_nodes]; //Vetor para guardar os nos pai de cada vértice da árvore
-    double* weight = new double[total_nodes];
-
-
+    float minimal_weight; //Variavel que armazena o peso do caminho atual
+     //Vetor para guardar os nos pai de cada vértice da árvore
     for(int i = 0; i < total_nodes ; i++) //Inicializando vetor de pais
+    {
         parent[i] = -1;
 
-    parent[initial_node] = initial_node; //Vértice inicial considera que eh o proprio pai para o algoritmo (mesmo nao tendo pai)
+    }
+
+    for(int j = 0; j < this->total_groups; j++){
+        groups[j] = -1;
+    }
+
+
+    parent[initial_node] = initial_node; //Vértice inicial considera que eh o proprio pai para o algoritmo (mesmo nao tendo pai
+    this->addToGroup(groups, this->getNode(initial_node)->getGroup());
 
     while (1)//Loop para definir o pai de cada vertice da arvore
     {
-        first_node = 1; //Variavel de controle para continuar ou nao o loop
+        first = 1; //Variavel de controle para continuar ou nao o loop
         for (int i = 0; i < this->getOrder(); i++)//Loop para iterar entre todos os nos e gerar a arvore
         {
 
@@ -1197,14 +1314,14 @@ void Graph::auxPrimAGMG(int initial_node, float alpha){
                 {
                     int index = current_edge->getTargetId(); //Usa o valor do id do vertice no grafo gerado para achar na lista do node o indice do vertice correspondente
 
-                    if (parent[index] == -1) //Se o no que esta ligado ao da iteracao atual nao tiver pai, entra nessa condicional
+                    if (parent[index] == -1 && !this->hasGroup(groups, this->getNode(index)->getGroup())) //Se o no que esta ligado ao da iteracao atual nao tiver pai, entra nessa condicional
                     {
-                        if(first_node == 1) //Se for o primeio no a ser visitado entra nessa condicional
+                        if(first == 1) //Se for o primeio no a ser visitado entra nessa condicional
                         {
                             minimal_weight = current_edge->getWeight(); //Salva o peso dessa aresta
                             id_parent = current_node->getId(); //Salva esse no como pai
                             id_child = current_edge->getTargetId(); //Salva o outro no que a aresta aponta como filho
-                            first_node = 0; //Coloca a variavel de controle como 0 para continuar o loop
+                            first = 0; //Coloca a variavel de controle como 0 para continuar o loop
                         }
                         else //Se nao for o primeiro no
                         {
@@ -1220,17 +1337,17 @@ void Graph::auxPrimAGMG(int initial_node, float alpha){
                 }
             }
         }
-        if(first_node == 1){ //Se first node chegar como 1 significa que não tem mais arestas esse nó
+        if(first == 1){ //Se first node chegar como 1 significa que não tem mais arestas esse nó
             break;
         }
 
-        if(id_child != -1)
+        if(id_child != -1){
             parent[id_child] = id_parent; //Salva o no pai no indice do filho no vetor, para continuar adequadamente o algoritmo
+            this->addToGroup(groups, this->getNode(id_child)->getGroup());
+        }
 
     }
 
-    for(int i =0; i < total_nodes; i++){
-        cout << "No filho: " << i << " Pai: " << parent[i] << endl;
-    }
+    return parent;
 
 }
