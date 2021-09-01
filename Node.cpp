@@ -94,6 +94,14 @@ void Node::setWeight(float weight){
 
 }
 
+int Node::getGroup() const {
+    return group;
+}
+
+void Node::setGroup(int group) {
+    Node::group = group;
+}
+
 // Other methods
 void Node::insertEdge(Node* target_node, bool directed,  float weight){
     // Verifies whether there are at least one edge in the node
@@ -266,3 +274,4 @@ Edge* Node::hasEdgeBetween(int target_id)
     }
     return nullptr;
 }
+

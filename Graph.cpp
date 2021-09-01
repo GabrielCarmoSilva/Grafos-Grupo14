@@ -114,6 +114,33 @@ void Graph::insertNode(int id)
         cout << "ERROR: O no ja existe" << endl;
     }
 }
+
+void Graph::insertNodeWithGroup(int id, int group)
+{
+    if (!this->searchNode(id))
+    {
+        Node* new_node = new Node(id);
+        new_node->setGroup(group);
+
+        if(this->first_node != nullptr)
+        {
+            this->last_node->setNextNode(new_node);
+            this->last_node = new_node;
+        }
+        else
+        {
+            this->first_node = new_node;
+            this->last_node = this->first_node;
+        }
+
+        this->order++;
+    }
+    else
+    {
+        cout << "ERROR: O no ja existe" << endl;
+    }
+}
+
 //Funcao que insere aresta
 void Graph::insertEdge(int id, int target_id, float weight)
 {
@@ -280,7 +307,7 @@ void Graph::print()
 
 //função para salvar um grafo no arquivo de output na linguagem dot
 void Graph::save(ofstream& output_file){
-
+    string colors[5] = {"red", "blue", "orange", "yellow", "violet"};
     //definindo tipo de grafo para o dot
     string graphType = this->directed ? "strict digraph {" : "strict graph {";
     output_file << graphType << endl;
@@ -289,6 +316,11 @@ void Graph::save(ofstream& output_file){
     for(Node* aux = this->first_node; aux != nullptr; aux = aux->getNextNode())
     {
         output_file << aux->getId();
+
+        if(aux->getGroup() > 0 && aux->getGroup() < 5){
+            output_file << "[color= " << colors[aux->getGroup()] << "]";
+        }
+
         if(this->weighted_node)
         {
             output_file << " [weight=\"" << aux->getWeight() << "\"]";

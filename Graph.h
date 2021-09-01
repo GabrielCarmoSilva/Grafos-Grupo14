@@ -80,6 +80,11 @@ public:
     bool isInListPrim(int list[], int size, int id);
     Graph* listToGraphTree(int size, int nodeList[]);
     int getFromList(int list[], int size, int id);
+    void insertNodeWithGroup(int id, int group);
+
+    int getGroup() const;
+
+    void setGroup(int group);
 
 private:
     //Auxiliar methods

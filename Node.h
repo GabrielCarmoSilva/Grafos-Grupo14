@@ -17,6 +17,7 @@ class Node{
 private:
     Edge* first_edge;
     Edge* last_edge;
+    int group;
     int id;
     unsigned int in_degree;
     unsigned int out_degree;
@@ -49,6 +50,10 @@ public:
     void incrementInDegree();
     void decrementInDegree();
     Edge* hasEdgeBetween(int target_id);
+
+    int getGroup() const;
+
+    void setGroup(int group);
 
     // Auxiliar methods
 
