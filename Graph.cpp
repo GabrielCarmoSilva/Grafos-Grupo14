@@ -1,7 +1,6 @@
 #include "Graph.h"
 #include "Node.h"
 #include "Edge.h"
-#include "Solution.h"
 #include <iostream>
 #include <fstream>
 #include <stack>
@@ -1249,6 +1248,18 @@ float Graph::ArrayWeight(int* nodes, int total_nodes){
     return total;
 }
 
+int Graph::ArrayGroups(int* nodes, int total_nodes){
+    int total = 0;
+    for(int i = 0; i < total_nodes; i++){
+        if(nodes[i] != -1){
+            total += 1;
+
+        }
+    }
+    return total;
+}
+
+
 
 Graph* Graph::PrimAGMG(float alpha){
     int* parent = new int[this->getOrder()];
@@ -1256,15 +1267,20 @@ Graph* Graph::PrimAGMG(float alpha){
     int* groups = new int[this->getTotalGroups()];
     bool first = true;
 
+    for(int i = 0; i < this->getOrder(); i++)
+        best[i] = -1;
+
     for(int i = 0; i < this->getOrder(); i++){
         auxPrimAGMG(i, alpha, parent, groups);
-        if(first){
-            for(int k = 0; k < this->getOrder(); k++)
-                best[k] = parent[k];
+        if(this->ArrayGroups(parent, this->getOrder()) == this->getTotalGroups()){
+            if(first){
+                for(int k = 0; k < this->getOrder(); k++)
+                    best[k] = parent[k];
 
-        } else if(this->ArrayWeight(best, this->getOrder()) > this->ArrayWeight(parent, this->getOrder())){
-            for(int j = 0; j < this->getOrder(); j++)
-                best[j] = parent[j];
+            } else if(this->ArrayWeight(best, this->getOrder()) > this->ArrayWeight(parent, this->getOrder())){
+                for(int j = 0; j < this->getOrder(); j++)
+                    best[j] = parent[j];
+            }
         }
     }
 

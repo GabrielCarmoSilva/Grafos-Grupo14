@@ -5,7 +5,6 @@
 #ifndef GRAPH_H_INCLUDED
 #define GRAPH_H_INCLUDED
 #include "Node.h"
-#include "Solution.h"
 #include <fstream>
 #include <stack>
 #include <list>
@@ -80,6 +79,7 @@ public:
     Graph* PrimAGMG(float alpha);
     Graph* ArrayToGraph(int* nodes, int total_nodes);
     float ArrayWeight(int* nodes, int total_nodes);
+    int ArrayGroups(int* nodes, int total_nodes);
 
     //imprimir e salvar
     void print();
