@@ -75,11 +75,17 @@ public:
 
 
     //AGMG
-    int* auxPrimAGMG(int initial_node, float alpha, int* parent, int* groups);
-    Graph* PrimAGMG(float alpha);
+    void auxPrimRandomizado(int initial_node, float alpha, int* parent, int* groups);
+    void auxPrimGuloso(int initial_node, int* parent, int* groups);
+    Graph* primRandomizadoAGMG(float alpha);
+    Graph* primGulosoAGMG();
+
     Graph* ArrayToGraph(int* nodes, int total_nodes);
     float ArrayWeight(int* nodes, int total_nodes);
     int ArrayGroups(int* nodes, int total_nodes);
+    bool nodeRange(int* parent, int* groups, bool* nodes, float alpha);
+    int randEdge(int* parent, int* groups, int node);
+    int randNode(bool* nodes);
 
     //imprimir e salvar
     void print();

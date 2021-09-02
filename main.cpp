@@ -166,8 +166,10 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
         case 0:
         {
            // Graph* aux = graph->PrimAGMG(1);
-            Graph* aux = graph->PrimAGMG(1);
+            Graph* aux = graph->primGulosoAGMG();
+            Graph* aux2 = graph->primRandomizadoAGMG(0);
             aux->save(output_file);
+            aux2->save(output_file);
             exit(0);
             break;
         }

@@ -156,7 +156,6 @@ void Graph::insertEdge(int id, int target_id, float weight)
         {
             origin_node->insertEdge(this->getNode(target_id), this->directed, weight);
             this->number_edges++;
-            //cout <<"aresta criada com no de origem " << id << " e no alvo " << target_id << endl;
         }
         else
         {
@@ -1261,26 +1260,70 @@ int Graph::ArrayGroups(int* nodes, int total_nodes){
 
 
 
-Graph* Graph::PrimAGMG(float alpha){
+Graph* Graph::primRandomizadoAGMG(float alpha){
     int* parent = new int[this->getOrder()];
     int* best = new int[this->getOrder()];
     int* groups = new int[this->getTotalGroups()];
+    bool first = true;
+    float best_weight = 0;
+
+    for(int i = 0; i < this->getOrder(); i++)
+        best[i] = -1;
+
+    for(int i = 0; i < 1; i++){
+        this->auxPrimRandomizado(i, alpha, parent, groups);
+        if(this->ArrayGroups(parent, this->getOrder()) == this->getTotalGroups()){
+            if(first){
+                for(int k = 0; k < this->getOrder(); k++)
+                    best[k] = parent[k];
+                first=false;
+                best_weight = this->ArrayWeight(best, this->getOrder());
+
+            } else if(this->ArrayWeight(best, this->getOrder()) > this->ArrayWeight(parent, this->getOrder())){
+                for(int j = 0; j < this->getOrder(); j++)
+                    best[j] = parent[j];
+                best_weight = this->ArrayWeight(best, this->getOrder());
+            }
+        } else{
+            cout << "inválido " << i << endl;
+        }
+    }
+
+    Graph* graph = this->ArrayToGraph(best, this->getOrder());
+
+    delete []parent;
+    delete []groups;
+    delete []best;
+    cout << "melhor peso encontrado: " << best_weight;
+    return graph;
+}
+
+Graph* Graph::primGulosoAGMG(){
+    int* parent = new int[this->getOrder()];
+    int* best = new int[this->getOrder()];
+    int* groups = new int[this->getTotalGroups()];
+    float best_weight = 0;
     bool first = true;
 
     for(int i = 0; i < this->getOrder(); i++)
         best[i] = -1;
 
-    for(int i = 0; i < this->getOrder(); i++){
-        auxPrimAGMG(i, alpha, parent, groups);
+    for(int i = 0; i < 1; i++){
+        this->auxPrimGuloso(i, parent, groups);
         if(this->ArrayGroups(parent, this->getOrder()) == this->getTotalGroups()){
             if(first){
                 for(int k = 0; k < this->getOrder(); k++)
                     best[k] = parent[k];
+                first=false;
+                best_weight = this->ArrayWeight(best, this->getOrder());
 
             } else if(this->ArrayWeight(best, this->getOrder()) > this->ArrayWeight(parent, this->getOrder())){
                 for(int j = 0; j < this->getOrder(); j++)
                     best[j] = parent[j];
+                best_weight = this->ArrayWeight(best, this->getOrder());
             }
+        } else{
+            cout << "inválido " << i << endl;
         }
     }
 
@@ -1290,17 +1333,19 @@ Graph* Graph::PrimAGMG(float alpha){
     delete []groups;
     delete []best;
 
+    cout << "melhor peso encontrado: " << best_weight << endl;
     return graph;
 }
 
-int* Graph::auxPrimAGMG(int initial_node, float alpha, int* parent, int* groups){
+
+void Graph::auxPrimGuloso(int initial_node, int* parent, int* groups){
 
     int id_child, first, id_parent; //Variaveis de controle para a funcao
     int total_nodes = this->getOrder();
     Node* current_node; //No atual da iteracao
     Edge* current_edge; //Aresta atual da iteracao
     float minimal_weight; //Variavel que armazena o peso do caminho atual
-     //Vetor para guardar os nos pai de cada vértice da árvore
+    //Vetor para guardar os nos pai de cada vértice da árvore
     for(int i = 0; i < total_nodes ; i++) //Inicializando vetor de pais
     {
         parent[i] = -1;
@@ -1363,7 +1408,197 @@ int* Graph::auxPrimAGMG(int initial_node, float alpha, int* parent, int* groups)
         }
 
     }
-
-    return parent;
-
 }
+
+void Graph::auxPrimRandomizado(int initial_node, float alpha, int* parent, int* groups){
+
+    int id_child, first, id_parent; //Variaveis de controle para a funcao
+    int total_nodes = this->getOrder();
+    Node* current_node; //No atual da iteracao
+    Edge* current_edge; //Aresta atual da iteracao
+    float minimal_weight; //Variavel que armazena o peso do caminho atual
+    bool *nodes = new bool[this->getOrder()];
+    //Vetor para guardar os nos pai de cada vértice da árvore
+    for(int i = 0; i < total_nodes ; i++) //Inicializando vetor de pais
+    {
+        parent[i] = -1;
+    }
+
+    for(int j = 0; j < this->total_groups; j++){
+        groups[j] = -1;
+    }
+
+
+    parent[initial_node] = initial_node; //Vértice inicial considera que eh o proprio pai para o algoritmo (mesmo nao tendo pai
+    this->addToGroup(groups, this->getNode(initial_node)->getGroup());
+
+    while (1)//Loop para definir o pai de cada vertice da arvore
+    {
+        bool check = true;
+
+        check = this->nodeRange(parent, groups, nodes, alpha);
+
+        if(!check){
+            break;
+        }
+
+        id_child = this->randNode(nodes);
+        id_parent = this->randEdge(parent, groups, id_child);
+
+        if(id_child != -1){
+            parent[id_child] = id_parent; //Salva o no pai no indice do filho no vetor, para continuar adequadamente o algoritmo
+            this->addToGroup(groups, this->getNode(id_child)->getGroup());
+        }
+
+    }
+
+    delete []nodes;
+}
+
+int Graph::randEdge(int* parent, int* groups, int node){
+    Node* current_node;
+    Edge* current_edge;
+    float minimal_weight, current_weight;
+    bool first = true;
+    int chosen_node = -1;
+
+    for (int i = 0; i < this->getOrder(); i++)
+    {
+        if(parent[i] != -1)
+        {
+            current_node = this->getNode(i);
+            if(current_node->searchEdge(node)){
+                current_weight = current_node->hasEdgeBetween(node)->getWeight();
+                if(first){
+                    minimal_weight = current_weight;
+                    chosen_node = current_node->getId();
+                    first = false;
+                } else if(minimal_weight > current_weight){
+                    minimal_weight = current_weight;
+                    chosen_node = current_node->getId();
+                }
+            }
+        }
+    }
+
+    return chosen_node;
+}
+
+int Graph::randNode(bool* nodes){
+    int size = 0;
+    int chosen_node = -1;
+    for(int i =0; i < this->getOrder(); i++){
+        if(nodes[i])
+            size++;
+    }
+
+    if(size != 0){
+        int* chosenNodes = new int[size];
+
+        int j = 0;
+        for(int i =0; i < this->getOrder(); i++){
+            if(nodes[i]){
+                chosenNodes[j] = i;
+                j++;
+            }
+        }
+
+        srand(time(0));
+
+        chosen_node = chosenNodes[rand()%size];
+    }
+
+    return chosen_node;
+}
+
+bool Graph::nodeRange(int* parent, int* groups, bool* nodes, float alpha) {
+
+    //-----------declaração de variáveis-----------
+
+    int id_child, first, id_parent;
+    int total_nodes = this->getOrder();
+    Node *current_node;
+    Edge *current_edge;
+    float minimal_weight, maximum_weight;
+
+    for (int j = 0; j < this->getOrder(); j++) {
+        nodes[j] = false;
+    }
+
+    //---------------------------------------------
+
+
+
+    //--------------------- Busca por valores de maior e menor distância ------------------------
+
+    first = 1;
+    for (int i = 0; i < this->getOrder(); i++) {
+        if (parent[i] != -1) {
+            current_node = this->getNode(i);
+            current_edge = current_node->getFirstEdge();
+
+            for (int j = 0; j < current_node->getOutDegree(); j++) {
+                int index = current_edge->getTargetId();
+                if (parent[index] == -1 && !this->hasGroup(groups, this->getNode(index)->getGroup())) {
+
+                    if (first == 1) {
+                        minimal_weight = current_edge->getWeight();
+                        maximum_weight = current_edge->getWeight();
+                        first = 0;
+                    } else {
+                        if (minimal_weight > current_edge->getWeight()) //Compara o peso da aresta atual com a menor, se o da atual for menor entra na condicao
+                        {
+                            minimal_weight = current_edge->getWeight(); //Salva o novo peso como menor peso
+                        }
+
+                        if (maximum_weight < current_edge->getWeight()) //Compara o peso da aresta atual com a menor, se o da atual for menor entra na condicao
+                        {
+                            maximum_weight = current_edge->getWeight(); //Salva o novo peso como menor peso
+                        }
+                    }
+                }
+                current_edge = current_edge->getNextEdge(); //Atualiza o valor da aresta atual para a proxima deste no, para continuar corretamente o loop
+            }
+
+        }
+    }
+
+    //variavel para cehcar se algum local pode ser visitado ou não -- condição de parada para o prim
+    bool check = false;
+
+    if(first == 0) {
+        //------------------------------------------------------------------------------------------
+
+
+        //definindo variável de distância maxima randomizada por alpha
+        float maxDistance = minimal_weight + (alpha * (maximum_weight - minimal_weight));
+
+
+
+
+        //-----------------------Busca pelos nos que se adequam a distancia minima-----------------------------
+
+        for (int i = 0; i < this->getOrder(); i++) {
+
+            if (parent[i] != -1) {
+                current_node = this->getNode(i);
+                current_edge = current_node->getFirstEdge();
+
+                for (int j = 0; j < current_node->getOutDegree(); j++) {
+                    int index = current_edge->getTargetId();
+
+                    if (current_edge->getWeight() <= maxDistance && parent[index] == -1 && !this->hasGroup(groups, this->getNode(index)->getGroup())) {
+                        nodes[index] = true;
+                        check = true;
+                    }
+                    current_edge = current_edge->getNextEdge();
+                }
+            }
+        }
+
+    }
+
+    //---------------------------------------------------------------------------------
+    return check;
+}
+
