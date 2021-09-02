@@ -1270,7 +1270,7 @@ Graph* Graph::primRandomizadoAGMG(float alpha){
     for(int i = 0; i < this->getOrder(); i++)
         best[i] = -1;
 
-    for(int i = 0; i < 1; i++){
+    for(int i = 0; i < this->getOrder(); i++){
         this->auxPrimRandomizado(i, alpha, parent, groups);
         if(this->ArrayGroups(parent, this->getOrder()) == this->getTotalGroups()){
             if(first){
@@ -1308,7 +1308,7 @@ Graph* Graph::primGulosoAGMG(){
     for(int i = 0; i < this->getOrder(); i++)
         best[i] = -1;
 
-    for(int i = 0; i < 1; i++){
+    for(int i = 0; i < this->getOrder(); i++){
         this->auxPrimGuloso(i, parent, groups);
         if(this->ArrayGroups(parent, this->getOrder()) == this->getTotalGroups()){
             if(first){
