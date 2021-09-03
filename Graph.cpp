@@ -1260,7 +1260,6 @@ int Graph::ArrayGroups(int* nodes, int total_nodes){
 
 float Graph::primRandomizadoAGMG(float alpha, int iterations){
     int* parent = new int[this->getOrder()];
-    int* best = new int[this->getOrder()];
     int* groups = new int[this->getTotalGroups()];
     bool first = true;
     float best_weight = 0;
@@ -1269,11 +1268,8 @@ float Graph::primRandomizadoAGMG(float alpha, int iterations){
     int current_iterations = 0;
     float fitness = 0;
 
-    for(int i = 0; i < this->getOrder(); i++)
-        best[i] = -1;
-
     while(current_iterations < iterations){
-        for(int i = 0; i < this->getOrder(); i++){
+        for(int i = 0; i < this->getOrder() && current_iterations < iterations; i++){
             current_iterations++;
             this->auxPrimRandomizado(i, alpha, parent, groups);
             if(this->ArrayGroups(parent, this->getOrder()) == this->getTotalGroups()){
@@ -1281,15 +1277,11 @@ float Graph::primRandomizadoAGMG(float alpha, int iterations){
                 float current_weight = this->ArrayWeight(parent, this->getOrder());
 
                 if(first){
-                    for(int k = 0; k < this->getOrder(); k++)
-                        best[k] = parent[k];
                     first=false;
                     best_weight = current_weight;
 
                 } else if(best_weight > current_weight){
-                    for(int j = 0; j < this->getOrder(); j++)
-                        best[j] = parent[j];
-                    best_weight = this->ArrayWeight(best, this->getOrder());
+                    best_weight = current_weight;
 
                 }
                 total_weight += current_weight;
@@ -1302,11 +1294,16 @@ float Graph::primRandomizadoAGMG(float alpha, int iterations){
         }
     }
 
-    Graph* graph = this->ArrayToGraph(best, this->getOrder());
+   // Graph* graph = this->ArrayToGraph(best, this->getOrder());
 
     delete []parent;
     delete []groups;
-    delete []best;
+
+    cout << "--------- finalizando reativo: ---------" << endl << endl;
+    cout << "melhor peso encontrado: " << best_weight << endl;
+    cout << "qualidade do alfa: " << fitness << endl << endl;
+    cout << "-----------------------------------------" << endl;
+
 
     return fitness;
 }
