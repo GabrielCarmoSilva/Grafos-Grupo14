@@ -75,7 +75,7 @@ public:
 
 
     //AGMG
-    void auxPrimRandomizado(int initial_node, float alpha, int* parent, int* groups);
+    float auxPrimRandomizado(int initial_node, float alpha, int* parent, int* groups);
     void auxPrimGuloso(int initial_node, int* parent, int* groups);
     float auxPrimReativo(float alpha, int max_iterations, int* doneiterations, double* weightFound);
     void primReativoAGMG(float* alpha, int alpha_size, int iterations, int block);
@@ -85,7 +85,7 @@ public:
     Graph* ArrayToGraph(int* nodes, int total_nodes);
     float ArrayWeight(int* nodes, int total_nodes);
     int ArrayGroups(int* nodes, int total_nodes);
-    bool nodeRange(int* parent, int* groups, bool* nodes, float alpha);
+    bool nodeRange(int* parent, int* groups, bool* nodes, float alpha, float* weights);
     int randEdge(int* parent, int* groups, int node);
     int randNode(bool* nodes);
 
