@@ -1779,12 +1779,8 @@ float Graph::auxPrimReativo(float alpha, int max_iterations, int* doneiterations
     //---------------------- Declarando variaveis/arrays ----------------------------------------
 
     int* parent = new int[this->getOrder()];
-    int* best = new int[this->getOrder()];
     int* groups = new int[this->getTotalGroups()];
     float best_weight = 0;
-
-    for(int i = 0; i < this->getOrder(); i++)
-        best[i] = -1;
 
     bool first = true;
     //------------------------------------------------------------------------------------
@@ -1819,7 +1815,7 @@ float Graph::auxPrimReativo(float alpha, int max_iterations, int* doneiterations
 
     delete []parent;
     delete []groups;
-    delete []best;
+
     return best_weight;
 }
 
