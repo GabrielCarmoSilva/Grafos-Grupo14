@@ -1640,7 +1640,7 @@ void Graph::primReativoAGMG(float* alpha, int alpha_size, int iterations, int bl
 
         //variaveis de controle
         int localIterations = 0;
-        float localWeight = 0;
+        double localWeight = 0;
         float chosen_weight = this->auxPrimReativo(alpha[i], this->getOrder(), &localIterations, &localWeight);
         alpha_iterations[i] += localIterations;
         current_iterations += localIterations;
@@ -1733,7 +1733,7 @@ void Graph::primReativoAGMG(float* alpha, int alpha_size, int iterations, int bl
             //função retorna iteraçoes realizadas no alfa
             //definindo variaveis de maximo de iteraçoes e int que será usado como contador
             int doneIterations = 0;
-            float weightFound = 0;
+            double weightFound = 0;
             int maxIterations = iterations-current_iterations < block-block_iteration ? iterations-current_iterations : block-block_iteration;
             float current_weight = this->auxPrimReativo(alpha[chosen_index], maxIterations, &doneIterations, &weightFound);
 
@@ -1777,7 +1777,7 @@ void Graph::primReativoAGMG(float* alpha, int alpha_size, int iterations, int bl
     delete []alpha_iterations;
 }
 
-float Graph::auxPrimReativo(float alpha, int max_iterations, int* doneiterations, float* weightFound){
+float Graph::auxPrimReativo(float alpha, int max_iterations, int* doneiterations, double* weightFound){
 
     //---------------------- Declarando variaveis/arrays ----------------------------------------
 
