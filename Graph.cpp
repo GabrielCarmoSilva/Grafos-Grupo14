@@ -1258,34 +1258,47 @@ int Graph::ArrayGroups(int* nodes, int total_nodes){
     return total;
 }
 
-
-
-Graph* Graph::primRandomizadoAGMG(float alpha){
+float Graph::primRandomizadoAGMG(float alpha, int iterations){
     int* parent = new int[this->getOrder()];
     int* best = new int[this->getOrder()];
     int* groups = new int[this->getTotalGroups()];
     bool first = true;
     float best_weight = 0;
+    float total_weight = 0;
+    float means;
+    int current_iterations = 0;
+    float fitness = 0;
 
     for(int i = 0; i < this->getOrder(); i++)
         best[i] = -1;
 
-    for(int i = 0; i < this->getOrder(); i++){
-        this->auxPrimRandomizado(i, alpha, parent, groups);
-        if(this->ArrayGroups(parent, this->getOrder()) == this->getTotalGroups()){
-            if(first){
-                for(int k = 0; k < this->getOrder(); k++)
-                    best[k] = parent[k];
-                first=false;
-                best_weight = this->ArrayWeight(best, this->getOrder());
+    while(current_iterations < iterations){
+        for(int i = 0; i < this->getOrder(); i++){
+            current_iterations++;
+            this->auxPrimRandomizado(i, alpha, parent, groups);
+            if(this->ArrayGroups(parent, this->getOrder()) == this->getTotalGroups()){
 
-            } else if(this->ArrayWeight(best, this->getOrder()) > this->ArrayWeight(parent, this->getOrder())){
-                for(int j = 0; j < this->getOrder(); j++)
-                    best[j] = parent[j];
-                best_weight = this->ArrayWeight(best, this->getOrder());
+                float current_weight = this->ArrayWeight(parent, this->getOrder());
+
+                if(first){
+                    for(int k = 0; k < this->getOrder(); k++)
+                        best[k] = parent[k];
+                    first=false;
+                    best_weight = current_weight;
+
+                } else if(best_weight > current_weight){
+                    for(int j = 0; j < this->getOrder(); j++)
+                        best[j] = parent[j];
+                    best_weight = this->ArrayWeight(best, this->getOrder());
+
+                }
+                total_weight += current_weight;
+                means = total_weight/current_iterations;
+                fitness = best_weight/means;
+
+            } else{
+                cout << "inválido " << i << endl;
             }
-        } else{
-            cout << "inválido " << i << endl;
         }
     }
 
@@ -1294,8 +1307,8 @@ Graph* Graph::primRandomizadoAGMG(float alpha){
     delete []parent;
     delete []groups;
     delete []best;
-    cout << "melhor peso encontrado: " << best_weight;
-    return graph;
+
+    return fitness;
 }
 
 Graph* Graph::primGulosoAGMG(){
@@ -1601,4 +1614,155 @@ bool Graph::nodeRange(int* parent, int* groups, bool* nodes, float alpha) {
     //---------------------------------------------------------------------------------
     return check;
 }
+
+
+void Graph::primReativoAGMG(float* alpha, int alpha_size, int iterations, int block){
+    int current_iterations = 0;
+    float* total_weight = new float[alpha_size];
+    int* alpha_iterations = new int[alpha_size];
+    float* probability = new float[alpha_size];
+    float* fitness = new float[alpha_size];
+    float best_fitness;
+    float best_weight;
+    float total_fitness = 0;
+
+    bool check = true;
+    srand(time(0));
+
+    for(int i = 0; i < alpha_size; i++){
+        current_iterations++;
+        total_weight[i] = this->auxPrimReativo(alpha[i]);
+        alpha_iterations[i]++;
+
+        if(check){
+            check = false;
+            best_weight = total_weight[i];
+
+        } else if(best_weight > total_weight[i]){
+            best_weight = total_weight[i];
+        }
+    }
+
+    check = true;
+    while(current_iterations < iterations) {
+        int block_iteration = 0;
+
+
+        total_fitness = 0;
+        for (int i = 0; i < alpha_size; i++) {
+            fitness[i] = best_weight / (total_weight[i] / alpha_iterations[i]);
+            total_fitness += fitness[i];
+
+            if (check) {
+                best_fitness = fitness[i];
+            } else if (best_fitness > fitness[i]) {
+                best_fitness = fitness[i];
+            }
+        }
+
+
+
+        float chosen = rand()/(RAND_MAX + 1.0);
+        float chosen_probability = 0;
+        int chosen_index = -1;
+
+        for (int i = 0; i < alpha_size; i++) {
+            probability[i] = fitness[i] / total_fitness;
+            chosen_probability += probability[i];
+            if (chosen_index == -1 && chosen_probability > chosen) {
+                chosen_index = i;
+            }
+        }
+
+        cout << "----------  Bloco resetado  ------------" << endl;
+        cout << "alfa escolhido: " << alpha[chosen_index] << endl;
+        cout << "fitness do alfa escolhido: " << fitness[chosen_index] << endl;
+        cout << "probabilidade do alfa 1: " << probability[0] << endl;
+        cout << "probabilidade do alfa 2: " << probability[1] << endl;
+        cout << "probabilidade do alfa 3: " << probability[2] << endl;
+        cout << "probabilidade do alfa 4: " << probability[3] << endl;
+        cout << "probabilidade do alfa 5: " << probability[4] << endl;
+        cout << "rand: " << chosen << endl;
+        cout << "melhor peso atual: " << best_weight << endl;
+        cout << "----------------------------------------" << endl;
+
+        while (block_iteration < block && current_iterations < iterations) {
+            block_iteration++;
+            current_iterations++;
+
+            float current_weight = this->auxPrimReativo(alpha[chosen_index]);
+
+            total_weight[chosen_index] += current_weight;
+            alpha_iterations[chosen_index]++;
+
+            if (best_weight > current_weight) {
+                best_weight = current_weight;
+            }
+
+            fitness[chosen_index] = best_weight / (total_weight[chosen_index] / alpha_iterations[chosen_index]);
+
+        }
+    }
+
+    for(int i = 0; i < alpha_size; i++){
+        cout << "alfa " << i << " " << alpha[i] << endl;
+        cout << "fitness: "  << fitness[i] << endl;
+        cout << "probabilidade: " << probability[i] << endl;
+        cout << "melhor peso: " << best_weight << endl;
+        cout << "melhor fitness: " << best_fitness << endl << endl;
+    }
+
+
+    delete []probability;
+    delete []fitness;
+    delete []total_weight;
+    delete []alpha_iterations;
+}
+
+float Graph::auxPrimReativo(float alpha){
+    int* parent = new int[this->getOrder()];
+    int* best = new int[this->getOrder()];
+    int* groups = new int[this->getTotalGroups()];
+    float best_weight = 0;
+    float total_weight = 0;
+    float means;
+    int current_iterations = 0;
+
+    for(int i = 0; i < this->getOrder(); i++)
+        best[i] = -1;
+
+    bool first = true;
+    for(int i = 0; i < this->getOrder(); i++){
+        this->auxPrimRandomizado(i, alpha, parent, groups);
+        if(this->ArrayGroups(parent, this->getOrder()) == this->getTotalGroups()){
+
+            float current_weight = this->ArrayWeight(parent, this->getOrder());
+
+            if(first){
+                for(int k = 0; k < this->getOrder(); k++)
+                    best[k] = parent[k];
+                first = false;
+                best_weight = current_weight;
+
+            } else if(best_weight > current_weight){
+                for(int j = 0; j < this->getOrder(); j++)
+                    best[j] = parent[j];
+                best_weight = this->ArrayWeight(best, this->getOrder());
+
+            }
+
+        } else{
+            cout << "inválido " << i << endl;
+        }
+    }
+
+    Graph* graph = this->ArrayToGraph(best, this->getOrder());
+
+    delete []parent;
+    delete []groups;
+    delete []best;
+
+    return best_weight;
+}
+
 
