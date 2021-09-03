@@ -1425,14 +1425,14 @@ void Graph::auxPrimGuloso(int initial_node, int* parent, int* groups){
 
 void Graph::auxPrimRandomizado(int initial_node, float alpha, int* parent, int* groups){
 
-    int id_child, first, id_parent; //Variaveis de controle para a funcao
+    int id_child, id_parent;
     int total_nodes = this->getOrder();
-    Node* current_node; //No atual da iteracao
-    Edge* current_edge; //Aresta atual da iteracao
-    float minimal_weight; //Variavel que armazena o peso do caminho atual
+    Node* current_node;
+    Edge* current_edge;
+    float minimal_weight;
     bool *nodes = new bool[this->getOrder()];
-    //Vetor para guardar os nos pai de cada vértice da árvore
-    for(int i = 0; i < total_nodes ; i++) //Inicializando vetor de pais
+
+    for(int i = 0; i < total_nodes ; i++)
     {
         parent[i] = -1;
     }
@@ -1442,7 +1442,7 @@ void Graph::auxPrimRandomizado(int initial_node, float alpha, int* parent, int* 
     }
 
 
-    parent[initial_node] = initial_node; //Vértice inicial considera que eh o proprio pai para o algoritmo (mesmo nao tendo pai
+    parent[initial_node] = initial_node;
     this->addToGroup(groups, this->getNode(initial_node)->getGroup());
 
     while (1)//Loop para definir o pai de cada vertice da arvore
@@ -1516,8 +1516,6 @@ int Graph::randNode(bool* nodes){
             }
         }
 
-        srand(time(0));
-
         chosen_node = chosenNodes[rand()%size];
     }
 
@@ -1538,7 +1536,7 @@ bool Graph::nodeRange(int* parent, int* groups, bool* nodes, float alpha) {
         nodes[j] = false;
     }
 
-    //---------------------------------------------
+    //-------------------------------------------------------------------------------------------
 
 
 
@@ -1617,8 +1615,11 @@ bool Graph::nodeRange(int* parent, int* groups, bool* nodes, float alpha) {
 
 
 void Graph::primReativoAGMG(float* alpha, int alpha_size, int iterations, int block){
+
+    //---------------------- Declarando variaveis/arrays ----------------------------------------
+
     int current_iterations = 0;
-    float* total_weight = new float[alpha_size];
+    double* total_weight = new double[alpha_size];
     int* alpha_iterations = new int[alpha_size];
     float* probability = new float[alpha_size];
     float* fitness = new float[alpha_size];
@@ -1627,29 +1628,50 @@ void Graph::primReativoAGMG(float* alpha, int alpha_size, int iterations, int bl
     float total_fitness = 0;
 
     bool check = true;
-    srand(time(0));
+
+    //---------------------------------------------------------------------------------
+
+
+    //preenchendo valores mínimos para evitar divisão por 0
+    //esses valores são: qualidade de solução (fitness)
+    //melhor peso e melhor qualidade (best_weight e best_fitness)
 
     for(int i = 0; i < alpha_size; i++){
-        current_iterations++;
-        total_weight[i] = this->auxPrimReativo(alpha[i]);
-        alpha_iterations[i]++;
+
+        //variaveis de controle
+        int localIterations = 0;
+        float localWeight = 0;
+        float chosen_weight = this->auxPrimReativo(alpha[i], this->getOrder(), &localIterations, &localWeight);
+        alpha_iterations[i] += localIterations;
+        current_iterations += localIterations;
+        total_weight[i] = localWeight;
 
         if(check){
             check = false;
-            best_weight = total_weight[i];
+            best_weight = chosen_weight;
 
-        } else if(best_weight > total_weight[i]){
-            best_weight = total_weight[i];
+        } else if(best_weight > chosen_weight){
+            best_weight = chosen_weight;
         }
     }
 
+
+    //------------------- while loop principal do reativo ---------------------
+
     check = true;
     while(current_iterations < iterations) {
+
+
+        //resetando variaveis locais
         int block_iteration = 0;
-
-
         total_fitness = 0;
+
+        //-------------- loop para setar qualidade (fitness) -------------------
+
+        //busca pela melhor qualidade de um alfa ao mesmo tempo que calcula a soma de total desses
         for (int i = 0; i < alpha_size; i++) {
+
+
             fitness[i] = best_weight / (total_weight[i] / alpha_iterations[i]);
             total_fitness += fitness[i];
 
@@ -1660,12 +1682,19 @@ void Graph::primReativoAGMG(float* alpha, int alpha_size, int iterations, int bl
             }
         }
 
+        //-------------------------------------------------------------------
 
 
+        //----------- loop para escolher alfa randomizado -------------------
+
+        //definindo seed de randomização
         float chosen = rand()/(RAND_MAX + 1.0);
         float chosen_probability = 0;
         int chosen_index = -1;
 
+        //reseta qualidade da solução ao mesmo tempo que decide qual será a nova
+        //não interfere no resultado pois antes de decidir se um alfa é ou não escolhido sua
+        //qualidade ja foi atualizada
         for (int i = 0; i < alpha_size; i++) {
             probability[i] = fitness[i] / total_fitness;
             chosen_probability += probability[i];
@@ -1674,81 +1703,114 @@ void Graph::primReativoAGMG(float* alpha, int alpha_size, int iterations, int bl
             }
         }
 
+
+
+        //-------------------------------------------------------------------
+
+
+        //atualização no console dos princiaps valores por atualização de bloco de iteraçoes
+
         cout << "----------  Bloco resetado  ------------" << endl;
         cout << "alfa escolhido: " << alpha[chosen_index] << endl;
         cout << "fitness do alfa escolhido: " << fitness[chosen_index] << endl;
-        cout << "probabilidade do alfa 1: " << probability[0] << endl;
-        cout << "probabilidade do alfa 2: " << probability[1] << endl;
-        cout << "probabilidade do alfa 3: " << probability[2] << endl;
-        cout << "probabilidade do alfa 4: " << probability[3] << endl;
-        cout << "probabilidade do alfa 5: " << probability[4] << endl;
+        cout << "probabilidade do alfa  1: " << probability[0] << endl;
+        cout << "probabilidade do alfa  2: " << probability[1] << endl;
+        cout << "probabilidade do alfa  3: " << probability[2] << endl;
+        cout << "probabilidade do alfa  4: " << probability[3] << endl;
+        cout << "probabilidade do alfa  5: " << probability[4] << endl;
         cout << "rand: " << chosen << endl;
         cout << "melhor peso atual: " << best_weight << endl;
         cout << "----------------------------------------" << endl;
 
+        //-------------------------------------------------------------------
+
+
+        //----------------------- while loop por bloco de iteração  -----------------------------
+
         while (block_iteration < block && current_iterations < iterations) {
-            block_iteration++;
-            current_iterations++;
 
-            float current_weight = this->auxPrimReativo(alpha[chosen_index]);
+            //busca por nova solução e verificação se é a nova melhor
+            //função retorna iteraçoes realizadas no alfa
+            //definindo variaveis de maximo de iteraçoes e int que será usado como contador
+            int doneIterations = 0;
+            float weightFound = 0;
+            int maxIterations = iterations-current_iterations < block-block_iteration ? iterations-current_iterations : block-block_iteration;
+            float current_weight = this->auxPrimReativo(alpha[chosen_index], maxIterations, &doneIterations, &weightFound);
 
-            total_weight[chosen_index] += current_weight;
-            alpha_iterations[chosen_index]++;
 
+            //atualizacao dos valores de peso total do alfa e iteracoes desse alfa
+            total_weight[chosen_index] += weightFound;
+            current_iterations += doneIterations;
+            block_iteration += doneIterations;
+            alpha_iterations[chosen_index] += doneIterations;
+
+
+
+            //checagem para caso seja o melhor peso
             if (best_weight > current_weight) {
                 best_weight = current_weight;
             }
 
-            fitness[chosen_index] = best_weight / (total_weight[chosen_index] / alpha_iterations[chosen_index]);
-
         }
+
+        //---------------------------------------------------------------------------------------
+
     }
+
+    //-------------------- impressao no console de resultados finais ---------------------------
 
     for(int i = 0; i < alpha_size; i++){
         cout << "alfa " << i << " " << alpha[i] << endl;
         cout << "fitness: "  << fitness[i] << endl;
         cout << "probabilidade: " << probability[i] << endl;
-        cout << "melhor peso: " << best_weight << endl;
-        cout << "melhor fitness: " << best_fitness << endl << endl;
     }
 
+    cout << "melhor peso: " << best_weight << endl;
+    cout << "melhor fitness: " << best_fitness << endl << endl;
 
+    //----------------------------------------------------------------------------------------
+
+    //---------------------- deletando arrays criados dinamicamente --------------------------
     delete []probability;
     delete []fitness;
     delete []total_weight;
     delete []alpha_iterations;
 }
 
-float Graph::auxPrimReativo(float alpha){
+float Graph::auxPrimReativo(float alpha, int max_iterations, int* doneiterations, float* weightFound){
+
+    //---------------------- Declarando variaveis/arrays ----------------------------------------
+
     int* parent = new int[this->getOrder()];
     int* best = new int[this->getOrder()];
     int* groups = new int[this->getTotalGroups()];
     float best_weight = 0;
-    float total_weight = 0;
-    float means;
-    int current_iterations = 0;
 
     for(int i = 0; i < this->getOrder(); i++)
         best[i] = -1;
 
     bool first = true;
-    for(int i = 0; i < this->getOrder(); i++){
-        this->auxPrimRandomizado(i, alpha, parent, groups);
-        if(this->ArrayGroups(parent, this->getOrder()) == this->getTotalGroups()){
+    //------------------------------------------------------------------------------------
 
+    //------------------------- for loop principal ---------------------------------------
+
+    for(int i = 0; i < this->getOrder() && (*doneiterations) < max_iterations; i++){
+        (*doneiterations)++;
+        //chamando prim guloso randomizado com alpha passado e arrays de visitacao
+        //de vertices e grupos e o vertice inicial
+        this->auxPrimRandomizado(i, alpha, parent, groups);
+
+        //verificação da validadez da solução
+        if(this->ArrayGroups(parent, this->getOrder()) == this->getTotalGroups()){
             float current_weight = this->ArrayWeight(parent, this->getOrder());
+            (*weightFound) += current_weight;
 
             if(first){
-                for(int k = 0; k < this->getOrder(); k++)
-                    best[k] = parent[k];
                 first = false;
                 best_weight = current_weight;
 
             } else if(best_weight > current_weight){
-                for(int j = 0; j < this->getOrder(); j++)
-                    best[j] = parent[j];
-                best_weight = this->ArrayWeight(best, this->getOrder());
-
+                best_weight = current_weight;
             }
 
         } else{
@@ -1756,12 +1818,11 @@ float Graph::auxPrimReativo(float alpha){
         }
     }
 
-    Graph* graph = this->ArrayToGraph(best, this->getOrder());
+    //------------------------------------------------------------------------------------
 
     delete []parent;
     delete []groups;
     delete []best;
-
     return best_weight;
 }
 

@@ -165,11 +165,12 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
         //Sair
         case 0:
         {
+            srand(time(0));
            // Graph* aux = graph->PrimAGMG(1);
             Graph* aux = graph->primGulosoAGMG();
             //Graph* aux2 = graph->primRandomizadoAGMG(0.5);
-            float* alpha = new float[5]{0.50, 0.10, 0.15, 0.30, 0.05};
-            graph->primReativoAGMG(alpha, 5, 200, 20);
+            float* alpha = new float[5]{0.5, 0.3, 0.15, 0.1, 0.05};
+            graph->primReativoAGMG(alpha, 5, 100000, 10000);
             //aux->save(output_file);
             //aux2->save(output_file);
             exit(0);
