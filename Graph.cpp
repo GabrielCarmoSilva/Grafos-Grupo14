@@ -1271,19 +1271,15 @@ float Graph::primRandomizadoAGMG(float alpha, int iterations){
     int current_iterations = 0;
     float fitness = 0;
 
+    for(Node* node = this->getFirstNode(); node != nullptr; node = node->getNextNode()){
+        node_groups[node->getId()] = node->getGroup();
+    }
+
     while(current_iterations < iterations){
         for(int i = 0; i < this->getOrder() && current_iterations < iterations; i++){
             current_iterations++;
 
-            auto start = high_resolution_clock::now();
-
             float current_weight = this->auxPrimRandomizado(i, alpha, parent, groups, node_groups);
-
-            auto stop = high_resolution_clock::now();
-            auto duration = duration_cast<microseconds>(stop - start);
-            cout << "Tempo de execução da função: "
-                 << duration.count() / pow(10, 6) << " seconds" << endl;
-
 
                 if(first){
                     first=false;
