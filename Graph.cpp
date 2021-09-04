@@ -1273,8 +1273,18 @@ float Graph::primRandomizadoAGMG(float alpha, int iterations){
     while(current_iterations < iterations){
         for(int i = 0; i < this->getOrder() && current_iterations < iterations; i++){
             current_iterations++;
+
+            auto start = high_resolution_clock::now();
+
+
             float current_weight = this->auxPrimRandomizado(i, alpha, parent, groups);
-            if(this->ArrayGroups(parent, this->getOrder()) == this->getTotalGroups()){
+
+
+            auto stop = high_resolution_clock::now();
+            auto duration = duration_cast<microseconds>(stop - start);
+            cout << "Tempo de execução da função: "
+                 << duration.count() / pow(10, 6) << " seconds" << endl;
+
 
                 if(first){
                     first=false;
@@ -1287,10 +1297,6 @@ float Graph::primRandomizadoAGMG(float alpha, int iterations){
                 total_weight += current_weight;
                 means = total_weight/current_iterations;
                 fitness = best_weight/means;
-
-            } else{
-                cout << "inválido " << i << endl;
-            }
         }
     }
 
@@ -1528,11 +1534,15 @@ bool Graph::nodeRange(int* parent, int* groups, bool* nodes, float alpha, float*
 
     //-----------declaração de variáveis-----------
 
+
+
+
     int id_child, first, id_parent;
     int total_nodes = this->getOrder();
     Node *current_node;
     Edge *current_edge;
-    float minimal_weight, maximum_weight;
+    float minimal_weight = std::numeric_limits<float>::max();
+    float maximum_weight = std::numeric_limits<float>::min();
 
     for (int j = 0; j < this->getOrder(); j++) {
         nodes[j] = false;
@@ -1540,34 +1550,25 @@ bool Graph::nodeRange(int* parent, int* groups, bool* nodes, float alpha, float*
 
     //-------------------------------------------------------------------------------------------
 
-
-
     //--------------------- Busca por valores de maior e menor distância ------------------------
 
     first = 1;
-    for (int i = 0; i < this->getOrder(); i++) {
-        if (parent[i] != -1) {
-            current_node = this->getNode(i);
+    for (Node* current_node = this->getFirstNode(); current_node != nullptr; current_node = current_node->getNextNode()) {
+        if (parent[current_node->getId()] != -1) {
             current_edge = current_node->getFirstEdge();
 
             for (int j = 0; j < current_node->getOutDegree(); j++) {
-                int index = current_edge->getTargetId();
-                if (parent[index] == -1 && !this->hasGroup(groups, this->getNode(index)->getGroup())) {
 
-                    if (first == 1) {
-                        minimal_weight = current_edge->getWeight();
-                        maximum_weight = current_edge->getWeight();
-                        first = 0;
-                    } else {
-                        if (minimal_weight > current_edge->getWeight()) //Compara o peso da aresta atual com a menor, se o da atual for menor entra na condicao
-                        {
-                            minimal_weight = current_edge->getWeight(); //Salva o novo peso como menor peso
-                        }
+                if (parent[current_edge->getTargetId()] == -1 && !this->hasGroup(groups, this->getNode(current_edge->getTargetId())->getGroup())) {
+                    first = 0;
+                    if (minimal_weight > current_edge->getWeight()) //Compara o peso da aresta atual com a menor, se o da atual for menor entra na condicao
+                    {
+                        minimal_weight = current_edge->getWeight(); //Salva o novo peso como menor peso
+                    }
 
-                        if (maximum_weight < current_edge->getWeight()) //Compara o peso da aresta atual com a menor, se o da atual for menor entra na condicao
-                        {
-                            maximum_weight = current_edge->getWeight(); //Salva o novo peso como menor peso
-                        }
+                    if (maximum_weight < current_edge->getWeight()) //Compara o peso da aresta atual com a menor, se o da atual for menor entra na condicao
+                    {
+                        maximum_weight = current_edge->getWeight(); //Salva o novo peso como menor peso
                     }
                 }
                 current_edge = current_edge->getNextEdge(); //Atualiza o valor da aresta atual para a proxima deste no, para continuar corretamente o loop
@@ -1575,6 +1576,8 @@ bool Graph::nodeRange(int* parent, int* groups, bool* nodes, float alpha, float*
 
         }
     }
+
+
 
     //variavel para cehcar se algum local pode ser visitado ou não -- condição de parada para o prim
     bool check = false;
@@ -1591,10 +1594,9 @@ bool Graph::nodeRange(int* parent, int* groups, bool* nodes, float alpha, float*
 
         //-----------------------Busca pelos nos que se adequam a distancia minima-----------------------------
 
-        for (int i = 0; i < this->getOrder(); i++) {
+        for (Node* current_node = this->getFirstNode(); current_node != nullptr; current_node = current_node->getNextNode()) {
 
-            if (parent[i] != -1) {
-                current_node = this->getNode(i);
+            if (parent[current_node->getId()] != -1) {
                 current_edge = current_node->getFirstEdge();
 
                 //busca pelas arestas/nos possiveis do vertice
@@ -1808,22 +1810,17 @@ float Graph::auxPrimReativo(float alpha, int max_iterations, int* doneiterations
         //chamando prim guloso randomizado com alpha passado e arrays de visitacao
         //de vertices e grupos e o vertice inicial
         float current_weight = this->auxPrimRandomizado(i, alpha, parent, groups);
-
         //verificação da validadez da solução
-        if(this->ArrayGroups(parent, this->getOrder()) == this->getTotalGroups()){
-            (*weightFound) += current_weight;
+        (*weightFound) += current_weight;
 
-            if(first){
-                first = false;
-                best_weight = current_weight;
+        if(first){
+            first = false;
+            best_weight = current_weight;
 
-            } else if(best_weight > current_weight){
-                best_weight = current_weight;
-            }
-
-        } else{
-            cout << "inválido " << i << endl;
+        } else if(best_weight > current_weight){
+            best_weight = current_weight;
         }
+
     }
 
     //------------------------------------------------------------------------------------
