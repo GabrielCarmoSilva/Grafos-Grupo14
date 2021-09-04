@@ -6,3 +6,7 @@ exemplo.txt
 grafo.txt
 teste
 .vscode
+gmstInstances/
+output.dot
+input.txt
+exemplo.dot

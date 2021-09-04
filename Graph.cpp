@@ -12,8 +12,10 @@
 #include <float.h>
 #include <iomanip>
 #include <limits>
+#include <chrono>
 
 using namespace std;
+using namespace std::chrono;
 
 /**************************************************************************************************
  * Defining the Graph's methods
@@ -1831,5 +1833,7 @@ float Graph::auxPrimReativo(float alpha, int max_iterations, int* doneiterations
 
     return best_weight;
 }
+
+
 
 

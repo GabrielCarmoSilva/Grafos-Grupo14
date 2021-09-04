@@ -9,8 +9,10 @@
 #include <chrono>
 #include "Graph.h"
 #include "Node.h"
+#include <chrono>
 
 using namespace std;
+using namespace std::chrono;
 
 Graph* leitura(ifstream& input_file, int directed, int weightedEdge, int weightedNode){
 
@@ -171,9 +173,14 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
             //Graph* aux2 = graph->primRandomizadoAGMG(0.5);
             float* alpha = new float[5]{0.5, 0.3, 0.15, 0.1, 0.05};
             //graph->primRandomizadoAGMG(0.1, 100000);
-            graph->primReativoAGMG(alpha, 5, 100000, 10000);
+            auto start = high_resolution_clock::now();
+            graph->primReativoAGMG(alpha, 5, 1000, 500);
             //aux->save(output_file);
             //aux2->save(output_file);
+            auto stop = high_resolution_clock::now();
+            auto duration = duration_cast<microseconds>(stop - start);
+            cout << "Tempo de execução da função: "
+                << duration.count() / pow(10, 6) << " seconds" << endl;
             exit(0);
             break;
         }
