@@ -1274,17 +1274,7 @@ float Graph::primRandomizadoAGMG(float alpha, int iterations){
         for(int i = 0; i < this->getOrder() && current_iterations < iterations; i++){
             current_iterations++;
 
-            auto start = high_resolution_clock::now();
-
-
             float current_weight = this->auxPrimRandomizado(i, alpha, parent, groups);
-
-
-            auto stop = high_resolution_clock::now();
-            auto duration = duration_cast<microseconds>(stop - start);
-            cout << "Tempo de execução da função: "
-                 << duration.count() / pow(10, 6) << " seconds" << endl;
-
 
                 if(first){
                     first=false;
@@ -1448,7 +1438,9 @@ float Graph::auxPrimRandomizado(int initial_node, float alpha, int* parent, int*
 
 
     parent[initial_node] = initial_node;
-    this->addToGroup(groups, this->getNode(initial_node)->getGroup());
+    int initial_group = this->getNode(initial_node)->getGroup();
+    groups[initial_group] = initial_group;
+    //this->addToGroup(groups, this->getNode(initial_node)->getGroup());
 
     while (1)//Loop para definir o pai de cada vertice da arvore
     {
@@ -1465,7 +1457,9 @@ float Graph::auxPrimRandomizado(int initial_node, float alpha, int* parent, int*
 
         if(id_child != -1){
             parent[id_child] = id_parent; //Salva o no pai no indice do filho no vetor, para continuar adequadamente o algoritmo
-            this->addToGroup(groups, this->getNode(id_child)->getGroup());
+            //this->addToGroup(groups, this->getNode(id_child)->getGroup());
+            int child_group = this->getNode(id_child)->getGroup();
+            groups[child_group] = child_group;
             total_weight += weights[id_child];
         }
 
@@ -1559,7 +1553,7 @@ bool Graph::nodeRange(int* parent, int* groups, bool* nodes, float alpha, float*
 
             for (int j = 0; j < current_node->getOutDegree(); j++) {
 
-                if (parent[current_edge->getTargetId()] == -1 && !this->hasGroup(groups, this->getNode(current_edge->getTargetId())->getGroup())) {
+                if (parent[current_edge->getTargetId()] == -1 && groups[this->getNode(current_edge->getTargetId())->getGroup()] == -1) {
                     first = 0;
                     if (minimal_weight > current_edge->getWeight()) //Compara o peso da aresta atual com a menor, se o da atual for menor entra na condicao
                     {
@@ -1604,7 +1598,7 @@ bool Graph::nodeRange(int* parent, int* groups, bool* nodes, float alpha, float*
                     int index = current_edge->getTargetId();
 
                     //checagem se eh valido!
-                    if (current_edge->getWeight() <= maxDistance && parent[index] == -1 && !this->hasGroup(groups, this->getNode(index)->getGroup())) {
+                    if (current_edge->getWeight() <= maxDistance && parent[current_edge->getTargetId()] == -1 && groups[this->getNode(current_edge->getTargetId())->getGroup()] == -1) {
 
                         //atualizando array de nos e pesos
                         if(!nodes[index]){
