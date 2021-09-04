@@ -1262,6 +1262,7 @@ int Graph::ArrayGroups(int* nodes, int total_nodes){
 
 float Graph::primRandomizadoAGMG(float alpha, int iterations){
     int* parent = new int[this->getOrder()];
+    int* node_groups = new int[this->getOrder()];
     int* groups = new int[this->getTotalGroups()];
     bool first = true;
     float best_weight = 0;
@@ -1274,7 +1275,15 @@ float Graph::primRandomizadoAGMG(float alpha, int iterations){
         for(int i = 0; i < this->getOrder() && current_iterations < iterations; i++){
             current_iterations++;
 
-            float current_weight = this->auxPrimRandomizado(i, alpha, parent, groups);
+            auto start = high_resolution_clock::now();
+
+            float current_weight = this->auxPrimRandomizado(i, alpha, parent, groups, node_groups);
+
+            auto stop = high_resolution_clock::now();
+            auto duration = duration_cast<microseconds>(stop - start);
+            cout << "Tempo de execução da função: "
+                 << duration.count() / pow(10, 6) << " seconds" << endl;
+
 
                 if(first){
                     first=false;
@@ -1416,20 +1425,19 @@ void Graph::auxPrimGuloso(int initial_node, int* parent, int* groups){
     }
 }
 
-float Graph::auxPrimRandomizado(int initial_node, float alpha, int* parent, int* groups){
+float Graph::auxPrimRandomizado(int initial_node, float alpha, int* parent, int* groups, int* node_groups){
 
     int id_child, id_parent;
     int total_nodes = this->getOrder();
-    Node* current_node;
-    Edge* current_edge;
-    float minimal_weight;
     bool *nodes = new bool[this->getOrder()];
     float* weights = new float[this->getOrder()];
     float total_weight = 0;
 
-    for(int i = 0; i < total_nodes ; i++)
+    for(Node* node = this->getFirstNode(); node != nullptr; node = node->getNextNode())
     {
-        parent[i] = -1;
+        parent[node->getId()] = -1;
+        weights[node->getId()] = std::numeric_limits<float>::max();
+        node_groups[node->getId()] = node->getGroup();
     }
 
     for(int j = 0; j < this->total_groups; j++){
@@ -1446,7 +1454,7 @@ float Graph::auxPrimRandomizado(int initial_node, float alpha, int* parent, int*
     {
         bool check = true;
 
-        check = this->nodeRange(parent, groups, nodes, alpha, weights);
+        check = this->nodeRange(parent, groups, node_groups, nodes, alpha, weights);
 
         if(!check){
             break;
@@ -1458,7 +1466,7 @@ float Graph::auxPrimRandomizado(int initial_node, float alpha, int* parent, int*
         if(id_child != -1){
             parent[id_child] = id_parent; //Salva o no pai no indice do filho no vetor, para continuar adequadamente o algoritmo
             //this->addToGroup(groups, this->getNode(id_child)->getGroup());
-            int child_group = this->getNode(id_child)->getGroup();
+            int child_group = node_groups[id_child];
             groups[child_group] = child_group;
             total_weight += weights[id_child];
         }
@@ -1524,7 +1532,7 @@ int Graph::randNode(bool* nodes){
     return chosen_node;
 }
 
-bool Graph::nodeRange(int* parent, int* groups, bool* nodes, float alpha, float* weights) {
+bool Graph::nodeRange(int* parent, int* groups, int* node_groups, bool* nodes, float alpha, float* weights) {
 
     //-----------declaração de variáveis-----------
 
@@ -1533,8 +1541,6 @@ bool Graph::nodeRange(int* parent, int* groups, bool* nodes, float alpha, float*
 
     int id_child, first, id_parent;
     int total_nodes = this->getOrder();
-    Node *current_node;
-    Edge *current_edge;
     float minimal_weight = std::numeric_limits<float>::max();
     float maximum_weight = std::numeric_limits<float>::min();
 
@@ -1549,12 +1555,8 @@ bool Graph::nodeRange(int* parent, int* groups, bool* nodes, float alpha, float*
     first = 1;
     for (Node* current_node = this->getFirstNode(); current_node != nullptr; current_node = current_node->getNextNode()) {
         if (parent[current_node->getId()] != -1) {
-            current_edge = current_node->getFirstEdge();
-
-            for (int j = 0; j < current_node->getOutDegree(); j++) {
-
-                if (parent[current_edge->getTargetId()] == -1 && groups[this->getNode(current_edge->getTargetId())->getGroup()] == -1) {
-                    first = 0;
+            for (Edge* current_edge = current_node->getFirstEdge(); current_edge != nullptr; current_edge = current_edge->getNextEdge()) {
+                if (parent[current_edge->getTargetId()] == -1 && groups[node_groups[current_edge->getTargetId()]] == -1) {
                     if (minimal_weight > current_edge->getWeight()) //Compara o peso da aresta atual com a menor, se o da atual for menor entra na condicao
                     {
                         minimal_weight = current_edge->getWeight(); //Salva o novo peso como menor peso
@@ -1565,18 +1567,14 @@ bool Graph::nodeRange(int* parent, int* groups, bool* nodes, float alpha, float*
                         maximum_weight = current_edge->getWeight(); //Salva o novo peso como menor peso
                     }
                 }
-                current_edge = current_edge->getNextEdge(); //Atualiza o valor da aresta atual para a proxima deste no, para continuar corretamente o loop
             }
 
         }
     }
 
-
-
     //variavel para cehcar se algum local pode ser visitado ou não -- condição de parada para o prim
-    bool check = false;
 
-    if(first == 0) {
+    if(minimal_weight != std::numeric_limits<float>::max() && maximum_weight != std::numeric_limits<float>::min()) {
         //------------------------------------------------------------------------------------------
 
 
@@ -1591,35 +1589,33 @@ bool Graph::nodeRange(int* parent, int* groups, bool* nodes, float alpha, float*
         for (Node* current_node = this->getFirstNode(); current_node != nullptr; current_node = current_node->getNextNode()) {
 
             if (parent[current_node->getId()] != -1) {
-                current_edge = current_node->getFirstEdge();
-
                 //busca pelas arestas/nos possiveis do vertice
-                for (int j = 0; j < current_node->getOutDegree(); j++) {
+                for (Edge* current_edge = current_node->getFirstEdge(); current_edge != nullptr; current_edge = current_edge->getNextEdge()) {
                     int index = current_edge->getTargetId();
 
                     //checagem se eh valido!
-                    if (current_edge->getWeight() <= maxDistance && parent[current_edge->getTargetId()] == -1 && groups[this->getNode(current_edge->getTargetId())->getGroup()] == -1) {
+                    if (current_edge->getWeight() <= maxDistance && parent[current_edge->getTargetId()] == -1 && groups[node_groups[current_edge->getTargetId()]] == -1) {
 
                         //atualizando array de nos e pesos
-                        if(!nodes[index]){
-                            weights[index] = current_edge->getWeight();
-                        } else if(weights[index] > current_edge->getWeight()){
+                        if(weights[index] > current_edge->getWeight()){
                             weights[index] = current_edge->getWeight();
                         }
 
                         nodes[index] = true;
-                        check = true;
-                    }
 
-                    current_edge = current_edge->getNextEdge();
+                    }
                 }
             }
         }
 
+        return true;
+
     }
 
+    return false;
+
     //---------------------------------------------------------------------------------
-    return check;
+
 }
 
 
@@ -1650,7 +1646,7 @@ void Graph::primReativoAGMG(float* alpha, int alpha_size, int iterations, int bl
         //variaveis de controle
         int localIterations = 0;
         double localWeight = 0;
-        float chosen_weight = this->auxPrimReativo(alpha[i], this->getOrder(), &localIterations, &localWeight);
+        float chosen_weight = this->auxPrimReativo(alpha[i], 1, &localIterations, &localWeight);
         alpha_iterations[i] += localIterations;
         current_iterations += localIterations;
         total_weight[i] = localWeight;
@@ -1738,14 +1734,17 @@ void Graph::primReativoAGMG(float* alpha, int alpha_size, int iterations, int bl
 
         while (block_iteration < block && current_iterations < iterations) {
 
+
+
+
             //busca por nova solução e verificação se é a nova melhor
             //função retorna iteraçoes realizadas no alfa
             //definindo variaveis de maximo de iteraçoes e int que será usado como contador
             int doneIterations = 0;
             double weightFound = 0;
             int maxIterations = iterations-current_iterations < block-block_iteration ? iterations-current_iterations : block-block_iteration;
-            float current_weight = this->auxPrimReativo(alpha[chosen_index], maxIterations, &doneIterations, &weightFound);
 
+            float current_weight = this->auxPrimReativo(alpha[chosen_index], maxIterations, &doneIterations, &weightFound);
 
             //atualizacao dos valores de peso total do alfa e iteracoes desse alfa
             total_weight[chosen_index] += weightFound;
@@ -1759,6 +1758,8 @@ void Graph::primReativoAGMG(float* alpha, int alpha_size, int iterations, int bl
             if (best_weight > current_weight) {
                 best_weight = current_weight;
             }
+
+
 
         }
 
@@ -1792,18 +1793,21 @@ float Graph::auxPrimReativo(float alpha, int max_iterations, int* doneiterations
 
     int* parent = new int[this->getOrder()];
     int* groups = new int[this->getTotalGroups()];
+    int* node_groups = new int[this->getOrder()];
     float best_weight = 0;
 
     bool first = true;
+
     //------------------------------------------------------------------------------------
 
     //------------------------- for loop principal ---------------------------------------
 
     for(int i = 0; i < this->getOrder() && (*doneiterations) < max_iterations; i++){
         (*doneiterations)++;
+
         //chamando prim guloso randomizado com alpha passado e arrays de visitacao
         //de vertices e grupos e o vertice inicial
-        float current_weight = this->auxPrimRandomizado(i, alpha, parent, groups);
+        float current_weight = this->auxPrimRandomizado(i, alpha, parent, groups, node_groups);
         //verificação da validadez da solução
         (*weightFound) += current_weight;
 
