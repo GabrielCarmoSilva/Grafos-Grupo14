@@ -124,16 +124,12 @@ int menu(){
 
     cout << "MENU" << endl;
     cout << "----" << endl;
-    cout << "Favor, utilize os vértices numerados de 1 a n" << endl;
+    cout << "Favor, utilize os vértices numerados de 0 a n-1" << endl;
+    cout << "Árvore Geradora Mínima Generalizada" << endl;
     cout << endl;
-    cout << "[1] Fecho transitivo direto do vertice de um grafo direcionado" << endl;
-    cout << "[2] Fecho transitivo indireto do vertice de um grafo direcionado" << endl;
-    cout << "[3] Caminho minimo entre dois vertices - Dijkstra" << endl;
-    cout << "[4] Caminho minimo entre dois vertices - Floyd" << endl;
-    cout << "[5] Arvore Geradora minimo de Prim" << endl;
-    cout << "[6] Arvore Geradora minimo de Kruskal" << endl;
-    cout << "[7] Arvore dada pela ordem de caminhamento em profundidade, destacando as arestas de retorno" << endl;
-    cout << "[8] Ordenacao topologica do grafo aciclico direcionado D" << endl;
+    cout << "[1] Algoritmo Guloso - Prim" << endl;
+    cout << "[2] Algoritmo Randomizado - Prim" << endl;
+    cout << "[3] Algoritmo Randomizado Reativo - Prim" << endl;
     cout << "[0] Sair" << endl;
 
     cin >> selecao;
@@ -167,147 +163,56 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
         //Sair
         case 0:
         {
-            srand(time(0));
-           // Graph* aux = graph->PrimAGMG(1);
-            Graph* aux = graph->primGulosoAGMG();
-            //Graph* aux2 = graph->primRandomizadoAGMG(0.5);
-            float* alpha = new float[5]{0.5, 0.3, 0.15, 0.1, 0.05};
-            //graph->primRandomizadoAGMG(0.1, 100000);
-            auto start = high_resolution_clock::now();
-            graph->primReativoAGMG(alpha, 5, 1000, 500);
-            //aux->save(output_file);
-            //aux2->save(output_file);
-            auto stop = high_resolution_clock::now();
-            auto duration = duration_cast<microseconds>(stop - start);
-            cout << "Tempo de execução da função: "
-                << duration.count() / pow(10, 6) << " seconds" << endl;
+            cout << "Saindo!" << endl;
             exit(0);
             break;
         }
-        //Fecho transitivo direto do vertice de um grafo direcionado
+        //Árvore geradora mínima generalizada - algoritmo de Prim guloso
         case 1:
         {
-            int id;
-            cout << "Digite o id do vertice: " << endl;
-            cin >> id;
-            Graph* aux = graph->FTD(id);
-
-            if(aux != nullptr && salvar())
-                aux->save(output_file);
-
+            srand(time(0));
+            auto start = high_resolution_clock::now();
+            Graph* aux = graph->primGulosoAGMG();
+            auto stop = high_resolution_clock::now();
+            auto duration = duration_cast<microseconds>(stop - start);
+            cout << "Tempo de execução da função: "
+                    << duration.count() / pow(10, 6) << " seconds" << endl;
             break;
         }
-        //Fecho transitivo indireto do vertice de um grafo direcionado
+        //Árvore geradora mínima generalizada - algoritmo de Prim randomizado
         case 2:
         {
-            int id;
-            cout << "Digite o id do vertice: " << endl;
-            cin >> id;
-            Graph* aux = graph->FTI(id);
-
-            if(aux != nullptr && salvar())
-                aux->save(output_file);
-
+            srand(time(0));
+            float alpha = 0.0;
+            int numIteracoes = 0;
+            cout << "Qual alfa você escolhe?" << endl;
+            cin >> alpha;
+            cout << "Digite o número de iterações" << endl;
+            cin >> numIteracoes;
+            auto start = high_resolution_clock::now();
+            graph->primRandomizadoAGMG(alpha, numIteracoes);
+            auto stop = high_resolution_clock::now();
+            auto duration = duration_cast<microseconds>(stop - start);
+            cout << "Tempo de execução da função: "
+                    << duration.count() / pow(10, 6) << " seconds" << endl;
             break;
-        }
-        //Caminho minimo entre dois vertices - Dijkstra
+        } 
+        //Árvore geradora mínima generalizada - algoritmo de Prim randomizado reativo
         case 3:
         {
-            int idSource;
-            int idTarget;
-            cout << "Digite o id de origem: " << endl;
-            cin >> idSource;
-            cout << "Digite o id de destino: " << endl;
-            cin >> idTarget;
-            Graph* aux = graph->dijkstra(idSource, idTarget);
-
-            if(aux != nullptr && salvar())
-                aux->save(output_file);
-
-            break;
-        }
-        //Caminho minimo entre dois vertices - Floyd
-        case 4:{
-            int idSource;
-            int idTarget;
-            while (!graph->searchNode(idSource))
-            {
-                cout << "Digite o id do primeiro vertice" << endl;
-                cin >> idSource;
-            }
-            while (!graph->searchNode(idTarget))
-            {
-                cout << "Digite o id do outro vertice" << endl;
-                cin >> idTarget;
-            }
-            Graph* aux = graph->floydMarshall(idSource, idTarget);
-            if(aux != nullptr && salvar())
-                aux->save(output_file);
-            break;
-        }
-        //Arvore Geradora minimo de Prim
-        case 5:
-        {
-            int n;
-            cout << "Digite a quantidade de vertices" << endl;
-            cin >> n;
-            int *nodes = new int[n];
-            for (int i = 0; i < n; i++)
-            {
-                while (!graph->searchNode(nodes[i]))
-                {
-                    cout << "Digite o vertice " << i << ":" << endl;
-                    cin >> nodes[i];
-                }
-                
-            }
-            Graph* aux = graph->agmPrim(n, nodes);
-            if(aux != nullptr && salvar())
-                aux->save(output_file);
-            break;
-        }
-        //Arvore Geradora minimo de Kruskal
-        case 6:
-        {
-            int n;
-            cout << "Digite a quantidade de vertices" << endl;
-            cin >> n;
-            int *nodes = new int[n];
-            for (int i = 0; i < n; i++)
-            {
-                while (!graph->searchNode(nodes[i]))
-                {
-                    cout << "Digite o vertice " << i << ":" << endl;
-                    cin >> nodes[i];
-                }
-                
-            }
-            Graph* aux = graph->agmKruskal(n, nodes);
-            if(aux != nullptr && salvar())
-                aux->save(output_file);
-            break;
-        }
-        //Arvore dada pela ordem de caminhamento em profundidade, destacando as arestas de retorno
-        case 7:
-        {
-            int n;
-            cout << "Escolha o vértice inicial: " << endl;
-            cin >> n;
-            Graph* aux = graph->BuscaEmProfundidade(n);
-
-            if(aux != nullptr && salvar())
-                aux->save(output_file);
-
-            break;
-        }
-        //Ordenacao topologica do grafo aciclico direcionado D
-        case 8:
-        {
-            Graph* aux = graph->aciclicoDirecionado();
-
-            if(aux != nullptr && salvar())
-                aux->save(output_file);
-
+            srand(time(0));
+            int numIteracoes, bloco = 0;
+            cout << "Digite o número de iterações total" << endl;
+            cin >> numIteracoes;
+            cout << "Digite o número de iterações por bloco" << endl;
+            cin >> bloco;
+            float* alpha = new float[5]{0.5, 0.3, 0.15, 0.1, 0.05};
+            auto start = high_resolution_clock::now();
+            graph->primReativoAGMG(alpha, 5, numIteracoes, bloco);
+            auto stop = high_resolution_clock::now();
+            auto duration = duration_cast<microseconds>(stop - start);
+            cout << "Tempo de execução da função: "
+                    << duration.count() / pow(10, 6) << " seconds" << endl;
             break;
         }
         default:
