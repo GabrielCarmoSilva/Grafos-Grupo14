@@ -1437,7 +1437,6 @@ float Graph::auxPrimRandomizado(int initial_node, float alpha, int* parent, int*
     {
         parent[node->getId()] = -1;
         weights[node->getId()] = std::numeric_limits<float>::max();
-        node_groups[node->getId()] = node->getGroup();
     }
 
     for(int j = 0; j < this->total_groups; j++){
@@ -1446,8 +1445,7 @@ float Graph::auxPrimRandomizado(int initial_node, float alpha, int* parent, int*
 
 
     parent[initial_node] = initial_node;
-    int initial_group = this->getNode(initial_node)->getGroup();
-    groups[initial_group] = initial_group;
+    groups[node_groups[initial_node]] = node_groups[initial_node];
     //this->addToGroup(groups, this->getNode(initial_node)->getGroup());
 
     while (1)//Loop para definir o pai de cada vertice da arvore
@@ -1631,6 +1629,11 @@ void Graph::primReativoAGMG(float* alpha, int alpha_size, int iterations, int bl
     float best_fitness;
     float best_weight;
     float total_fitness = 0;
+    int* node_groups = new int[this->getOrder()];
+
+    for(Node* node = this->getFirstNode(); node != nullptr; node = node->getNextNode()){
+        node_groups[node->getId()] = node->getGroup();
+    }
 
     bool check = true;
 
@@ -1646,7 +1649,7 @@ void Graph::primReativoAGMG(float* alpha, int alpha_size, int iterations, int bl
         //variaveis de controle
         int localIterations = 0;
         double localWeight = 0;
-        float chosen_weight = this->auxPrimReativo(alpha[i], 1, &localIterations, &localWeight);
+        float chosen_weight = this->auxPrimReativo(node_groups, alpha[i], 1, &localIterations, &localWeight);
         alpha_iterations[i] += localIterations;
         current_iterations += localIterations;
         total_weight[i] = localWeight;
@@ -1744,7 +1747,8 @@ void Graph::primReativoAGMG(float* alpha, int alpha_size, int iterations, int bl
             double weightFound = 0;
             int maxIterations = iterations-current_iterations < block-block_iteration ? iterations-current_iterations : block-block_iteration;
 
-            float current_weight = this->auxPrimReativo(alpha[chosen_index], maxIterations, &doneIterations, &weightFound);
+
+            float current_weight = this->auxPrimReativo(node_groups, alpha[chosen_index], maxIterations, &doneIterations, &weightFound);
 
             //atualizacao dos valores de peso total do alfa e iteracoes desse alfa
             total_weight[chosen_index] += weightFound;
@@ -1785,15 +1789,15 @@ void Graph::primReativoAGMG(float* alpha, int alpha_size, int iterations, int bl
     delete []fitness;
     delete []total_weight;
     delete []alpha_iterations;
+    delete []node_groups;
 }
 
-float Graph::auxPrimReativo(float alpha, int max_iterations, int* doneiterations, double* weightFound){
+float Graph::auxPrimReativo(int* node_groups, float alpha, int max_iterations, int* doneiterations, double* weightFound){
 
     //---------------------- Declarando variaveis/arrays ----------------------------------------
 
     int* parent = new int[this->getOrder()];
     int* groups = new int[this->getTotalGroups()];
-    int* node_groups = new int[this->getOrder()];
     float best_weight = 0;
 
     bool first = true;
