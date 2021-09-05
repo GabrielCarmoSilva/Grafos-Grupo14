@@ -10,3 +10,5 @@ gmstInstances/
 output.dot
 input.txt
 exemplo.dot
+tests.txt
+tests/

@@ -78,9 +78,9 @@ public:
     float auxPrimRandomizado(int initial_node, float alpha, int* parent, int* groups, int* node_groups);
     float auxPrimGuloso(int initial_node, int* parent, int* groups, int* node_groups, float* weights);
     float auxPrimReativo(int* node_groups, float alpha, int max_iterations, int* doneiterations, double* weightFound);
-    void primReativoAGMG(float* alpha, int alpha_size, int iterations, int block);
-    float primRandomizadoAGMG(float alpha, int iterations);
-    void primGulosoAGMG();
+    void primReativoAGMG(float* alpha, int alpha_size, int iterations, int block, ofstream& output_file);
+    float primRandomizadoAGMG(float alpha, int iterations, ofstream& output_file);
+    void primGulosoAGMG(ofstream& output_file);
 
     Graph* ArrayToGraph(int* nodes, int total_nodes);
     float ArrayWeight(int* nodes, int total_nodes);

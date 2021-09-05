@@ -1259,7 +1259,7 @@ int Graph::ArrayGroups(int* nodes, int total_nodes){
     return total;
 }
 
-float Graph::primRandomizadoAGMG(float alpha, int iterations){
+float Graph::primRandomizadoAGMG(float alpha, int iterations, ofstream& output_file){
     int* parent = new int[this->getOrder()];
     int* node_groups = new int[this->getOrder()];
     int* groups = new int[this->getTotalGroups()+1];
@@ -1305,11 +1305,13 @@ float Graph::primRandomizadoAGMG(float alpha, int iterations){
     cout << "qualidade do alfa: " << fitness << endl << endl;
     cout << "-----------------------------------------" << endl;
 
+    output_file << "Alfa: " << alpha << endl;
+    output_file << "Melhor peso encontrado: " << best_weight << endl;
 
     return fitness;
 }
 
-void Graph::primGulosoAGMG(){
+void Graph::primGulosoAGMG(ofstream& output_file){
     int* parent = new int[this->getOrder()];
     int* best = new int[this->getOrder()];
     int* groups = new int[this->getTotalGroups()+1];
@@ -1337,6 +1339,8 @@ void Graph::primGulosoAGMG(){
 
     cout << "melhor peso encontrado: " << best_weight << endl;
 
+
+    output_file << "Melhor peso encontrado: " << best_weight << endl;
 
 //    for(int i = 0; i < this->getOrder(); i++){
 //        if(parent[i] != -1){
@@ -1626,7 +1630,7 @@ bool Graph::nodeRange(int* parent, int* groups, int* node_groups, bool* nodes, f
 }
 
 
-void Graph::primReativoAGMG(float* alpha, int alpha_size, int iterations, int block){
+void Graph::primReativoAGMG(float* alpha, int alpha_size, int iterations, int block, ofstream& output_file){
 
     //---------------------- Declarando variaveis/arrays ----------------------------------------
 
@@ -1790,6 +1794,8 @@ void Graph::primReativoAGMG(float* alpha, int alpha_size, int iterations, int bl
 
     cout << "melhor peso: " << best_weight << endl;
     cout << "melhor fitness: " << best_fitness << endl << endl;
+
+    output_file << "Melhor peso encontrado: " << best_weight << endl;
 
     //----------------------------------------------------------------------------------------
 

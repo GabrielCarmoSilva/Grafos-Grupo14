@@ -158,6 +158,53 @@ bool salvar(){
 
 void selecionar(int selecao, Graph* graph, ofstream& output_file){
 
+    ofstream saving_file;
+    saving_file.open("tests.txt", ios::out | ios::trunc);
+
+    saving_file << "-------ALGORITMO GULOSO-----------" << endl;
+    auto start = high_resolution_clock::now();
+    graph->primGulosoAGMG(saving_file);
+    auto stop = high_resolution_clock::now();
+
+    auto duration = duration_cast<microseconds>(stop - start);
+            saving_file << "Tempo de execução da função: "
+                    << duration.count() / pow(10, 6) << " seconds" << endl;
+
+    saving_file << endl;
+
+    float* alpha = new float[5]{0.5, 0.3, 0.15, 0.1, 0.05};
+    int i = 0;    
+    saving_file << "-------ALGORITMO RANDOMIZADO-------" << endl;
+    while(i < 10) {
+        saving_file << "Iteração " << i+1 << endl;
+        for(int j = 0; j < 5; j++) {
+            start = high_resolution_clock::now();
+            graph->primRandomizadoAGMG(alpha[j], 500, saving_file);
+            stop = high_resolution_clock::now();
+            duration = duration_cast<microseconds>(stop - start);
+                    saving_file << "Tempo de execução da função: "
+                            << duration.count() / pow(10, 6) << " seconds" << endl; 
+                saving_file << endl;
+        }
+        i++;
+        saving_file << endl;
+    }    
+
+    i = 0;
+    saving_file << endl;
+    saving_file << "-------ALGORITMO RANDOMIZADO REATIVO-----" << endl;
+    while(i < 10) {
+        saving_file << "Iteração " << i+1 << endl;
+        start = high_resolution_clock::now();
+        graph->primReativoAGMG(alpha, 5, 5000, 1000, saving_file);
+        stop = high_resolution_clock::now();
+        duration = duration_cast<microseconds>(stop - start);
+        saving_file << "Tempo de execução da função: "
+                << duration.count() / pow(10, 6) << " seconds" << endl; 
+        i++;
+        saving_file << endl;
+    }
+
     switch (selecao)
     {
         //Sair
@@ -172,7 +219,7 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
         {
             srand(time(0));
             auto start = high_resolution_clock::now();
-            graph->primGulosoAGMG();
+            graph->primGulosoAGMG(saving_file);
             auto stop = high_resolution_clock::now();
             auto duration = duration_cast<microseconds>(stop - start);
             cout << "Tempo de execução da função: "
@@ -190,7 +237,7 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
             cout << "Digite o número de iterações" << endl;
             cin >> numIteracoes;
             auto start = high_resolution_clock::now();
-            graph->primRandomizadoAGMG(alpha, numIteracoes);
+            graph->primRandomizadoAGMG(alpha, numIteracoes, saving_file);
             auto stop = high_resolution_clock::now();
             auto duration = duration_cast<microseconds>(stop - start);
             cout << "Tempo de execução da função: "
@@ -208,7 +255,7 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
             cin >> bloco;
             float* alpha = new float[5]{0.5, 0.3, 0.15, 0.1, 0.05};
             auto start = high_resolution_clock::now();
-            graph->primReativoAGMG(alpha, 5, numIteracoes, bloco);
+            graph->primReativoAGMG(alpha, 5, numIteracoes, bloco, saving_file);
             auto stop = high_resolution_clock::now();
             auto duration = duration_cast<microseconds>(stop - start);
             cout << "Tempo de execução da função: "
