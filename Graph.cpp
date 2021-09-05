@@ -1299,6 +1299,7 @@ float Graph::primRandomizadoAGMG(float alpha, int iterations){
 
     delete []parent;
     delete []groups;
+    delete []node_groups;
 
     cout << "--------- finalizando reativo: ---------" << endl << endl;
     cout << "melhor peso encontrado: " << best_weight << endl;
@@ -1467,7 +1468,7 @@ float Graph::auxPrimRandomizado(int initial_node, float alpha, int* parent, int*
 
     }
 
-    delete []nodes;
+    //delete []nodes;
 
     return total_weight;
 }
