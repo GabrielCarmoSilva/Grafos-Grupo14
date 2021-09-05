@@ -172,7 +172,7 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
         {
             srand(time(0));
             auto start = high_resolution_clock::now();
-            Graph* aux = graph->primGulosoAGMG();
+            graph->primGulosoAGMG();
             auto stop = high_resolution_clock::now();
             auto duration = duration_cast<microseconds>(stop - start);
             cout << "Tempo de execução da função: "
