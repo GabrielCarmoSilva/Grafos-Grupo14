@@ -14,76 +14,6 @@
 using namespace std;
 using namespace std::chrono;
 
-Graph* leitura(ifstream& input_file, int directed, int weightedEdge, int weightedNode){
-
-    //Variaveis para auxiliar na criacao dos nao no Grafo
-    int idNodeSource;
-    int idNodeTarget;
-    int order;
-
-    //Pegando a ordem do grafo
-    input_file >> order;
-
-    //Criando objeto grafo
-    Graph* graph = new Graph(order, directed, weightedEdge, weightedNode);
-
-    //Leitura de arquivo
-
-    if(!graph->getWeightedEdge() && !graph->getWeightedNode())
-    {
-
-        while(input_file >> idNodeSource >> idNodeTarget)
-        {
-
-            graph->insertEdge(idNodeSource, idNodeTarget, 0);
-
-        }
-
-    }else if(graph->getWeightedEdge() && !graph->getWeightedNode() )
-            {
-
-                float edgeWeight;
-
-                while(input_file >> idNodeSource >> idNodeTarget >> edgeWeight)
-                {
-
-                    graph->insertEdge(idNodeSource, idNodeTarget, edgeWeight);
-
-                }
-
-            }else if(graph->getWeightedNode() && !graph->getWeightedEdge())
-                    {
-
-                        float nodeSourceWeight, nodeTargetWeight;
-
-                        while(input_file >> idNodeSource >> nodeSourceWeight >> idNodeTarget >> nodeTargetWeight)
-                        {
-
-                            graph->insertEdge(idNodeSource, idNodeTarget, 0);
-                            graph->getNode(idNodeSource)->setWeight(nodeSourceWeight);
-                            graph->getNode(idNodeTarget)->setWeight(nodeTargetWeight);
-
-                        }
-
-                    }else if(graph->getWeightedNode() && graph->getWeightedEdge())
-                            {
-
-                                float nodeSourceWeight, nodeTargetWeight, edgeWeight;
-
-                                while(input_file >> idNodeSource >> nodeSourceWeight >> idNodeTarget >> nodeTargetWeight >> edgeWeight)
-                                {
-
-                                    graph->insertEdge(idNodeSource, idNodeTarget, edgeWeight);
-                                    graph->getNode(idNodeSource)->setWeight(nodeSourceWeight);
-                                    graph->getNode(idNodeTarget)->setWeight(nodeTargetWeight);
-
-                                }
-
-                            }
-    return graph;
-}
-
-
 Graph* leituraAGMG(ifstream& input_file){
 
     // o AGMG é sempre não direcionado e com peso nas arestas
@@ -124,8 +54,8 @@ int menu(){
 
     cout << "MENU" << endl;
     cout << "----" << endl;
-    cout << "Favor, utilize os vértices numerados de 0 a n-1" << endl;
-    cout << "Árvore Geradora Mínima Generalizada" << endl;
+    cout << "Favor, utilize os vertices numerados de 0 a n-1 e grupos de 1 a n" << endl;
+    cout << "Arvore Geradora Minima Generalizada" << endl;
     cout << endl;
     cout << "[1] Algoritmo Guloso - Prim" << endl;
     cout << "[2] Algoritmo Randomizado - Prim" << endl;
@@ -172,11 +102,18 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
         {
             srand(time(0));
             auto start = high_resolution_clock::now();
-            graph->primGulosoAGMG();
+
+            Graph* aux = graph->primGulosoAGMG();
+
             auto stop = high_resolution_clock::now();
             auto duration = duration_cast<microseconds>(stop - start);
-            cout << "Tempo de execução da função: "
+            cout << "Tempo de execucao da funcao: "
                     << duration.count() / pow(10, 6) << " seconds" << endl;
+
+            if(salvar()){
+                aux->save(output_file);
+            }
+
             break;
         }
         //Árvore geradora mínima generalizada - algoritmo de Prim randomizado
@@ -185,16 +122,23 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
             srand(time(0));
             float alpha = 0.0;
             int numIteracoes = 0;
-            cout << "Qual alfa você escolhe?" << endl;
+            cout << "Qual alfa voce escolhe?" << endl;
             cin >> alpha;
-            cout << "Digite o número de iterações" << endl;
+            cout << "Digite o numero de iteracoes" << endl;
             cin >> numIteracoes;
             auto start = high_resolution_clock::now();
-            graph->primRandomizadoAGMG(alpha, numIteracoes);
+
+            Graph* aux = graph->primRandomizadoAGMG(alpha, numIteracoes);
+
             auto stop = high_resolution_clock::now();
             auto duration = duration_cast<microseconds>(stop - start);
-            cout << "Tempo de execução da função: "
+            cout << "Tempo de execucao da funcao: "
                     << duration.count() / pow(10, 6) << " seconds" << endl;
+
+            if(salvar()){
+                aux->save(output_file);
+            }
+
             break;
         } 
         //Árvore geradora mínima generalizada - algoritmo de Prim randomizado reativo
@@ -202,17 +146,25 @@ void selecionar(int selecao, Graph* graph, ofstream& output_file){
         {
             srand(time(0));
             int numIteracoes, bloco = 0;
-            cout << "Digite o número de iterações total" << endl;
+            cout << "Digite o numero de iteracoes total" << endl;
             cin >> numIteracoes;
-            cout << "Digite o número de iterações por bloco" << endl;
+            cout << "Digite o numero de iteracoes por bloco" << endl;
             cin >> bloco;
+
             float* alpha = new float[5]{0.5, 0.3, 0.15, 0.1, 0.05};
             auto start = high_resolution_clock::now();
-            graph->primReativoAGMG(alpha, 5, numIteracoes, bloco);
+
+            Graph *aux = graph->primReativoAGMG(alpha, 5, numIteracoes, bloco);
+
             auto stop = high_resolution_clock::now();
             auto duration = duration_cast<microseconds>(stop - start);
-            cout << "Tempo de execução da função: "
+            cout << "Tempo de execucao da funcao: "
                     << duration.count() / pow(10, 6) << " seconds" << endl;
+
+            if(salvar()){
+                aux->save(output_file);
+            }
+
             break;
         }
         default:

@@ -24,18 +24,6 @@ private:
     Node* first_node;
     Node* last_node;
 
-
-    //métodos auxiliares
-    void auxFTI(int id, int visited[]);
-    void auxFTD(int id, int visited[]);
-    void auxBuscaEmProfundidade(int id, int visited[], Graph* retorno);
-    bool auxaciclicoDirecionado(int id, int visited[], Graph* retorno, int order[]);
-    int findMinimumEdge(int visited[], int nodes[], int total_nodes);
-
-
-    //marcar arestas
-    void markEdge(int id, int target_id);
-
 public:
     //Constructor
     Graph(int order, bool directed, bool weighted_edge, bool weighted_node);
@@ -56,60 +44,32 @@ public:
     bool searchNode(int id);
     Node* getNode(int id);
 
-    //methods phase1
-    Graph* agmKruskal(int total_nodes, int nodes[]);
-    Graph* agmPrim(int total_nodes, int nodes[]);
-    Graph* floydMarshall(int idSource, int idTarget);
-    Graph* dijkstra(int idSource, int idTarget);
-    void directedTransitiveClosure(int id);
-    int procuraMenorDistancia(float *dist, int *visitado, int NV);//
-    Graph* FTI(int id);
-    Graph* FTD(int id);
-    Graph* BuscaEmProfundidade(int id);
-    Graph* aciclicoDirecionado();
-
-    //methods phase1
-    //float greed();
-    //float greedRandom();
-    //float greedRactiveRandom();
-
-
     //AGMG
     float auxPrimRandomizado(int initial_node, float alpha, int* parent, int* groups, int* node_groups);
     float auxPrimGuloso(int initial_node, int* parent, int* groups, int* node_groups, float* weights);
-    float auxPrimReativo(int* node_groups, float alpha, int max_iterations, int* doneiterations, double* weightFound);
-    void primReativoAGMG(float* alpha, int alpha_size, int iterations, int block);
-    float primRandomizadoAGMG(float alpha, int iterations);
-    void primGulosoAGMG();
+    float auxPrimReativo(int* node_groups, int* parent, int* best, float alpha, int max_iterations, int* doneiterations, double* weightFound);
+    Graph* primReativoAGMG(float* alpha, int alpha_size, int iterations, int block);
+    Graph* primRandomizadoAGMG(float alpha, int iterations);
+    Graph* primGulosoAGMG();
 
+    //meotodos statics e helpers
     Graph* ArrayToGraph(int* nodes, int total_nodes);
     float ArrayWeight(int* nodes, int total_nodes);
     int ArrayGroups(int* nodes, int total_nodes);
     bool nodeRange(int* parent, int* groups, int* node_groups, bool* nodes, float alpha, float* weights);
     int randEdge(int* parent, int* groups, int node);
     int randNode(bool* nodes);
-
-    //imprimir e salvar
-    void print();
-    void save(ofstream& output_file);
-
-    //static e helpers
-    bool isInList(int* list, int id);
-    Graph* listToGraph(int nodeList[]);
-    bool isInListPrim(int list[], int size, int id);
-    Graph* listToGraphTree(int size, int nodeList[]);
-    int getFromList(int list[], int size, int id);
     void insertNodeWithGroup(int id, int group);
     bool hasGroup(int groups[], int group);
     bool graphHasGroup(int group);
     bool addToGroup(int groups[], int group);
-
     int getTotalGroups() const;
-
     void setTotalGroups(int totalGroups);
+    void markEdge(int id, int target_id);
 
-private:
-    //Auxiliar methods
+    //imprimir e salvar
+    void print();
+    void save(ofstream& output_file);
 
 };
 
