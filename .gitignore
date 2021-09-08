@@ -5,8 +5,8 @@ grafo_1000_2.txt
 exemplo.txt
 grafo.txt
 teste
+teste_grafo.dot
 .vscode
-gmstInstances/
-output.dot
 input.txt
 exemplo.dot
+.idea/
