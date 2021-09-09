@@ -26,7 +26,7 @@ Graph* leituraAGMG(ifstream& input_file){
     float edgeWeight;
     int total_groups = 0;
 
-    while(getline(input_file, group) && !group.empty()){
+    while(getline(input_file, group) && !group.empty() && group != "\r" && group != "\n"){
 
         if(!graph->graphHasGroup(stoi(group))){
             total_groups++;
